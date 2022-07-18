@@ -111,7 +111,7 @@
     };
   };
 
-  home.file.".face".source="./logo.png";
+  home.file.".face".source=./logo.png;
 
   imports = [ ./dconf.nix ];
 }
