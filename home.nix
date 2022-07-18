@@ -115,7 +115,6 @@
   };
 
   home.file.".face".source=./logo.png;
-  home.file.".local/bin".source=./update;
 
   imports = [ ./dconf.nix ];
 }
