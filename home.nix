@@ -20,7 +20,7 @@
     gnome.gnome-tweaks
     gnome.gnome-shell-extensions
     gnomeExtensions.caffeine
-    gnomeExtensions.dash-to-dock
+    gnomeExtensions.floating-dock
     gnomeExtensions.alphabetical-app-grid
     gnomeExtensions.appindicator
     gnomeExtensions.compiz-windows-effect
@@ -112,9 +112,27 @@
   gtk = {
     enable = true;
     theme = {
-      name = "Layan-dark";
-      package = pkgs.layan-gtk-theme;
+      name = "Material-dark";
+      package = pkgs.materia-theme;
     };
+    cursorTheme = {
+      name="Bibata Modern Classic";
+      package=pkgs.bibata-cursors;
+    };
+    font = {
+      name = "Noto Sans Regular";
+      package = pkgs.noto-fonts;
+      size=11;
+    };
+    iconTheme = {
+      name="kora";
+      package=pkgs.kora-icon-theme;
+    };
+  };
+
+  qt={
+    enable=true;
+    platformTheme="gnome";
   };
 
   home.file.".face".source=./logo.png;
