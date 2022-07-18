@@ -133,7 +133,10 @@
   qt={
     enable=true;
     platformTheme="gnome";
-    style.name="adwaita-dark";
+    style={
+      name="adwaita-dark"
+      package=pkgs.adwaita-qt;
+    };
   };
 
   home.file.".face".source=./logo.png;
