@@ -20,7 +20,7 @@
     gnome.gnome-tweaks
     gnome.gnome-shell-extensions
     gnomeExtensions.caffeine
-    gnomeExtensions.floating-dock
+    gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
     gnomeExtensions.appindicator
     gnomeExtensions.compiz-windows-effect
@@ -34,7 +34,6 @@
     noto-fonts
     materia-theme
     bibata-cursors
-    kora-icon-theme
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
