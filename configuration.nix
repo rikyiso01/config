@@ -96,6 +96,7 @@
     isNormalUser = true;
     description = "riky";
     extraGroups = [ "networkmanager" "wheel" "docker" "vboxusers"];
+    shell=pkgs.zsh;
   };
 
   # Allow unfree packages
@@ -106,7 +107,6 @@
   environment.systemPackages = with pkgs; [
      micro
      lsof
-     git
    ];
 
    environment.gnome.excludePackages = (with pkgs; [
@@ -157,7 +157,8 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.05"; # Did you read the comment?
 
-  users.defaultUserShell = pkgs.zsh;
+  programs.zsh.enable=true;
+  programs.git.enable=true;
 
   programs.kdeconnect.enable = true;
   programs.kdeconnect.package = pkgs.gnomeExtensions.gsconnect;

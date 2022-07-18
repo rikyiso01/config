@@ -9,8 +9,6 @@
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
     vscode
-    bat
-    exa
     du-dust
     fd
     procs
@@ -29,11 +27,8 @@
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
     firefox-bin
-    docker
-    gh
     file
     marktext
-    dconf2nix
     roboto
     fira-code
     noto-fonts
@@ -69,6 +64,9 @@
   home.sessionPath = [ "$HOME/.local/bin" ];
 
   fonts.fontconfig.enable = true;
+  programs.bat.enable=true;
+  programs.exa.enable=true;
+  programs.gh.enable=true;
 
   programs.zsh = {
     enable=true;
