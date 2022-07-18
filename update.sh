@@ -11,7 +11,9 @@ MONITORED_SYSTEMS="$SYSTEM/configuration.nix"
 OLD_LOCAL="$(cat $MONITORED_LOCALS)"
 OLD_SYSTEM="$(cat $MONITORED_SYSTEMS)"
 
+git stash
 git -C "$LOCAL" pull
+git stash pop || true
 if [[ "$(cat $MONITORED_SYSTEMS)" != "$OLD_SYSTEMS" ]]
 then
     sudo git -C "$SYSTEM" pull
