@@ -119,11 +119,6 @@
       name="Bibata Modern Classic";
       package=pkgs.bibata-cursors;
     };
-    font = {
-      name = "Noto Sans Regular";
-      package = pkgs.noto-fonts;
-      size=11;
-    };
     iconTheme = {
       name="kora";
       package=pkgs.kora-icon-theme;
