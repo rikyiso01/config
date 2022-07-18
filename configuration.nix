@@ -18,7 +18,6 @@
                                           title Manjaro
                                           efi /EFI/Manjaro/grubx64.efi
                                         ''; };
-  nix.settings.auto-optimise-store = true;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
