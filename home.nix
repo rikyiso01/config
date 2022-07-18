@@ -34,6 +34,9 @@
     file
     marktext
     dconf2nix
+    roboto
+    fira-code
+    noto-fonts
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -64,6 +67,8 @@
   };
 
   home.sessionPath = [ "$HOME/.local/bin" ];
+
+  fonts.fontconfig.enable = true;
 
   programs.zsh = {
     enable=true;

@@ -157,24 +157,10 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.05"; # Did you read the comment?
 
-  programs.zsh = {
-    enable = true;
-    shellAliases = {
-      ll = "ls -l";
-      l = "ls -ahl";
-      ls = "ls --color=tty";
-    };
-  };
   users.defaultUserShell = pkgs.zsh;
 
   programs.kdeconnect.enable = true;
   programs.kdeconnect.package = pkgs.gnomeExtensions.gsconnect;
-
-  fonts.fonts = with pkgs; [
-    roboto
-    fira-code
-    noto-fonts
-  ];
 
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
