@@ -61,8 +61,9 @@
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
-    PATH = "$HOME/.local/bin:$PATH";
   };
+
+  home.sessionPath = [ "$HOME/.local/bin" ];
 
   programs.zsh = {
     enable=true;

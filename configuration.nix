@@ -163,7 +163,6 @@
       ll = "ls -l";
       l = "ls -ahl";
       ls = "ls --color=tty";
-      update = "sudo nixos-rebuild switch";
     };
   };
   users.defaultUserShell = pkgs.zsh;
