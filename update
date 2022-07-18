@@ -14,7 +14,7 @@ then
     sudo nixos-rebuild switch
 fi
 
-dconf dump / | dconf2nix > dconf.nix
+dconf dump / | dconf2nix > "$LOCAL/dconf.nix"
 
 git -C "$LOCAL" fetch
 if $(git -C "$LOCAL" rev-parse HEAD) != $(git -C "$LOCAL" rev-parse @{u})
