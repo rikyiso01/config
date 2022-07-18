@@ -32,6 +32,9 @@
     roboto
     fira-code
     noto-fonts
+    materia-theme
+    bibata-cursors
+    kora-icon-theme
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -108,22 +111,6 @@
   programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfree = true;
-
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Material-dark";
-      package = pkgs.materia-theme;
-    };
-    cursorTheme = {
-      name="Bibata Modern Classic";
-      package=pkgs.bibata-cursors;
-    };
-    iconTheme = {
-      name="kora";
-      package=pkgs.kora-icon-theme;
-    };
-  };
 
   qt={
     enable=true;
