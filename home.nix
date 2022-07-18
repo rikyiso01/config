@@ -63,7 +63,7 @@
 
   programs.zsh = {
     enable=true;
-    initExtra="source $HOME/.config/nixpkgs/.p10k.zsh";
+    initExtra="source $HOME/.config/nixpkgs/theme.zsh";
     shellAliases={
       update="sudo nixos-rebuild switch && ~/.config/nixpkgs/update.sh && home-manager switch";
       cat="bat";
