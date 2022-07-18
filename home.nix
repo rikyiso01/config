@@ -111,14 +111,6 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  gtk={
-    enable=true;
-    theme={
-      name="Material-dark";
-      package=pkgs.materia-theme;
-    };
-  };
-
   qt={
     enable=true;
     platformTheme="gnome";
