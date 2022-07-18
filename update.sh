@@ -7,13 +7,13 @@ cd "$(dirname $0)"
 SYSTEM='/etc/nixos'
 LOCAL="$HOME/.config/nixpkgs"
 MONITORED_LOCALS="$LOCAL/home.nix"
-MONITORED_SYSTEMS="$SYSTEM/configuration.nix"
+MONITORED_SYSTEMS="$LOCAL/configuration.nix"
 OLD_LOCALS="$(cat $MONITORED_LOCALS)"
 OLD_SYSTEMS="$(cat $MONITORED_SYSTEMS)"
 
-git -C "$LOCAL" stash
+git -C "$LOCAL" stash -q
 git -C "$LOCAL" pull
-git -C "$LOCAL" stash pop || true
+git -C "$LOCAL" stash pop -q || true
 if [[ "$(cat $MONITORED_SYSTEMS)" != "$OLD_SYSTEMS" ]]
 then
     sudo git -C "$SYSTEM" pull
