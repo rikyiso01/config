@@ -66,7 +66,8 @@
     enable=true;
     initExtra="source $HOME/.config/nixpkgs/theme.zsh";
     shellAliases={
-      update="sudo git -C /etc/nixos pull && sudo nixos-rebuild switch && git -C ~/.config/nixpkgs pull && ~/.config/nixpkgs/update.sh && home-manager switch";
+      update-home="git -C ~/.config/nixpkgs pull && ~/.config/nixpkgs/update.sh && home-manager switch";
+      update="sudo git -C /etc/nixos pull && sudo nixos-rebuild switch && update-home";
       cat="bat";
       ls="exa";
       du="dust";
