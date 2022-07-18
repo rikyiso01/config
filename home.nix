@@ -133,6 +133,7 @@
   qt={
     enable=true;
     platformTheme="gnome";
+    style.name="adwaita-dark";
   };
 
   home.file.".face".source=./logo.png;
