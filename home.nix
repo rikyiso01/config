@@ -61,13 +61,14 @@
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
-    PATH="$HOME/.local/bin:$PATH";
   };
 
   programs.zsh = {
     enable=true;
     initExtra="source $HOME/.config/nixpkgs/theme.zsh";
     shellAliases={
+      home-update="dconf dump / | dconf2nix > $HOME/.confix/nixpkgs/dconf.nix && git -C $HOME/.config/nixpkgs pull && home-manager switch";
+      update="sudo git -C /etc/nixos pull && sudo nixos-rebuild switch && update-home";
       cat="bat";
       ls="exa";
       du="dust";
