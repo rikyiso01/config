@@ -32,7 +32,6 @@
     roboto
     fira-code
     noto-fonts
-    layan-gtk-theme
     bibata-cursors
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -110,6 +109,14 @@
   programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfree = true;
+
+  gtk={
+    enable=true;
+    theme={
+      name="Layan-dark-solid";
+      package=pkgs.layan-gtk-theme;
+    };
+  };
 
   qt={
     enable=true;
