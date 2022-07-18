@@ -6,7 +6,6 @@ cd "$(dirname $0)"
 
 dconf dump / | dconf2nix > 'dconf.nix'
 
-git add dconf.nix
 git commit -am 'update dconf.nix'
 git push
 

@@ -33,6 +33,7 @@
     fira-code
     noto-fonts
     bibata-cursors
+    materia-theme
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -113,8 +114,8 @@
   gtk={
     enable=true;
     theme={
-      name="Layan-dark-solid";
-      package=pkgs.layan-gtk-theme;
+      name="Material-dark";
+      package=pkgs.materia-theme;
     };
   };
 

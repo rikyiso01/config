@@ -34,6 +34,8 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  services.xserver.desktopManager.xterm.enable = false;
+
   # Set your time zone.
   time.timeZone = "Europe/Rome";
 
