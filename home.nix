@@ -32,6 +32,8 @@
     docker
     gh
     file
+    marktext
+    dconf2nix
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -59,15 +61,13 @@
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
-    #GPG_TTY="$(tty)"
+    PATH="$HOME/.local/bin:$PATH";
   };
 
   programs.zsh = {
     enable=true;
     initExtra="source $HOME/.config/nixpkgs/theme.zsh";
     shellAliases={
-      update-home="git -C ~/.config/nixpkgs pull && ~/.config/nixpkgs/update.sh && home-manager switch";
-      update="sudo git -C /etc/nixos pull && sudo nixos-rebuild switch && update-home";
       cat="bat";
       ls="exa";
       du="dust";
@@ -114,6 +114,7 @@
   };
 
   home.file.".face".source=./logo.png;
+  home.file.".local/bin".source=./update;
 
   imports = [ ./dconf.nix ];
 }

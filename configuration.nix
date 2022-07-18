@@ -107,7 +107,6 @@
      micro
      lsof
      git
-     dconf2nix
    ];
 
    environment.gnome.excludePackages = (with pkgs; [
