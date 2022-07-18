@@ -31,6 +31,7 @@
     firefox-bin
     docker
     gh
+    file
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -65,7 +66,7 @@
     enable=true;
     initExtra="source $HOME/.config/nixpkgs/theme.zsh";
     shellAliases={
-      update="sudo nixos-rebuild switch && ~/.config/nixpkgs/update.sh && home-manager switch";
+      update="sudo git -C /etc/nixos pull && sudo nixos-rebuild switch && git -C ~/.config/nixpkgs pull && ~/.config/nixpkgs/update.sh && home-manager switch";
       cat="bat";
       ls="exa";
       du="dust";
