@@ -32,7 +32,7 @@
     roboto
     fira-code
     noto-fonts
-    materia-theme
+    layan-gtk-theme
     bibata-cursors
     (let 
       my-python-packages = python-packages: with python-packages; [
