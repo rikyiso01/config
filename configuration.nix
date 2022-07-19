@@ -14,11 +14,6 @@
       <nixos-hardware/common/cpu/intel>
     ];
 
-  boot.loader.systemd-boot.extraEntries = { "manjaro.conf" = ''
-                                          title Manjaro
-                                          efi /EFI/Manjaro/grubx64.efi
-                                        ''; };
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

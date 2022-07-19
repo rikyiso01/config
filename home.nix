@@ -43,6 +43,9 @@
       python-with-my-packages = python310.withPackages my-python-packages;
     in
     python-with-my-packages)
+
+    (retroarch.override { cores = with libretro; [ mupen64plus ]; })
+    libretro.mupen64plus
   ];
 
   programs.git = {
