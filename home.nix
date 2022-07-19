@@ -45,6 +45,7 @@
         scipy
         numpy
         plotly
+        dash
         matplotlib
         notebook
       ];
