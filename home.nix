@@ -48,6 +48,7 @@
         dash
         matplotlib
         notebook
+        black
       ];
       python-with-my-packages = python310.withPackages my-python-packages;
     in
