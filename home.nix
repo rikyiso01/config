@@ -39,6 +39,13 @@
         poetry
         pudb
         ipython
+        ipykernel
+        pandas
+        scipy
+        numpy
+        plotly
+        matplotlib
+        notebook
       ];
       python-with-my-packages = python310.withPackages my-python-packages;
     in
