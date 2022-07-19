@@ -72,6 +72,7 @@
   programs.bat.enable=true;
   programs.exa.enable=true;
   programs.gh.enable=true;
+  services.jupyter.enable=true;
 
   programs.zsh = {
     enable=true;
