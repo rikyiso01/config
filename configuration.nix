@@ -178,6 +178,7 @@
 
   services.jupyter= {
     enable=true;
+    user="riky";
     kernels={
       python3 = let
         env = (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [
