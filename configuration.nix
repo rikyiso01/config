@@ -182,7 +182,7 @@
     password="'sha1:1b961dc713fb:88483270a63e57d18d43cf337e629539de1436ba'";
     kernels={
       python3 = let
-        env = (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [
+        env = (pkgs.python310.withPackages (pythonPackages: with pythonPackages; [
                 ipykernel
                 pandas
                 scipy
@@ -200,8 +200,6 @@
           "{connection_file}"
         ];
         language = "python";
-        logo32 = /${env.sitePackages}/ipykernel/resources/logo-32x32.png;
-        logo64 = /${env.sitePackages}/ipykernel/resources/logo-64x64.png;
       };
     };
   };
