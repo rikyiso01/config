@@ -36,6 +36,7 @@
     materia-theme
     docker-compose
     nodejs
+    chromium
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
