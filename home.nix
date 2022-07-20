@@ -36,7 +36,7 @@
     materia-theme
     docker-compose
     nodejs
-    chromium
+    teams
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
