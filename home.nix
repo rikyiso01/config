@@ -35,6 +35,7 @@
     bibata-cursors
     materia-theme
     docker-compose
+    nodejs
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
