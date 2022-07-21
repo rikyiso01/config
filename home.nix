@@ -37,7 +37,6 @@
     docker-compose
     nodejs
     ungoogled-chromium
-    flutter
     gcc
     (let 
       my-python-packages = python-packages: with python-packages; [
