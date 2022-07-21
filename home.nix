@@ -89,7 +89,7 @@
   programs.zsh = {
     enable=true;
     initExtra="source $HOME/.config/nixpkgs/theme.zsh";
-    envExtra="export $PATH=$HOME/.local/bin:$PATH";
+    envExtra="PATH=$HOME/.local/bin:$PATH";
     shellAliases={
       cat="bat";
       ls="exa";
