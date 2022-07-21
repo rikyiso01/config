@@ -37,6 +37,7 @@
     docker-compose
     nodejs
     ungoogled-chromium
+    flutter
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
