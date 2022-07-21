@@ -26,7 +26,7 @@
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
-    brave
+    firefox-bin
     file
     marktext
     roboto
@@ -37,6 +37,7 @@
     docker-compose
     nodejs
     gcc
+    google-chrome
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
