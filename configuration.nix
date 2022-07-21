@@ -12,7 +12,6 @@
       <nixos-hardware/common/pc/laptop>
       <nixos-hardware/common/pc/laptop/acpi_call.nix>
       <nixos-hardware/common/cpu/intel>
-      ./nix-alien.nix
     ];
 
   # Bootloader.
@@ -176,6 +175,4 @@
   };
 
   programs.gnupg.agent.enable=true;
-
-  programs.nix-ld.enable = true;
 }
