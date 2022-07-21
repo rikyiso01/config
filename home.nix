@@ -36,6 +36,8 @@
     materia-theme
     docker-compose
     nodejs
+    ungoogled-chromium
+    chromedriver
     gcc
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -76,7 +78,7 @@
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
-    CHROME_EXECUTABLE="brave";
+    CHROME_EXECUTABLE="chrome";
   };
 
   home.sessionPath = ["$HOME/.local/flutter/bin"];
