@@ -38,7 +38,7 @@
     nodejs
     gcc
     chromedriver
-    ungoogled-chromium
+    google-chrome
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
