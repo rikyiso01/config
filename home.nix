@@ -40,6 +40,7 @@
     chromedriver
     gcc
     steam-run
+    pkg-config
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
