@@ -38,7 +38,6 @@
     nodejs
     gcc
     chromedriver
-    google-chrome
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -78,6 +77,7 @@
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
+    CHROME_EXECUTABLE="brave";
   };
 
   home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/flutter/bin"];
