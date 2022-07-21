@@ -38,7 +38,6 @@
     nodejs
     ungoogled-chromium
     chromedriver
-    gcc
     steam-run
     pkg-config
     clang
