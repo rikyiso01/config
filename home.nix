@@ -41,6 +41,9 @@
     gcc
     steam-run
     pkg-config
+    clang
+    cmake
+    ninja
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
