@@ -12,6 +12,7 @@
       <nixos-hardware/common/pc/laptop>
       <nixos-hardware/common/pc/laptop/acpi_call.nix>
       <nixos-hardware/common/cpu/intel>
+      ./nix-alien.nix
     ];
 
   # Bootloader.
