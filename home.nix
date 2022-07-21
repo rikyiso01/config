@@ -8,7 +8,6 @@
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
-    vscode
     du-dust
     fd
     procs
@@ -111,6 +110,13 @@
       enable = true;
       plugins = [ "git" "sudo"];
     };
+  };
+
+  programs.vscode = {
+    enable = true;
+    extensions = with pkgs.vscode-extensions; [
+      ms-vscode.cpptools
+    ];
   };
 
   # This value determines the Home Manager release that your
