@@ -6,13 +6,6 @@ let
   ) { };
 in
 {
-  # Optional, but this is needed for `nix-alien-ld` command
-  # See https://github.com/Mic92/nix-ld#installation for how to setup `nix-ld`
-  # channel
-  imports = [
-    <nix-ld/modules/nix-ld.nix>
-  ];
-
   environment.systemPackages = with nix-alien-pkgs; [
     nix-alien
     nix-index-update
