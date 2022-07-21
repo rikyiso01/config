@@ -79,7 +79,7 @@
     CHROME_EXECUTABLE="brave";
   };
 
-  home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/flutter/bin"];
+  home.sessionPath = ["$HOME/.local/flutter/bin"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
@@ -89,6 +89,7 @@
   programs.zsh = {
     enable=true;
     initExtra="source $HOME/.config/nixpkgs/theme.zsh";
+    envExtra="export $PATH=$HOME/.local/bin:$PATH";
     shellAliases={
       cat="bat";
       ls="exa";
