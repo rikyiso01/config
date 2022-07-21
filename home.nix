@@ -39,6 +39,7 @@
     ungoogled-chromium
     chromedriver
     gcc
+    steam-run
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
