@@ -79,7 +79,7 @@
     NIXOS_OZONE_WL = "1";
   };
 
-  home.sessionPath = [ "$HOME/.local/bin" ];
+  home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/flutter/bin"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
