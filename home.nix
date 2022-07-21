@@ -78,7 +78,7 @@
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
-    CHROME_EXECUTABLE="chrome";
+    CHROME_EXECUTABLE="chromium";
   };
 
   home.sessionPath = ["$HOME/.local/bin" "$HOME/.local/flutter/bin"];
