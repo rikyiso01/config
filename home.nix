@@ -37,6 +37,7 @@
     docker-compose
     nodejs
     gcc
+    chromedriver
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
