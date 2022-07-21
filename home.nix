@@ -43,6 +43,7 @@
     clang
     cmake
     ninja
+    android-studio
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
