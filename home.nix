@@ -44,7 +44,6 @@
     cmake
     ninja
     android-studio
-    gparted
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
