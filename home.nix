@@ -44,7 +44,6 @@
     cmake
     ninja
     android-studio
-    etcher
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
