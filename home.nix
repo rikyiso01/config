@@ -63,8 +63,9 @@
     in
     python-with-my-packages)
 
-    (retroarch.override { cores = with libretro; [ mupen64plus ]; })
+    (retroarch.override { cores = with libretro; [ mupen64plus dolphin ]; })
     libretro.mupen64plus
+    libretro.dolphin
   ];
 
   programs.git = {
