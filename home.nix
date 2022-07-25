@@ -153,8 +153,8 @@ rec {
     };
   };
 
-  home.file.".face".target=./.config/nixpkgs/logo.png;
-  home.file.".local/bin/update".target=./.config/nixpkgs/update.sh;
+  home.file.".face".target=".config/nixpkgs/logo.png";
+  home.file.".local/bin/update".target=".config/nixpkgs/update.sh";
 
   imports = [ ./dconf.nix ];
 
