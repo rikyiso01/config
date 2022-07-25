@@ -1,10 +1,20 @@
 { config, pkgs, ... }:
 
 {
+
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "riky";
   home.homeDirectory = "/home/riky";
+
+  nixpkgs.overlays = [
+    (
+      self: super:
+      {
+        chromedriver-brave = super.callPackage /${home.homeDirectory}/.config/nixpkgs/chromedriver.nix {}; # path containing default.nix
+      }
+    )
+  ];
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
@@ -36,14 +46,13 @@
     materia-theme
     docker-compose
     nodejs
-    ungoogled-chromium
-    chromedriver
     steam-run
     pkg-config
     clang
     cmake
     ninja
     android-studio
+    chromedriver-brave
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
