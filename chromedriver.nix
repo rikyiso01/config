@@ -30,6 +30,8 @@ in stdenv.mkDerivation rec {
 
   installPhase = ''
     install -m755 -D chromedriver $out/bin/chromedriver
+    printf "#!/bin/bash\nbrave" > tmp.sh
+    install -m755 -D tmp.sh $out/bin/chromium
   '' + lib.optionalString (!stdenv.isDarwin) ''
     patchelf --set-interpreter ${glibc.out}/lib/ld-linux-x86-64.so.2 $out/bin/chromedriver
     wrapProgram "$out/bin/chromedriver" --prefix LD_LIBRARY_PATH : "${libs}"
