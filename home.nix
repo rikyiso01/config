@@ -11,7 +11,7 @@ rec {
     (
       self: super:
       {
-        chromedriver-brave = super.callPackage /${home.homeDirectory}/.config/nixpkgs/chromedriver.nix {};
+        chromedriver-brave = super.callPackage /${home.homeDirectory}/.config/nixpkgs/chromedriver.nix {}; # path containing default.nix
       }
     )
   ];
@@ -153,8 +153,8 @@ rec {
     };
   };
 
-  home.file.".face".target=".config/nixpkgs/logo.png";
-  home.file.".local/bin/update".target=".config/nixpkgs/update.sh";
+  home.file.".face".source=./logo.png;
+  home.file.".local/bin/update".source=./update.sh;
 
   imports = [ ./dconf.nix ];
 
