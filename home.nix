@@ -148,4 +148,9 @@
   home.file.".local/bin/update".source=./update.sh;
 
   imports = [ ./dconf.nix ];
+
+  services.home-manager.autoUpgrade={
+    enable=true;
+    frequency="weekly";
+  };
 }
