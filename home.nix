@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 
-{
+rec {
 
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
@@ -11,7 +11,7 @@
     (
       self: super:
       {
-        chromedriver-brave = super.callPackage /home/riky/.config/nixpkgs/chromedriver.nix {}; # path containing default.nix
+        chromedriver-brave = super.callPackage /${home.homeDirectory}/.config/nixpkgs/chromedriver.nix {};
       }
     )
   ];
@@ -153,8 +153,8 @@
     };
   };
 
-  home.file.".face".source=./logo.png;
-  home.file.".local/bin/update".source=./update.sh;
+  home.file.".face".target=.config/nixpkgs/logo.png;
+  home.file.".local/bin/update".target=.config/nixpkgs/update.sh;
 
   imports = [ ./dconf.nix ];
 
