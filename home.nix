@@ -11,7 +11,7 @@
     (
       self: super:
       {
-        chromedriver-brave = super.callPackage /${home.homeDirectory}/.config/nixpkgs/chromedriver.nix {}; # path containing default.nix
+        chromedriver-brave = super.callPackage /home/riky/.config/nixpkgs/chromedriver.nix {}; # path containing default.nix
       }
     )
   ];
