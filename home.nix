@@ -55,6 +55,7 @@ rec {
     chromedriver-brave
     lutris
     wine64
+    xdelta3
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
