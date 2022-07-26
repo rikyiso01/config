@@ -53,6 +53,8 @@ rec {
     ninja
     android-studio
     chromedriver-brave
+    lutris
+    wine64
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
