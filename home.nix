@@ -53,7 +53,7 @@ rec {
     ninja
     android-studio
     chromedriver-brave
-    lutris
+    lutris-original
     wineWowPackages.stable
     winetricks
     openssl
