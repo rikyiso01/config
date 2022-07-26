@@ -55,7 +55,6 @@ rec {
     chromedriver-brave
     lutris
     wine
-    wine64
     winetricks
     (let 
       my-python-packages = python-packages: with python-packages; [
