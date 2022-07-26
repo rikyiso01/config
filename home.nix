@@ -56,6 +56,7 @@ rec {
     lutris
     wine
     winetricks
+    openssl
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
