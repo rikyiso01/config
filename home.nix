@@ -54,8 +54,9 @@ rec {
     android-studio
     chromedriver-brave
     lutris
+    wine
     wine64
-    xdelta3
+    winetricks
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
