@@ -54,7 +54,7 @@ rec {
     android-studio
     chromedriver-brave
     lutris
-    wine64
+    wineWowPackages.stable
     winetricks
     openssl
     (let 
