@@ -57,7 +57,6 @@ rec {
     wineWowPackages.stable
     winetricks
     openssl
-    playonlinux
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
