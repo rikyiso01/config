@@ -167,7 +167,7 @@
   virtualisation.virtualbox.host.enable = true;
   # virtualisation.virtualbox.host.enableExtensionPack = true;
 
-  services.flatpak.enable = true;
+  # services.flatpak.enable = true;
 
 
   nix.gc = {
