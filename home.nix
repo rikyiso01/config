@@ -57,6 +57,7 @@ rec {
     wineWowPackages.stable
     winetricks
     openssl
+    godot
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
