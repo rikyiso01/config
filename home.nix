@@ -36,7 +36,7 @@ rec {
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
-    # brave
+    brave
     file
     marktext
     roboto
