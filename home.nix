@@ -36,7 +36,6 @@ rec {
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
-    brave
     file
     marktext
     roboto
@@ -107,6 +106,17 @@ rec {
   programs.bat.enable=true;
   programs.exa.enable=true;
   programs.gh.enable=true;
+
+  programs.chromium = {
+    enable=true;
+    package=pkgs.brave;
+    extensions=[
+      {id="nngceckbapebfimnlniiiahkandclblb";}
+      {id="eimadpbcbfnmbkopoojfekhnkhdbieeh";}
+      {id="dbfmnekepjoapopniengjbcpnbljalfg";}
+      {id="ldgfbffkinooeloadekpmfoklnobpien";}
+    ];
+  };
 
   programs.zsh = {
     enable=true;
