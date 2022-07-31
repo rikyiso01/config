@@ -26,3 +26,5 @@ if [[ "$(cat $MONITORED_LOCALS)" != "$OLD_LOCALS" ]]
 then
     home-manager switch
 fi
+
+$LOCAL/flatpak.sh

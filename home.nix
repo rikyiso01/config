@@ -28,7 +28,7 @@ rec {
     curl
     dconf2nix
     gnome.gnome-tweaks
-    gnome.gnome-shell-extensions
+    #gnome.gnome-shell-extensions
     gnomeExtensions.caffeine
     gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
@@ -37,7 +37,7 @@ rec {
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
     file
-    marktext
+    #marktext
     roboto
     fira-code
     noto-fonts
@@ -69,9 +69,9 @@ rec {
     in
     python-with-my-packages)
 
-    (retroarch.override { cores = with libretro; [ mupen64plus dolphin ]; })
+    /*(retroarch.override { cores = with libretro; [ mupen64plus dolphin ]; })
     libretro.mupen64plus
-    libretro.dolphin
+    libretro.dolphin*/
   ];
 
   programs.git = {

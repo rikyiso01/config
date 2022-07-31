@@ -108,6 +108,9 @@
 
    environment.gnome.excludePackages = (with pkgs; [
      gnome-photos
+     baobab
+     evince
+     gnome-text-editor
    ]) ++ (with pkgs.gnome; [
      cheese # webcam tool
      gnome-music
@@ -125,6 +128,13 @@
      gnome-calendar
      gnome-calculator
      simple-scan
+     file-roller
+     gnome-characters
+     gnome-connections
+     gnome-font-viewer
+     eog
+     gnome-logs
+     seahorse
    ]);
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -183,17 +193,4 @@
     enable=true;
     dates="weekly";
   };
-
-  networking.extraHosts=''
-    # Genshin logging servers (do not remove!)
-    0.0.0.0 overseauspider.yuanshen.com
-    0.0.0.0 log-upload-os.hoyoverse.com
-
-    # Optional Unity proxy/cdn servers
-    0.0.0.0 prd-lender.cdp.internal.unity3d.com
-    0.0.0.0 thind-prd-knob.data.ie.unity3d.com
-    0.0.0.0 thind-gke-usc.prd.data.corp.unity3d.com
-    0.0.0.0 cdp.cloud.unity3d.com
-    0.0.0.0 remote-config-proxy-prd.uca.cloud.unity3d.com
-  '';
 }
