@@ -51,8 +51,7 @@ rec {
     chromedriver-brave
     lutris
     godot
-    dolphin-emu
-    mupen64plus
+    gamemode
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
