@@ -51,7 +51,6 @@ rec {
     chromedriver-brave
     lutris
     godot
-    gamemode
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
