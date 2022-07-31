@@ -50,13 +50,14 @@ rec {
     clang
     cmake
     ninja
+    gtk3
     android-studio
     chromedriver-brave
     lutris
-    wineWowPackages.stable
-    winetricks
     openssl
     godot
+    dolphin-emu
+    mupen64plus
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
