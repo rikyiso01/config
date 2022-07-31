@@ -49,7 +49,6 @@ rec {
     gcc
     android-studio
     chromedriver-brave
-    lutris
     godot
     (let 
       my-python-packages = python-packages: with python-packages; [
