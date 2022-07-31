@@ -46,15 +46,10 @@ rec {
     docker-compose
     nodejs
     steam-run
-    pkg-config
-    clang
-    cmake
-    ninja
-    gtk3
+    gcc
     android-studio
     chromedriver-brave
     lutris
-    openssl
     godot
     dolphin-emu
     mupen64plus
