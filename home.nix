@@ -18,7 +18,7 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
-    vscodium-fhs
+    vscode
     du-dust
     fd
     procs
