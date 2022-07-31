@@ -151,7 +151,7 @@ rec {
   home.file.".face".source=./logo.png;
   home.file.".local/bin/update".source=./update.sh;
   home.file.".local/bin/chromium"={
-    text="#!/usr/bin/env bash\nexec brave $@";
+    text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
     executable=true;
   };
 
