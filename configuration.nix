@@ -111,6 +111,7 @@
      baobab
      evince
      gnome-text-editor
+     gnome-connections
    ]) ++ (with pkgs.gnome; [
      cheese # webcam tool
      gnome-music
@@ -130,7 +131,6 @@
      simple-scan
      file-roller
      gnome-characters
-     gnome-connections
      gnome-font-viewer
      eog
      gnome-logs
