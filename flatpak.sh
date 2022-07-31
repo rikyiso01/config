@@ -18,7 +18,7 @@ org.gnome.TextEditor
 com.brave.Browser
 "
 
-flatpak install --or-update flathub $flathub
+flatpak install --or-update -y flathub $flathub
 
 flatpak remote-add --if-not-exists launcher.moe https://gol.launcher.moe/gol.launcher.moe.flatpakrepo
 flatpak install --or-update launcher.moe com.gitlab.KRypt0n_.an-anime-game-launcher
