@@ -7,14 +7,14 @@ rec {
   home.username = "riky";
   home.homeDirectory = "/home/riky";
 
-  nixpkgs.overlays = [
+  /*nixpkgs.overlays = [
     (
       self: super:
       {
         chromedriver-brave = super.callPackage /${home.homeDirectory}/.config/nixpkgs/chromedriver.nix {}; # path containing default.nix
       }
     )
-  ];
+  ];*/
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
@@ -28,7 +28,6 @@ rec {
     curl
     dconf2nix
     gnome.gnome-tweaks
-    #gnome.gnome-shell-extensions
     gnomeExtensions.caffeine
     gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
@@ -37,7 +36,6 @@ rec {
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
     file
-    #marktext
     roboto
     fira-code
     noto-fonts
@@ -48,7 +46,7 @@ rec {
     steam-run
     gcc
     android-studio
-    chromedriver-brave
+    chromedriver
     godot
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -99,17 +97,6 @@ rec {
   programs.bat.enable=true;
   programs.exa.enable=true;
   programs.gh.enable=true;
-
-  programs.chromium = {
-    enable=true;
-    package=pkgs.brave;
-    extensions=[
-      {id="nngceckbapebfimnlniiiahkandclblb";}
-      {id="eimadpbcbfnmbkopoojfekhnkhdbieeh";}
-      {id="dbfmnekepjoapopniengjbcpnbljalfg";}
-      {id="ldgfbffkinooeloadekpmfoklnobpien";}
-    ];
-  };
 
   programs.zsh = {
     enable=true;
@@ -163,6 +150,10 @@ rec {
 
   home.file.".face".source=./logo.png;
   home.file.".local/bin/update".source=./update.sh;
+  home.file.".local/bin/chromium"={
+    text="#!/usr/bin/env bash\nexec brave $@";
+    executable=true;
+  };
 
   imports = [ ./dconf.nix ];
 
