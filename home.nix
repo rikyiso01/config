@@ -49,7 +49,6 @@ rec {
     android-studio
     chromedriver
     godot
-    flatpak-builder
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
