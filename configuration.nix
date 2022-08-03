@@ -129,9 +129,7 @@
      gnome-calculator
      simple-scan
      file-roller
-     gnome-font-viewer
      eog
-     gnome-logs
      seahorse
    ]);
 
