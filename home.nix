@@ -151,10 +151,14 @@ rec {
 
   home.file.".face".source=./logo.png;
   home.file.".local/bin/update".source=./update.sh;
-  /*home.file.".local/bin/chromium"={
+  home.file.".local/bin/chromium"={
     text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
     executable=true;
-  };*/
+  };
+  home.file.".local/flatpak/chromium"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host flatpak run com.brave.Browser $@";
+    executable=true;
+  };
 
   imports = [ ./dconf.nix ];
 
