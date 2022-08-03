@@ -159,6 +159,10 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host flatpak run com.brave.Browser $@";
     executable=true;
   };
+  home.file.".local/flatpak/git"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host git $@";
+    executable=true;
+  };
 
   imports = [ ./dconf.nix ];
 
