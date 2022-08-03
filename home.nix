@@ -7,19 +7,9 @@ rec {
   home.username = "riky";
   home.homeDirectory = "/home/riky";
 
-  /*nixpkgs.overlays = [
-    (
-      self: super:
-      {
-        chromedriver-brave = super.callPackage /${home.homeDirectory}/.config/nixpkgs/chromedriver.nix {}; # path containing default.nix
-      }
-    )
-  ];*/
-
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
     vscode
-    ungoogled-chromium
     du-dust
     fd
     procs
@@ -46,9 +36,7 @@ rec {
     nodejs
     steam-run
     gcc
-    android-studio
     chromedriver
-    godot
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -67,10 +55,6 @@ rec {
       python-with-my-packages = python310.withPackages my-python-packages;
     in
     python-with-my-packages)
-
-    /*(retroarch.override { cores = with libretro; [ mupen64plus dolphin ]; })
-    libretro.mupen64plus
-    libretro.dolphin*/
   ];
 
   programs.git = {
