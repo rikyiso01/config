@@ -15,12 +15,16 @@ com.github.tchx84.Flatseal
 org.gnome.Evince
 org.gnome.FileRoller
 org.gnome.Shotwell
-org.gnome.seahorse.Application
 "
 
 if [ ! -d "$HOME/.local/share/fonts" ]
 then
     ln -s "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
+fi
+
+if [ ! -d "$HOME/.themes" ]
+then
+    ln -s "$HOME/.nix-profile/share/themes" "$HOME/.themes"
 fi
 
 flatpak install --or-update -y flathub $flathub

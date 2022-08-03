@@ -38,6 +38,10 @@ rec {
     gcc
     chromedriver
     gnome-text-editor
+    gnome.seahorse
+    baobab
+    gnome.gnome-characters
+    gnome.gnome-logs
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry

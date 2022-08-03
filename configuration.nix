@@ -111,6 +111,7 @@
      gnome-connections
      evince
      gnome-text-editor
+     baobab
    ]) ++ (with pkgs.gnome; [
      cheese # webcam tool
      gnome-music
@@ -131,6 +132,8 @@
      file-roller
      eog
      seahorse
+     gnome-characters
+     gnome-logs
    ]);
 
   # Some programs need SUID wrappers, can be configured further or are
