@@ -147,6 +147,10 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host git $@";
     executable=true;
   };
+  home.file.".local/flatpak/python"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host python $@";
+    executable=true;
+  };
 
   imports = [ ./dconf.nix ];
 

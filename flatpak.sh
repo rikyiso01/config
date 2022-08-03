@@ -11,7 +11,17 @@ com.brave.Browser
 com.vscodium.codium
 org.godotengine.Godot
 com.google.AndroidStudio
+com.github.tchx84.Flatseal
+org.gnome.Evince
+org.gnome.FileRoller
+org.gnome.Shotwell
+org.gnome.seahorse.Application
 "
+
+if [ ! -d "$HOME/.local/share/fonts" ]
+then
+    ln -s "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
+fi
 
 flatpak install --or-update -y flathub $flathub
 
