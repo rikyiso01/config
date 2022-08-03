@@ -109,6 +109,8 @@
    environment.gnome.excludePackages = (with pkgs; [
      gnome-photos
      gnome-connections
+     evince
+     gnome-text-editor
    ]) ++ (with pkgs.gnome; [
      cheese # webcam tool
      gnome-music
@@ -126,6 +128,11 @@
      gnome-calendar
      gnome-calculator
      simple-scan
+     file-roller
+     gnome-font-viewer
+     eog
+     gnome-logs
+     seahorse
    ]);
 
   # Some programs need SUID wrappers, can be configured further or are

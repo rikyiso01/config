@@ -9,6 +9,8 @@ com.github.marktext.marktext
 org.libretro.RetroArch
 com.brave.Browser
 com.vscodium.codium
+org.godotengine.Godot
+com.google.AndroidStudio
 "
 
 flatpak install --or-update -y flathub $flathub
