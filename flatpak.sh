@@ -5,6 +5,7 @@ set -e
 fix()
 {
     grep -v 'DBusActivatable=true' < "$HOME/.local/share/flatpak/exports/share/applications/$1.desktop" > "$HOME/.local/share/applications/$1.desktop"
+    chmod +x "$HOME/.local/share/applications/$1.desktop"
 }
 
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -21,6 +22,10 @@ org.gnome.Evince
 org.gnome.FileRoller
 org.gnome.Shotwell
 org.gnome.baobab
+org.gnome.TextEditor
+org.gnome.seahorse.Application
+org.gnome.Characters
+org.gnome.Logs
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -36,6 +41,12 @@ fi
 flatpak install --user --or-update -y flathub $flathub
 
 fix 'org.gnome.baobab'
+fix 'org.gnome.FileRoller'
+fix 'org.gnome.TextEditor'
+fix 'org.gnome.seahorse.Application'
+fix 'org.gnome.Characters'
+fix 'org.gnome.Logs'
+
 
 flatpak override com.vscodium.codium --user --env=PATH=$HOME/.local/flatpak:/usr/bin:/app/bin
 flatpak override --user --filesystem=$HOME/.themes:ro

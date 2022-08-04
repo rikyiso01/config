@@ -37,10 +37,6 @@ rec {
     steam-run
     gcc
     chromedriver
-    gnome-text-editor
-    gnome.seahorse
-    gnome.gnome-characters
-    gnome.gnome-logs
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
