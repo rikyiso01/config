@@ -39,7 +39,6 @@ rec {
     chromedriver
     gnome-text-editor
     gnome.seahorse
-    baobab
     gnome.gnome-characters
     gnome.gnome-logs
     (let 
