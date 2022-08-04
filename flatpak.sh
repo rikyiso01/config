@@ -54,7 +54,7 @@ fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
 
 add-wayland 'com.vscodium.codium'
-
+add-wayland 'com.vscodium.codium-url-handler'
 
 
 flatpak override 'com.vscodium.codium' --user --env=PATH=$HOME/.local/flatpak:/usr/bin:/app/bin
