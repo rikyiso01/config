@@ -8,7 +8,13 @@ fix()
     chmod +x "$HOME/.local/share/applications/$1.desktop"
 }
 
-flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+add-wayland()
+{
+    sed 's/Exec=.*/& --enable-features=UseOzonePlatform --ozone-platform=wayland/g' < "$HOME/.local/share/flatpak/exports/share/applications/$1.desktop" > "$HOME/.local/share/applications/$1.desktop"
+    chmod +x "$HOME/.local/share/applications/$1.desktop"
+}
+
+flatpak remote-add --user --if-not-exists flathub 'https://flathub.org/repo/flathub.flatpakrepo'
 
 flathub='
 com.github.marktext.marktext
@@ -47,9 +53,12 @@ fix 'org.gnome.seahorse.Application'
 fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
 
+add-wayland 'com.vscodium.codium'
 
-flatpak override com.vscodium.codium --user --env=PATH=$HOME/.local/flatpak:/usr/bin:/app/bin
+
+
+flatpak override 'com.vscodium.codium' --user --env=PATH=$HOME/.local/flatpak:/usr/bin:/app/bin
 flatpak override --user --filesystem=$HOME/.themes:ro
 
-flatpak remote-add --user --if-not-exists launcher.moe https://gol.launcher.moe/gol.launcher.moe.flatpakrepo
-flatpak install --user --or-update launcher.moe com.gitlab.KRypt0n_.an-anime-game-launcher
+flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
+flatpak install --user --or-update launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
