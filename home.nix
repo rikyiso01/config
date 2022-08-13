@@ -66,7 +66,7 @@ rec {
   	  key="riky.isola@gmail.com";
   	  signByDefault=true;
   	};
-    extraConfig={"init.defaultBranch"="main";};
+    extraConfig={init.defaultBranch="main";};
   };
 
   home.sessionVariables = {
