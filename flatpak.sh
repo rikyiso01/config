@@ -32,6 +32,13 @@ org.gnome.TextEditor
 org.gnome.seahorse.Application
 org.gnome.Characters
 org.gnome.Logs
+com.github.tchx84.Flatseal
+org.gnome.dfeet
+
+
+org.gnome.Platform.Compat.i386
+org.freedesktop.Platform.GL32.default
+org.freedesktop.Platform.GL.default
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -64,3 +71,6 @@ flatpak override 'com.brave.Browser' --user --filesystem=$HOME/.local/downloadhe
 
 flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
 flatpak install --user --or-update launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
+
+flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
+flatpak install --user --or-update flathub-beta 'net.lutris.Lutris'
