@@ -34,11 +34,6 @@ org.gnome.Characters
 org.gnome.Logs
 com.github.tchx84.Flatseal
 org.gnome.dfeet
-
-
-org.gnome.Platform.Compat.i386
-org.freedesktop.Platform.GL32.default
-org.freedesktop.Platform.GL.default
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -74,3 +69,5 @@ flatpak install --user --or-update launcher.moe 'com.gitlab.KRypt0n_.an-anime-ga
 
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
 flatpak install --user --or-update flathub-beta 'net.lutris.Lutris'
+
+flatpak update
