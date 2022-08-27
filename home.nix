@@ -65,10 +65,13 @@ rec {
   	userName="rikyiso01";
   	userEmail="riky.isola@gmail.com";
   	signing={
-  	  key="riky.isola@gmail.com";
+  	  key="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
   	  signByDefault=true;
   	};
-    extraConfig={init.defaultBranch="main";};
+    extraConfig={
+      init.defaultBranch="main";
+      gpg.format="ssh";
+    };
   };
 
   home.sessionVariables = {
