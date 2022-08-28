@@ -34,6 +34,9 @@ org.gnome.Characters
 org.gnome.Logs
 com.github.tchx84.Flatseal
 org.gnome.dfeet
+org.videolan.VLC
+org.gnome.Geary
+org.gnome.Calendar
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
