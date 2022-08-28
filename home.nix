@@ -37,6 +37,7 @@ rec {
     steam-run
     gcc
     chromedriver
+    ffmpeg
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
