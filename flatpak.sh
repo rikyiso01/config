@@ -57,6 +57,8 @@ fix 'org.gnome.TextEditor'
 fix 'org.gnome.seahorse.Application'
 fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
+fix 'org.gnome.Geary'
+fix 'org.gnome.Calendar'
 
 add-wayland 'com.vscodium.codium'
 add-wayland 'com.vscodium.codium-url-handler'
