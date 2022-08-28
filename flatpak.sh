@@ -36,6 +36,7 @@ com.github.tchx84.Flatseal
 org.gnome.dfeet
 org.videolan.VLC
 org.gnome.Geary
+org.gimp.GIMP
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
