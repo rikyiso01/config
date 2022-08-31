@@ -160,7 +160,7 @@ rec {
     executable=true;
   };
 
-  imports = [ ./dconf.nix ];
+  #imports = [ ./dconf.nix ];
 
   services.home-manager.autoUpgrade={
     enable=true;
