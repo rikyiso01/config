@@ -37,6 +37,7 @@ org.gnome.dfeet
 org.videolan.VLC
 org.gnome.Geary
 org.gimp.GIMP
+org.gnome.Totem
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -58,6 +59,7 @@ fix 'org.gnome.seahorse.Application'
 fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
 fix 'org.gnome.Geary'
+fix 'org.gnome.Totem'
 
 add-wayland 'com.vscodium.codium'
 add-wayland 'com.vscodium.codium-url-handler'
