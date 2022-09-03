@@ -135,6 +135,7 @@
      seahorse
      gnome-characters
      gnome-logs
+     gnome-software
    ]);
 
   # Some programs need SUID wrappers, can be configured further or are
