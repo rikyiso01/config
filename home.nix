@@ -39,7 +39,7 @@ rec {
     gcc
     chromedriver
     ffmpeg
-    secret-tool
+    libsecret
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
