@@ -174,7 +174,7 @@ rec {
     executable=true;
   };
   home.file.".config/autostart"={
-    text="[Desktop Entry]\nExec=keepass"
+    text="[Desktop Entry]\nExec=keepass";
     executable=true;
   };
 
