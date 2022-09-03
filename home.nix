@@ -26,6 +26,7 @@ rec {
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
+    gnomeExtensions.gsconnect
     file
     roboto
     fira-code

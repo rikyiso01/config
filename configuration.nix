@@ -170,8 +170,7 @@
 
   programs.gamemode.enable=true;
 
-  programs.kdeconnect.enable = true;
-  programs.kdeconnect.package = pkgs.gnomeExtensions.gsconnect;
+  network.firewall.enable=false;
 
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
