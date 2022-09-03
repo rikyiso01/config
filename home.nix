@@ -164,7 +164,7 @@ rec {
     executable=true;
   };
   home.file.".local/flatpak/downloadhelper"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host /home/riky/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run ${home.homeDirectory}/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
   };
 

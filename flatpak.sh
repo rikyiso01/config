@@ -65,10 +65,12 @@ add-wayland 'com.vscodium.codium'
 add-wayland 'com.vscodium.codium-url-handler'
 
 
-flatpak override 'com.vscodium.codium' --user --env=PATH=$HOME/.local/flatpak:/usr/bin:/app/bin
-flatpak override --user --filesystem=$HOME/.themes:ro
+flatpak override 'com.vscodium.codium' --user --env="PATH=$HOME/.local/flatpak:/usr/bin:/app/bin"
+flatpak override --user --filesystem='~/.themes:ro'
 
-flatpak override 'com.brave.Browser' --user --filesystem=$HOME/.local/downloadhelper:ro
+flatpak override 'com.brave.Browser' --user --filesystem='~/.local/flatpak:ro'
+flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
+flatpak override 'com.brave.Browser' --user --talk-name='org.freedesktop.Flatpak'
 
 flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
 flatpak install --user --or-update launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
