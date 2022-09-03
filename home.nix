@@ -159,6 +159,14 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host python $@";
     executable=true;
   };
+  home.file.".local/flatpak/keepassxc"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host flatpak run org.keepassxc.KeePassXC $@";
+    executable=true;
+  };
+  home.file.".local/flatpak/downloadhelper"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host /home/riky/.local/downloadhelper/bin/downloadhelper $@";
+    executable=true;
+  };
 
   #imports = [ ./dconf.nix ];
 
