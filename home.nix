@@ -38,6 +38,7 @@ rec {
     gcc
     chromedriver
     ffmpeg
+    keepassxc
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
