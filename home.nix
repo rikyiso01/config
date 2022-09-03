@@ -174,7 +174,7 @@ rec {
     executable=true;
   };
   home.file.".config/autostart/keepass.desktop"={
-    text="[Desktop Entry]\nName=keepass\nExec=${home.homeDirectory}/.local/bin/keepass";
+    text="[Desktop Entry]\nName=keepass\nExec=${home.homeDirectory}/.local/bin/keepass\nType=Application";
     executable=true;
   };
 
