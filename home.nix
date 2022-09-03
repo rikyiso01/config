@@ -9,7 +9,6 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
-    vscode
     du-dust
     fd
     procs
@@ -161,24 +160,13 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host python $@";
     executable=true;
   };
-  home.file.".local/flatpak/keepassxc"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host flatpak run org.keepassxc.KeePassXC $@";
-    executable=true;
-  };
   home.file.".local/flatpak/downloadhelper"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
   };
-  home.file.".local/bin/keepass"={
-    text="#!/usr/bin/env bash\nnohup secret-tool lookup keepass keepass | org.keepassxc.KeePassXC --pw-stdin $HOME/Sync/keepass.kdbx > /dev/null &";
-    executable=true;
+  home.file.".local/share/applications/micro.desktop"={
+    text="";
   };
-  home.file.".config/autostart/keepass.desktop"={
-    text="[Desktop Entry]\nName=keepass\nExec=${home.homeDirectory}/.local/bin/keepass\nType=Application";
-    executable=true;
-  };
-
-  services.syncthing.enable=true;
 
   #imports = [ ./dconf.nix ];
 
