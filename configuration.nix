@@ -170,7 +170,7 @@
 
   programs.gamemode.enable=true;
 
-  network.firewall.enable=false;
+  networking.firewall.enable=false;
 
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
