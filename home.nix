@@ -173,7 +173,7 @@ rec {
     text="nohup secret-tool lookup keepass keepass | org.keepassxc.KeePassXC --pw-stdin $HOME/Sync/keepass.kdbx > /dev/null &";
     executable=true;
   };
-  home.file.".config/autostart"={
+  home.file.".config/autostart/keepass.desktop"={
     text="[Desktop Entry]\nExec=keepass";
     executable=true;
   };
