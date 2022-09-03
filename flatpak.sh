@@ -62,14 +62,8 @@ fix 'org.gnome.Geary'
 flatpak override --user --filesystem='~/.themes:ro'
 
 
-add-wayland 'com.vscodium.codium'
-add-wayland 'com.vscodium.codium-url-handler'
-flatpak override 'com.vscodium.codium' --user --env="PATH=$HOME/.local/flatpak:/usr/bin:/app/bin"
 
-
-add-wayland 'com.visualstudio.code'
-add-wayland 'com.visualstudio.code-url-handler'
-flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/app/bin:/app/bin:/usr/bin:/home/riky/.var/app/com.visualstudio.code/data/node_modules/bin"
+flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
 
 flatpak override 'com.brave.Browser' --user --filesystem='~/.local/flatpak:ro'
