@@ -169,6 +169,8 @@ rec {
     executable=true;
   };
 
+  services.syncthing.enable=true;
+
   #imports = [ ./dconf.nix ];
 
   services.home-manager.autoUpgrade={
