@@ -20,7 +20,6 @@ flathub='
 com.github.marktext.marktext
 org.libretro.RetroArch
 com.brave.Browser
-com.vscodium.codium
 org.godotengine.Godot
 com.google.AndroidStudio
 com.github.tchx84.Flatseal
@@ -37,6 +36,7 @@ org.gnome.dfeet
 org.videolan.VLC
 org.gnome.Geary
 org.gimp.GIMP
+com.visualstudio.code
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -59,12 +59,18 @@ fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
 fix 'org.gnome.Geary'
 
+flatpak override --user --filesystem='~/.themes:ro'
+
+
 add-wayland 'com.vscodium.codium'
 add-wayland 'com.vscodium.codium-url-handler'
-
-
 flatpak override 'com.vscodium.codium' --user --env="PATH=$HOME/.local/flatpak:/usr/bin:/app/bin"
-flatpak override --user --filesystem='~/.themes:ro'
+
+
+add-wayland 'com.visualstudio.code'
+add-wayland 'com.visualstudio.code-url-handler'
+flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/app/bin:/app/bin:/usr/bin:/home/riky/.var/app/com.visualstudio.code/data/node_modules/bin"
+
 
 flatpak override 'com.brave.Browser' --user --filesystem='~/.local/flatpak:ro'
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'

@@ -164,6 +164,10 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
   };
+  home.file.".local/flatpak/zsh"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host --env=TERM=xterm-256color zsh $@";
+    executable=true;
+  };
   home.file.".local/share/applications/micro.desktop"={
     text="";
   };
