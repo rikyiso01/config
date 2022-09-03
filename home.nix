@@ -168,6 +168,10 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host --env=TERM=xterm-256color zsh $@";
     executable=true;
   };
+  home.file.".local/flatpak/code"={
+    text="#!/usr/bin/env bash\ntouch /etc/shells\nexec code $@";
+    executable=true;
+  };
   home.file.".local/share/applications/micro.desktop"={
     text="";
   };
