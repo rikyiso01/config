@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
-
-cd "$(dirname $0)"
+set -euo pipefail
 
 SYSTEM='/etc/nixos'
 LOCAL="$HOME/.config/nixpkgs"
