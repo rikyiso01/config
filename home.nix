@@ -83,9 +83,10 @@ rec {
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
     CHROME_EXECUTABLE="chromium";
+    MANPATH="$HOME/.npm-packages/share/man";
   };
 
-  home.sessionPath = ["$HOME/.local/bin" "$HOME/.local/flutter/bin"];
+  home.sessionPath = ["$HOME/.local/bin" "$HOME/.local/flutter/bin" "$HOME/.npm-packages/bin"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
