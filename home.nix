@@ -39,6 +39,7 @@ rec {
     gcc
     chromedriver
     ffmpeg
+    secret-tool
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -165,7 +166,15 @@ rec {
     executable=true;
   };
   home.file.".local/flatpak/downloadhelper"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run ${home.homeDirectory}/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
+    executable=true;
+  };
+  home.file.".local/bin/keepass"={
+    text="nohup secret-tool lookup keepass keepass | org.keepassxc.KeePassXC --pw-stdin "$HOME/Sync/keepass.kdbx" > /dev/null &";
+    executable=true;
+  };
+  home.file.".config/autostart"={
+    text="[Desktop Entry]\nExec=keepass"
     executable=true;
   };
 
