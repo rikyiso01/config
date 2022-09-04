@@ -34,7 +34,6 @@ org.gnome.Logs
 com.github.tchx84.Flatseal
 org.gnome.dfeet
 org.videolan.VLC
-org.gnome.Geary
 org.gimp.GIMP
 com.visualstudio.code
 '
@@ -57,7 +56,6 @@ fix 'org.gnome.TextEditor'
 fix 'org.gnome.seahorse.Application'
 fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
-fix 'org.gnome.Geary'
 
 flatpak override --user --filesystem='~/.themes:ro'
 
