@@ -54,8 +54,8 @@ rec {
     lsof
     micro
     powertop
-    nodePackages_latest.pnpm
-    nodejs
+    usbutils
+    yarn
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
