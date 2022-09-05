@@ -55,6 +55,7 @@ rec {
     micro
     powertop
     nodePackages_latest.pnpm
+    nodejs
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
