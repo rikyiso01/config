@@ -39,6 +39,8 @@ rec {
     chromedriver
     ffmpeg
     libsecret
+    cargo
+    rustc
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
