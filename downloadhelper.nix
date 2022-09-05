@@ -11,6 +11,7 @@ stdenv.mkDerivation rec {
   phases = "installPhase";
 
   installPhase = ''
+    pwd
     mkdir -p $out/bin
     install -Dm555 -t $out/bin net.downloadhelper.coapp-${version}/bin/net.downloadhelper.coapp-linux-64
   '';
