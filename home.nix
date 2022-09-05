@@ -40,6 +40,7 @@ rec {
     ffmpeg
     libsecret
     cargo
+    rustc
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -164,6 +165,10 @@ rec {
   };
   home.file.".local/flatpak/cargo"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host cargo $@";
+    executable=true;
+  };
+  home.file.".local/flatpak/rustc"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host rustc $@";
     executable=true;
   };
   home.file.".local/flatpak/downloadhelper"={
