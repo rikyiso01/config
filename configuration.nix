@@ -102,41 +102,38 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-     micro
-     lsof
-   ];
+  # environment.systemPackages = with pkgs; [];
 
-   environment.gnome.excludePackages = (with pkgs; [
-     gnome-photos
-     gnome-connections
-     evince
-     gnome-text-editor
-     baobab
-   ]) ++ (with pkgs.gnome; [
-     cheese # webcam tool
-     gnome-music
-     epiphany # web browser
-     geary # email reader
-     totem # video player
-     tali # poker game
-     iagno # go game
-     hitori # sudoku game
-     atomix # puzzle game
-     gnome-contacts
-     gnome-weather
-     gnome-clocks
-     gnome-maps
-     gnome-calendar
-     gnome-calculator
-     simple-scan
-     file-roller
-     eog
-     seahorse
-     gnome-characters
-     gnome-logs
-     gnome-software
-   ]);
+  environment.gnome.excludePackages = (with pkgs; [
+    gnome-photos
+    gnome-connections
+    evince
+    gnome-text-editor
+    baobab
+  ]) ++ (with pkgs.gnome; [
+    cheese # webcam tool
+    gnome-music
+    epiphany # web browser
+    geary # email reader
+    totem # video player
+    tali # poker game
+    iagno # go game
+    hitori # sudoku game
+    atomix # puzzle game
+    gnome-contacts
+    gnome-weather
+    gnome-clocks
+    gnome-maps
+    gnome-calendar
+    gnome-calculator
+    simple-scan
+    file-roller
+    eog
+    seahorse
+    gnome-characters
+    gnome-logs
+    gnome-software
+  ]);
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -181,6 +178,7 @@
 
   services.flatpak.enable = true;
   services.tlp.enable=true;
+  services.power-profiles-daemon.enable=false;
 
 
   nix.gc = {

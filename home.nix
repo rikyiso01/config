@@ -52,6 +52,8 @@ rec {
     cairo
     gtk4
     gobject-introspection
+    lsof
+    micro
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
