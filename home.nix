@@ -164,19 +164,17 @@ rec {
     executable=true;
   };
   home.file.".local/flatpak/downloadhelper"={
-    text="#!/usr/bin/env bash\nexec host-spawn steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
   };
 
-
-  home.file.".local/flatpak/host-spawn".source=./host-spawn;
-  home.file.".local/flatpak/chromium".source=./host-spawn;
-  home.file.".local/flatpak/git".source=./host-spawn;
-  home.file.".local/flatpak/python".source=./host-spawn;
-  home.file.".local/flatpak/cargo".source=./host-spawn;
-  home.file.".local/flatpak/rustc".source=./host-spawn;
-  home.file.".local/flatpak/rust-analyzer".source=./host-spawn;
-  home.file.".local/flatpak/rustfmt".source=./host-spawn;
+  home.file.".local/flatpak/chromium".source=./normal-spawn;
+  home.file.".local/flatpak/git".source=./normal-spawn;
+  home.file.".local/flatpak/python".source=./normal-spawn;
+  home.file.".local/flatpak/cargo".source=./normal-spawn;
+  home.file.".local/flatpak/rustc".source=./normal-spawn;
+  home.file.".local/flatpak/rust-analyzer".source=./normal-spawn;
+  home.file.".local/flatpak/rustfmt".source=./normal-spawn;
   home.file.".local/flatpak/zsh".source=./host-spawn;
   home.file.".local/flatpak/code"={
     text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
