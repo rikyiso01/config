@@ -172,6 +172,10 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host rustc $@";
     executable=true;
   };
+  home.file.".local/flatpak/rust-analyzer"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host rust-analyzer $@";
+    executable=true;
+  };
   home.file.".local/flatpak/downloadhelper"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
