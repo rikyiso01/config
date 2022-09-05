@@ -56,6 +56,7 @@ rec {
     powertop
     usbutils
     yarn
+    import ./downloadhelper.nix
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -165,10 +166,24 @@ rec {
     text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
     executable=true;
   };
+  home.file.".local/bin/node"={
+    text="#!/usr/bin/env bash\nexec yarn node $@"
+  };
   home.file.".local/flatpak/downloadhelper"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
   };
+  home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
+  {
+    "name": "net.downloadhelper.coapp",
+    "description": "Video DownloadHelper companion app",
+    "path": "/home/riky/.local/flatpak/downloadhelper",
+    "type": "stdio",
+    "allowed_origins": [
+        "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
+    ]
+  }
+  ''
 
   home.file.".local/flatpak/chromium".source=./normal-spawn.sh;
   home.file.".local/flatpak/git".source=./normal-spawn.sh;
