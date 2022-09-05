@@ -1,7 +1,7 @@
 { stdenv, fetchzip }:
 stdenv.mkDerivation rec {
   name    = "downloadhelper-${version}";
-  version = "1.6.3";
+  version = "1.6.2";
 
   src = fetchzip {
     url = "https://github.com/mi-g/vdhcoapp/releases/download/v${version}/net.downloadhelper.coapp-${version}-1_amd64.tar.gz";
