@@ -4,7 +4,7 @@ set -euo pipefail
 
 SYSTEM='/etc/nixos'
 LOCAL="$HOME/.config/nixpkgs"
-MONITORED_LOCALS="$LOCAL/home.nix"
+MONITORED_LOCALS="$LOCAL/home.nix $LOCAL/downloadhelper.nix"
 MONITORED_SYSTEMS="$LOCAL/configuration.nix"
 OLD_LOCALS="$(cat $MONITORED_LOCALS)"
 OLD_SYSTEMS="$(cat $MONITORED_SYSTEMS)"

@@ -8,11 +8,8 @@ stdenv.mkDerivation rec {
     sha256 = "sha256:0kjwagwql3b6im4hmr83jjyx8ngwg0rc49xx47vkvislbfybby18";
   };
 
-  phases = "installPhase";
-
   installPhase = ''
-    pwd
     mkdir -p $out/bin
-    install -Dm555 -t $out/bin net.downloadhelper.coapp-${version}/bin/net.downloadhelper.coapp-linux-64
+    install -Dm555 -t $out/bin ${src}/bin/net.downloadhelper.coapp-linux-64
   '';
 }
