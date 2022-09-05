@@ -50,6 +50,8 @@ rec {
     alsa-lib
     pkgconfig
     cairo
+    gtk4
+    gobject-introspection
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
