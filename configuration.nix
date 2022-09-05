@@ -180,6 +180,7 @@
   # virtualisation.virtualbox.host.enableExtensionPack = true;
 
   services.flatpak.enable = true;
+  services.tlp.enable=true;
 
 
   nix.gc = {
