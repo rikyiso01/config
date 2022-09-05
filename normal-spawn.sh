@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-exec flatpak-spawn --host $0 $@
+exec flatpak-spawn --host $(basename $0) $@
