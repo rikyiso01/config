@@ -41,6 +41,7 @@ rec {
     libsecret
     cargo
     rustc
+    rust-analyzer
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
