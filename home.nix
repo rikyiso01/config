@@ -162,6 +162,10 @@ rec {
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host python $@";
     executable=true;
   };
+  home.file.".local/flatpak/cargo"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host cargo $@";
+    executable=true;
+  };
   home.file.".local/flatpak/downloadhelper"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
