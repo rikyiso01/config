@@ -167,7 +167,7 @@ rec {
     executable=true;
   };
   home.file.".local/bin/node"={
-    text="#!/usr/bin/env bash\nexec yarn node $@"
+    text="#!/usr/bin/env bash\nexec yarn node $@";
   };
   home.file.".local/flatpak/downloadhelper"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
