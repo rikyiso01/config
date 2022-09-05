@@ -10,6 +10,6 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
-    install -Dm555 -t $out/bin ${src}/bin/net.downloadhelper.coapp-linux-64
+    install -Dm555 -t $out/bin bin/net.downloadhelper.coapp-linux-64
   '';
 }
