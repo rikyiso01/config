@@ -56,7 +56,7 @@ rec {
     powertop
     usbutils
     yarn
-    import ./downloadhelper.nix
+    pkgs.callPackage (import ./downloadhelper.nix) {}
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
