@@ -108,9 +108,7 @@ rec {
 
   programs.zsh = {
     enable=true;
-    initExtra=''source $HOME/.config/nixpkgs/theme.zsh
-    [[ "$TERM_PROGRAM" == "vscode" ]] && . ~/.local/share/flatpak/app/com.visualstudio.code/current/active/files/extra/vscode/resources/app/out/vs/workbench/contrib/terminal/browser/media/shellIntegration-rc.zsh
-    '';
+    initExtra="source $HOME/.config/nixpkgs/theme.zsh";
     shellAliases={
       cat="bat";
       ls="exa";
@@ -160,46 +158,24 @@ rec {
 
   home.file.".face".source=./logo.png;
   home.file.".local/bin/update".source=./update.sh;
+
   home.file.".local/bin/chromium"={
     text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
-    executable=true;
-  };
-  home.file.".local/flatpak/chromium"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host flatpak run com.brave.Browser $@";
-    executable=true;
-  };
-  home.file.".local/flatpak/git"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host git $@";
-    executable=true;
-  };
-  home.file.".local/flatpak/python"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host python $@";
-    executable=true;
-  };
-  home.file.".local/flatpak/cargo"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host cargo $@";
-    executable=true;
-  };
-  home.file.".local/flatpak/rustc"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host rustc $@";
-    executable=true;
-  };
-  home.file.".local/flatpak/rust-analyzer"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host rust-analyzer $@";
-    executable=true;
-  };
-  home.file.".local/flatpak/rustfmt"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host rustfmt $@";
     executable=true;
   };
   home.file.".local/flatpak/downloadhelper"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
   };
-  home.file.".local/flatpak/zsh"={
-    source=./host-spawn;
-    executable=true;
-  };
+
+  home.file.".local/flatpak/chromium".source=./host-spawn;
+  home.file.".local/flatpak/git".source=./host-spawn;
+  home.file.".local/flatpak/python".source=./host-spawn;
+  home.file.".local/flatpak/cargo".source=./host-spawn;
+  home.file.".local/flatpak/rustc".source=./host-spawn;
+  home.file.".local/flatpak/rust-analyzer".source=./host-spawn;
+  home.file.".local/flatpak/rustfmt".source=./host-spawn;
+  home.file.".local/flatpak/zsh".source=./host-spawn;
   home.file.".local/flatpak/code"={
     text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
     executable=true;
