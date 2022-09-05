@@ -183,7 +183,7 @@ rec {
         "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
     ]
   }
-  ''
+  '';
 
   home.file.".local/flatpak/chromium".source=./normal-spawn.sh;
   home.file.".local/flatpak/git".source=./normal-spawn.sh;
