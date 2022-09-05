@@ -43,6 +43,11 @@ rec {
     rustc
     rust-analyzer
     rustfmt
+    pkg-config
+    xorg.libX11
+    xorg.libXi
+    mesa
+    alsa-lib
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
