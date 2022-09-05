@@ -168,13 +168,13 @@ rec {
     executable=true;
   };
 
-  home.file.".local/flatpak/chromium".source=./normal-spawn;
-  home.file.".local/flatpak/git".source=./normal-spawn;
-  home.file.".local/flatpak/python".source=./normal-spawn;
-  home.file.".local/flatpak/cargo".source=./normal-spawn;
-  home.file.".local/flatpak/rustc".source=./normal-spawn;
-  home.file.".local/flatpak/rust-analyzer".source=./normal-spawn;
-  home.file.".local/flatpak/rustfmt".source=./normal-spawn;
+  home.file.".local/flatpak/chromium".source=./normal-spawn.sh;
+  home.file.".local/flatpak/git".source=./normal-spawn.sh;
+  home.file.".local/flatpak/python".source=./normal-spawn.sh;
+  home.file.".local/flatpak/cargo".source=./normal-spawn.sh;
+  home.file.".local/flatpak/rustc".source=./normal-spawn.sh;
+  home.file.".local/flatpak/rust-analyzer".source=./normal-spawn.sh;
+  home.file.".local/flatpak/rustfmt".source=./normal-spawn.sh;
   home.file.".local/flatpak/zsh".source=./host-spawn;
   home.file.".local/flatpak/code"={
     text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
