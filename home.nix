@@ -101,7 +101,7 @@ rec {
     MANPATH="$HOME/.npm-packages/share/man";
   };
 
-  home.sessionPath = ["$HOME/.local/bin" "$HOME/.local/flutter/bin" "$HOME/.npm-packages/bin"];
+  home.sessionPath = ["$HOME/.local/bin" "$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
