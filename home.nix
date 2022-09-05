@@ -48,6 +48,8 @@ rec {
     xorg.libXi
     mesa
     alsa-lib
+    pkgconfig
+    cairo
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
