@@ -177,7 +177,13 @@
   # virtualisation.virtualbox.host.enableExtensionPack = true;
 
   services.flatpak.enable = true;
-  services.tlp.enable=true;
+  services.tlp={
+    settings={
+      USB_BLACKLIST="0cf3:e500";
+      MAX_LOST_WORK_SECS_ON_BAT=1500;
+    };
+    enable=true;
+  };
   services.power-profiles-daemon.enable=false;
 
 

@@ -33,7 +33,6 @@ rec {
     bibata-cursors
     materia-theme
     docker-compose
-    nodejs
     steam-run
     gcc
     chromedriver
@@ -55,6 +54,7 @@ rec {
     lsof
     micro
     powertop
+    nodePackages_latest.pnpm
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
