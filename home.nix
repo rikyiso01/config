@@ -195,7 +195,7 @@ rec {
     executable=true;
   };
   home.file.".local/flatpak/zsh"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host --env=TERM=xterm-256color zsh $@";
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host --env=TERM=xterm-256color nix-shell -p gtk4 gobject-introspection pkgconfig alsa-lib --run 'exec zsh' $@";
     executable=true;
   };
   home.file.".local/flatpak/code"={
