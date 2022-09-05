@@ -75,8 +75,6 @@ rec {
       python-with-my-packages = python310.withPackages my-python-packages;
     in
     python-with-my-packages)
-
-    yarn
   ];
 
   programs.git = {
