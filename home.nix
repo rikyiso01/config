@@ -42,6 +42,7 @@ rec {
     cargo
     rustc
     rust-analyzer
+    rustfmt
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -174,6 +175,10 @@ rec {
   };
   home.file.".local/flatpak/rust-analyzer"={
     text="#!/usr/bin/env bash\nexec flatpak-spawn --host rust-analyzer $@";
+    executable=true;
+  };
+  home.file.".local/flatpak/rustfmt"={
+    text="#!/usr/bin/env bash\nexec flatpak-spawn --host rustfmt $@";
     executable=true;
   };
   home.file.".local/flatpak/downloadhelper"={
