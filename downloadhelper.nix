@@ -8,14 +8,14 @@ stdenv.mkDerivation rec {
     sha256 = "sha256:0kjwagwql3b6im4hmr83jjyx8ngwg0rc49xx47vkvislbfybby18";
   };
 
-  /*nativeBuildInputs = [
+  nativeBuildInputs = [
     autoPatchelfHook
   ];
 
   buildInputs = [
   ];
 
-  unpackPhase = "true";*/
+  unpackPhase = "true";
 
   installPhase = ''
     mkdir -p $out/bin
