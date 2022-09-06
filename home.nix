@@ -195,7 +195,7 @@ rec {
     text="";
   };
 
-  home.file.".local/lutris/tlauncher.yml".source=./tlauncher.yml;
+  home.file."Games/tlauncher.yml".source=./tlauncher.yml;
 
   #imports = [ ./dconf.nix ];
 
