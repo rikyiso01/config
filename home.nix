@@ -195,8 +195,6 @@ rec {
     text="";
   };
 
-  home.file."Games/tlauncher.yml".source=./tlauncher.yml;
-
   #imports = [ ./dconf.nix ];
 
   services.home-manager.autoUpgrade={
