@@ -194,7 +194,7 @@ rec {
   home.file.".local/flatpak/rust-analyzer".source=./normal-spawn.sh;
   home.file.".local/flatpak/rustfmt".source=./normal-spawn.sh;
   home.file.".local/flatpak/xdelta3".source=./normal-spawn.sh;
-  home.file.".local/flatpak/net.downloadhelper.coapp-linux-64".source=./normal-spawn.sh;
+  home.file.".local/flatpak/netdownloadhelpercoapp-linux-64".source=./normal-spawn.sh;
   home.file.".local/flatpak/zsh".source=./host-spawn;
   home.file.".local/flatpak/code"={
     text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
