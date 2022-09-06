@@ -58,7 +58,6 @@ rec {
     yarn
     xdelta
     xterm
-    (pkgs.callPackage ./tlauncher.nix {})
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -186,10 +185,7 @@ rec {
   }
   '';
 
-  home.file.".local/flatpak/xdelta3".source=./normal-spawn.sh;
-  home.file.".local/flatpak/xterm".source=./normal-spawn.sh;
   home.file.".local/flatpak/git".source=./normal-spawn.sh;
-  home.file.".local/flatpak/tlauncher".source=./normal-spawn.sh;
   home.file.".local/flatpak/code"={
     text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
     executable=true;
