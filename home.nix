@@ -57,7 +57,7 @@ rec {
     usbutils
     yarn
     xdelta
-    (pkgs.callPackage ./downloadhelper.nix {})
+    #(pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
