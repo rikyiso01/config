@@ -74,4 +74,6 @@ flatpak install --user --or-update launcher.moe 'com.gitlab.KRypt0n_.an-anime-ga
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
 flatpak install --user --or-update flathub-beta 'net.lutris.Lutris'
 
+flatpak override 'net.lutris.Lutris' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin:/app/utils/bin:/usr/lib/extensions/vulkan/MangoHud/bin/:/app/jre/bin/"
+
 flatpak update

@@ -56,6 +56,7 @@ rec {
     powertop
     usbutils
     yarn
+    xdelta
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -177,7 +178,7 @@ rec {
   {
     "name": "net.downloadhelper.coapp",
     "description": "Video DownloadHelper companion app",
-    "path": "/home/riky/.local/flatpak/downloadhelper",
+    "path": "net.downloadhelper.coapp-linux-64",
     "type": "stdio",
     "allowed_origins": [
         "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
@@ -192,6 +193,8 @@ rec {
   home.file.".local/flatpak/rustc".source=./normal-spawn.sh;
   home.file.".local/flatpak/rust-analyzer".source=./normal-spawn.sh;
   home.file.".local/flatpak/rustfmt".source=./normal-spawn.sh;
+  home.file.".local/flatpak/xdelta3".source=./normal-spawn.sh;
+  home.file.".local/flatpak/net.downloadhelper.coapp-linux-64".source=./normal-spawn.sh;
   home.file.".local/flatpak/zsh".source=./host-spawn;
   home.file.".local/flatpak/code"={
     text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
@@ -207,4 +210,6 @@ rec {
     enable=true;
     frequency="weekly";
   };
+
+  nix.extraOptions="experimental-features = nix-command";
 }
