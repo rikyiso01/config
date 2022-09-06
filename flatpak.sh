@@ -59,14 +59,9 @@ fix 'org.gnome.Logs'
 
 flatpak override --user --filesystem='~/.themes:ro'
 
+flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
-
-flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
-
-
-flatpak override 'com.brave.Browser' --user --filesystem='~/.local/flatpak:ro'
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
-flatpak override 'com.brave.Browser' --user --talk-name='org.freedesktop.Flatpak'
 
 flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
 flatpak install --user --or-update launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
@@ -75,5 +70,6 @@ flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta
 flatpak install --user --or-update flathub-beta 'net.lutris.Lutris'
 
 flatpak override 'net.lutris.Lutris' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin:/app/utils/bin:/usr/lib/extensions/vulkan/MangoHud/bin/:/app/jre/bin/"
+flatpak override 'net.lutris.Lutris' --user --filesystem='/nix/store:ro'
 
 flatpak update

@@ -1,0 +1,39 @@
+name: Minecraft
+game_slug: minecraft
+version: 2.86
+slug: minecraft-installer
+runner: linux
+
+script:
+  files:
+  - tlauncher:
+      filename: tlauncher.zip
+      url: "https://dl2.tlauncher.org/f.php?f=files%2FTLauncher-2.86.zip"
+  - java: https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+  installer:
+  - extract:
+      file: tlauncher
+  - extract:
+      file: java
+  - execute:
+      file: mkdir
+      args: $GAMEDIR/.tlauncher
+  - execute:
+      file: mkdir
+      args: $GAMEDIR/.minecraft
+  - execute:
+      file: ln
+      args: -fs $GAMEDIR/.tlauncher $HOME/.tlauncher
+  - execute:
+      file: ln
+      args: -fs $GAMEDIR/.minecraft $HOME/.minecraft
+  - move:
+      dst: $CACHE
+      src: $GAMEDIR/README-EN.txt
+  - move:
+      dst: $CACHE
+      src: $GAMEDIR/README-RUS.txt
+  game:
+    exe: $GAMEDIR/bin/java
+    args: -jar $GAMEDIR/TLauncher-$VERSION.jar
+    working_dir: $GAMEDIR

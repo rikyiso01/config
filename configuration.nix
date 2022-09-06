@@ -180,6 +180,18 @@
   services.tlp.enable=true;
   services.power-profiles-daemon.enable=false;
 
+  networking.hosts={
+    "0.0.0.0"=[
+      "overseauspider.yuanshen.com"
+      "log-upload-os.hoyoverse.com"
+      "prd-lender.cdp.internal.unity3d.com"
+      "thind-prd-knob.data.ie.unity3d.com"
+      "thind-gke-usc.prd.data.corp.unity3d.com"
+      "cdp.cloud.unity3d.com"
+      "remote-config-proxy-prd.uca.cloud.unity3d.com"
+    ];
+  };
+
 
   nix.gc = {
     automatic = true;

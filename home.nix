@@ -57,7 +57,9 @@ rec {
     usbutils
     yarn
     xdelta
-    #(pkgs.callPackage ./downloadhelper.nix {})
+    xterm
+    (pkgs.callPackage ./tlauncher.nix {})
+    (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
         poetry
@@ -101,6 +103,7 @@ rec {
     NIXOS_OZONE_WL = "1";
     CHROME_EXECUTABLE="chromium";
     MANPATH="$HOME/.npm-packages/share/man";
+    NIXPKGS_ALLOW_UNFREE="1";
   };
 
   home.sessionPath = ["$HOME/.local/bin" "$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin"];
@@ -169,16 +172,13 @@ rec {
   };
   home.file.".local/bin/node"={
     text="#!/usr/bin/env bash\nexec yarn node $@";
-  };
-  home.file.".local/flatpak/downloadhelper"={
-    text="#!/usr/bin/env bash\nexec flatpak-spawn --host steam-run $HOME/.local/downloadhelper/bin/net.downloadhelper.coapp-linux-64 $@";
     executable=true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
   {
     "name": "net.downloadhelper.coapp",
     "description": "Video DownloadHelper companion app",
-    "path": "net.downloadhelper.coapp-linux-64",
+    "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",
     "type": "stdio",
     "allowed_origins": [
         "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
@@ -186,21 +186,20 @@ rec {
   }
   '';
 
-  home.file.".local/flatpak/chromium".source=./normal-spawn.sh;
+  home.file.".local/flatpak/xdelta3".source=./normal-spawn.sh;
+  home.file.".local/flatpak/xterm".source=./normal-spawn.sh;
   home.file.".local/flatpak/git".source=./normal-spawn.sh;
-  home.file.".local/flatpak/python".source=./normal-spawn.sh;
-  home.file.".local/flatpak/cargo".source=./normal-spawn.sh;
-  home.file.".local/flatpak/rustc".source=./normal-spawn.sh;
-  home.file.".local/flatpak/rust-analyzer".source=./normal-spawn.sh;
-  home.file.".local/flatpak/rustfmt".source=./normal-spawn.sh;
-  home.file.".local/flatpak/zsh".source=./host-spawn;
+  home.file.".local/flatpak/tlauncher".source=./normal-spawn.sh;
   home.file.".local/flatpak/code"={
     text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
     executable=true;
   };
+  home.file.".local/flatpak/zsh".source=./host-spawn;
   home.file.".local/share/applications/micro.desktop"={
     text="";
   };
+
+  home.file.".local/lutris/tlauncher.yml".source=./tlauncher.yml;
 
   #imports = [ ./dconf.nix ];
 
@@ -209,5 +208,6 @@ rec {
     frequency="weekly";
   };
 
-  #nix.extraOptions="experimental-features = nix-command";
+  nix.package=pkgs.nix;
+  nix.settings={experimental-features=["nix-command"];};
 }

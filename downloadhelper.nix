@@ -1,4 +1,4 @@
-{ stdenv, fetchzip, autoPatchelfHook }:
+{ stdenv, fetchzip }:
 stdenv.mkDerivation rec {
   name    = "downloadhelper-${version}";
   version = "1.6.3";
@@ -8,17 +8,8 @@ stdenv.mkDerivation rec {
     sha256 = "sha256:0kjwagwql3b6im4hmr83jjyx8ngwg0rc49xx47vkvislbfybby18";
   };
 
-  nativeBuildInputs = [
-    autoPatchelfHook
-  ];
-
-  buildInputs = [
-  ];
-
-  unpackPhase = "true";
-
   installPhase = ''
     mkdir -p $out/bin
-    install -Dm555 -t $out/bin bin/net.downloadhelper.coapp-linux-64
+    ln -s ${src}/bin/net.downloadhelper.coapp-linux-64 $out/bin
   '';
 }
