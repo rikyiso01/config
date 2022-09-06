@@ -12,7 +12,10 @@ stdenv.mkDerivation rec {
     autoPatchelfHook
   ];
 
-  sourceRoot = ".";
+  buildInputs = [
+  ];
+
+  unpackPhase = "true";
 
   installPhase = ''
     mkdir -p $out/bin
