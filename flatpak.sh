@@ -18,7 +18,6 @@ flatpak remote-add --user --if-not-exists flathub 'https://flathub.org/repo/flat
 
 flathub='
 com.github.marktext.marktext
-org.libretro.RetroArch
 com.brave.Browser
 org.godotengine.Godot
 com.google.AndroidStudio
@@ -62,9 +61,6 @@ flatpak override --user --filesystem='~/.themes:ro'
 flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
-
-flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
-flatpak install --user --or-update launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
 
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
 flatpak install --user --or-update flathub-beta 'net.lutris.Lutris'
