@@ -102,7 +102,9 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [android-tools];
+  # environment.systemPackages = with pkgs; [android-tools];
+
+  services.udev.extraRules="SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0666\", GROUP=\"users\"";
 
   environment.gnome.excludePackages = (with pkgs; [
     gnome-photos

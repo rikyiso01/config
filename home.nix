@@ -58,6 +58,7 @@ rec {
     yarn
     xdelta
     xterm
+    android-tools
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
