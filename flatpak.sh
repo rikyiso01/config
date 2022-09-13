@@ -35,6 +35,7 @@ org.gnome.dfeet
 org.videolan.VLC
 org.gimp.GIMP
 com.visualstudio.code
+rest.insomnia.Insomnia
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
