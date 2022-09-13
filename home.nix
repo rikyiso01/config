@@ -62,6 +62,8 @@ rec {
     xterm
     android-tools
     nmap
+    chromium
+    flyctl
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -171,6 +173,10 @@ rec {
 
   home.file.".local/bin/chromium"={
     text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
+    executable=true;
+  };
+  home.file.".local/bin/global_black"={
+    text="#!/usr/bin/env bash\nexec black $@";
     executable=true;
   };
   home.file.".local/bin/node"={
