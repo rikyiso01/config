@@ -26,6 +26,8 @@ rec {
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
     gnomeExtensions.gsconnect
+    gnomeExtensions.disconnect-wifi
+    gnomeExtensions.refresh-wifi-connections
     file
     roboto
     fira-code
@@ -59,6 +61,7 @@ rec {
     xdelta
     xterm
     android-tools
+    nmap
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
