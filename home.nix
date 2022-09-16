@@ -62,7 +62,6 @@ rec {
     xterm
     android-tools
     nmap
-    chromium
     flyctl
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
