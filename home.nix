@@ -186,7 +186,7 @@ rec {
     executable=true;
   };
   home.file.".local/bin/node"={
-    text="#!/usr/bin/env bash\nexec steam-run ${home.homeDirectory}/.local/share/pnpm/node $@";
+    text="#!/usr/bin/env bash\nexec steam-run ${home.homeDirectory}/.config/pnpm/node $@";
     executable=true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
