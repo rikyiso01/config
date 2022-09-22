@@ -116,7 +116,7 @@ rec {
     NIXPKGS_ALLOW_UNFREE="1";
   };
 
-  home.sessionPath = ["$HOME/.local/bin" "$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin"];
+  home.sessionPath = ["$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
@@ -125,7 +125,7 @@ rec {
 
   programs.zsh = {
     enable=true;
-    initExtra="source $HOME/.config/nixpkgs/theme.zsh";
+    initExtra="source $HOME/.config/nixpkgs/theme.zsh\nPATH=$HOME/.local/bin:$PATH";
     shellAliases={
       cat="bat";
       ls="exa";

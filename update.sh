@@ -18,7 +18,7 @@ then
     sudo nixos-rebuild switch
 fi
 
-dconf dump / | python -c 'from sys import stdin;print(stdin.read().replace("\\n","").replace("\\\\",""),end="")' | dconf2nix > "$LOCAL/dconf.nix"
+#dconf dump / | python -c 'from sys import stdin;print(stdin.read().replace("\\n","").replace("\\\\",""),end="")' | dconf2nix > "$LOCAL/dconf.nix"
 
 if [[ "$(cat $MONITORED_LOCALS)" != "$OLD_LOCALS" ]]
 then
