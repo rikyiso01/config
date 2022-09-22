@@ -57,7 +57,7 @@ rec {
     micro
     powertop
     usbutils
-    nodePackages.pnpm
+    yarn
     xdelta
     xterm
     android-tools
@@ -114,10 +114,9 @@ rec {
     CHROME_EXECUTABLE="chromium";
     MANPATH="$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE="1";
-    PNPM_HOME="$HOME/.config/pnpm";
   };
 
-  home.sessionPath = ["$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin" "$HOME/.config/pnpm"];
+  home.sessionPath = ["$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
@@ -186,7 +185,7 @@ rec {
     executable=true;
   };
   home.file.".local/bin/node"={
-    text="#!/usr/bin/env bash\nexec steam-run ${home.homeDirectory}/.config/pnpm/node $@";
+    text="#!/usr/bin/env bash\nexec yarn node $@";
     executable=true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
