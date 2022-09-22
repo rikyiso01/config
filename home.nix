@@ -134,7 +134,7 @@ rec {
       find="fd";
       ps="procs";
       curl="curlie";
-      gdb="gdb -q";
+      gdb="gef";
     };
     zplug = {
       enable = true;
