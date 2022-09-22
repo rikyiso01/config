@@ -114,9 +114,10 @@ rec {
     CHROME_EXECUTABLE="chromium";
     MANPATH="$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE="1";
+    PNPM_HOME="$HOME/.config/pnpm";
   };
 
-  home.sessionPath = ["$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin"];
+  home.sessionPath = ["$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin" "$HOME/.config/pnpm"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
