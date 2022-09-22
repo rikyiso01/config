@@ -66,6 +66,7 @@ rec {
     gef
     php81
     bun
+    wireguard-tools
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
