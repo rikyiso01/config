@@ -114,9 +114,8 @@ rec {
     CHROME_EXECUTABLE="chromium";
     MANPATH="$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE="1";
+    PATH="$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH";
   };
-
-  home.sessionPath = ["$HOME/.local/flutter/bin" "$HOME/.config/yarn/global/node_modules/.bin"];
 
   fonts.fontconfig.enable = true;
   programs.bat.enable=true;
@@ -125,7 +124,7 @@ rec {
 
   programs.zsh = {
     enable=true;
-    initExtra="source $HOME/.config/nixpkgs/theme.zsh\nPATH=$HOME/.local/bin:$PATH";
+    initExtra="source $HOME/.config/nixpkgs/theme.zsh";
     shellAliases={
       cat="bat";
       ls="exa";
