@@ -36,6 +36,9 @@ org.videolan.VLC
 org.gimp.GIMP
 com.visualstudio.code
 rest.insomnia.Insomnia
+org.ghidra_sre.Ghidra
+org.wireshark.Wireshark
+io.typora.Typora
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]

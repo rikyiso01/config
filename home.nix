@@ -63,6 +63,9 @@ rec {
     android-tools
     nmap
     flyctl
+    gef
+    php81
+    bun
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -74,11 +77,14 @@ rec {
         scipy
         numpy
         plotly
-        dash
-        matplotlib
         notebook
         black
         pyyaml
+        scikit-learn
+        httpx
+        pwntools
+        beautifulsoup4
+        pycryptodome
       ];
       python-with-my-packages = python310.withPackages my-python-packages;
     in
