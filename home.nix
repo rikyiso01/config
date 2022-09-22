@@ -57,7 +57,7 @@ rec {
     micro
     powertop
     usbutils
-    yarn
+    nodePackages.pnpm
     xdelta
     xterm
     android-tools
@@ -65,7 +65,6 @@ rec {
     flyctl
     gef
     php81
-    bun
     wireguard-tools
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
@@ -186,7 +185,7 @@ rec {
     executable=true;
   };
   home.file.".local/bin/node"={
-    text="#!/usr/bin/env bash\nexec yarn node $@";
+    text="#!/usr/bin/env bash\nexec steam-run ${home.homeDirectory}/.local/share/pnpm/node $@";
     executable=true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
