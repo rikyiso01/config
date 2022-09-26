@@ -85,6 +85,7 @@ rec {
         pwntools
         beautifulsoup4
         pycryptodome
+        pytest
       ];
       python-with-my-packages = python310.withPackages my-python-packages;
     in
