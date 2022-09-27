@@ -64,7 +64,7 @@ rec {
     nmap
     flyctl
     gef
-    php81
+    php
     wireguard-tools
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
@@ -94,7 +94,7 @@ rec {
     # TAP
     dotnet-sdk
     # SAW
-    php81Packages.php-cs-fixer
+    php80Packages.php-cs-fixer
   ];
 
   programs.git = {
