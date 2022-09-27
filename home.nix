@@ -91,8 +91,10 @@ rec {
     in
     python-with-my-packages)
 
-    # tap
+    # TAP
     dotnet-sdk
+    # SAW
+    php81Packages.php-cs-fixer
   ];
 
   programs.git = {
