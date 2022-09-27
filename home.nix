@@ -86,6 +86,7 @@ rec {
         beautifulsoup4
         pycryptodome
         pytest
+        jupyterlab
       ];
       python-with-my-packages = python310.withPackages my-python-packages;
     in
@@ -93,8 +94,6 @@ rec {
 
     # TAP
     dotnet-sdk
-    # SAW
-    php80Packages.php-cs-fixer
   ];
 
   programs.git = {
@@ -130,7 +129,7 @@ rec {
   programs.zsh = {
     enable=true;
     initExtra=''source $HOME/.config/nixpkgs/theme.zsh
-    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH'';
+    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.dotnet/tools:$PATH'';
     shellAliases={
       cat="bat";
       ls="exa";
