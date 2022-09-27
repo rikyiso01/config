@@ -191,7 +191,7 @@ rec {
     executable=true;
   };
   home.file.".local/bin/jupyter"={
-    text="#!/usr/bin/env bash\nexec docker run --pull always -p 127.0.0.1:8888:8888 ghcr.io/rikyiso01/jupyter-docker:latest jupyter $@";
+    text="#!/usr/bin/env bash\nexec docker run --pull always -p 127.0.0.1:8888:8888 ghcr.io/rikyiso01/jupyter-docker:latest $@ &";
     executable=true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
