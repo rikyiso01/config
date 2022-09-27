@@ -86,7 +86,6 @@ rec {
         beautifulsoup4
         pycryptodome
         pytest
-        jupyterlab
       ];
       python-with-my-packages = python310.withPackages my-python-packages;
     in
@@ -129,7 +128,7 @@ rec {
   programs.zsh = {
     enable=true;
     initExtra=''source $HOME/.config/nixpkgs/theme.zsh
-    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.dotnet/tools:$PATH'';
+    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH'';
     shellAliases={
       cat="bat";
       ls="exa";
