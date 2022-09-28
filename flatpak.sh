@@ -67,9 +67,9 @@ flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
 
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
-flatpak install --user --or-update flathub-beta 'net.lutris.Lutris'
+flatpak install --user --or-update -y flathub-beta 'net.lutris.Lutris'
 
 flatpak override 'net.lutris.Lutris' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin:/app/utils/bin:/usr/lib/extensions/vulkan/MangoHud/bin/:/app/jre/bin/"
 flatpak override 'net.lutris.Lutris' --user --filesystem='/nix/store:ro'
 
-flatpak update
+flatpak update -y
