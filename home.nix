@@ -66,6 +66,8 @@ rec {
     gef
     php
     wireguard-tools
+    bintools-unwrapped
+    ghc
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -89,8 +91,6 @@ rec {
       python-with-my-packages = python310.withPackages my-python-packages;
     in
     python-with-my-packages)
-
-    # TAP
     dotnet-sdk
   ];
 
