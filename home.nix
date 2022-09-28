@@ -69,6 +69,9 @@ rec {
     binutils
     ghc
     haskell-language-server
+    binwalk
+    exiftool
+    imagemagick
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
