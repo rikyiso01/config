@@ -66,7 +66,7 @@ rec {
     gef
     php
     wireguard-tools
-    bintools-unwrapped
+    binutils
     ghc
     haskell-language-server
     (pkgs.callPackage ./downloadhelper.nix {})
