@@ -72,6 +72,8 @@ rec {
     binwalk
     exiftool
     imagemagick
+    jdk
+    unzip
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
@@ -196,7 +198,7 @@ rec {
     executable=true;
   };
   home.file.".local/bin/jupyter-server"={
-    text="#!/usr/bin/env bash\nexec nohup docker run --pull always -p 127.0.0.1:8888:8888 ghcr.io/rikyiso01/jupyter-docker:latest > /dev/null 2> /dev/null &";
+    text="#!/usr/bin/env bash\ndocker build -f jupyter -t jupyter:latest ${home.homeDirectory}/.config/nixpkgs\nexec nohup docker run -p 127.0.0.1:8888:8888 jupyter:latest > /dev/null 2> /dev/null &";
     executable=true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
