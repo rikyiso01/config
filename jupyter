@@ -3,12 +3,14 @@ FROM jupyter/tensorflow-notebook
 USER root
 RUN echo 'jovyan ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER jovyan
+
+# Dependencies
 RUN sudo apt-get update &&\
     sudo apt-get install -y --no-install-recommends apt-transport-https wget gpg &&\
     wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/dart.gpg &&\
     echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | sudo tee /etc/apt/sources.list.d/dart_stable.list &&\
     sudo apt-get update &&\
-    sudo apt-get install -y --no-install-recommends dotnet6 php php-cli php-zmq rust-src rustc cargo dart &&\
+    sudo apt-get install -y --no-install-recommends dotnet6 php php-cli php-zmq rust-src rustc cargo dart postgresql &&\
     sudo apt-get install -y --no-install-recommends openjdk-18-jdk-headless &&\
     sudo rm -rf /var/lib/apt/lists/* &&\
     sudo apt-get clean
@@ -71,9 +73,12 @@ RUN wget -qO elm.gz https://github.com/elm/compiler/releases/download/0.19.1/bin
     pip install elm_kernel &&\
     python -m elm_kernel.install
 
-# Postgresql e MySql
-#RUN sudo apt install -y postgresql #mysql-server
-#RUN pip install ipython-sql sqlalchemy psycopg2-binary #mysql-python
+#Postgres
+#%load_ext sql
+#from subprocess import run;run("sudo /etc/init.d/postgresql start",shell=True);
+#%sql postgresql://postgres:jovyan@localhost
+RUN pip install ipython-sql sqlalchemy psycopg2-binary &&\
+    sudo /etc/init.d/postgresql start && sudo -u postgres psql -c "alter user postgres password 'jovyan'"
 
 # Disables authentication
 RUN jupyter lab --generate-config && echo "c.NotebookApp.token = 'jovyan'" >> /home/jovyan/.jupyter/jupyter_lab_config.py
