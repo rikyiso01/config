@@ -76,6 +76,7 @@ rec {
     unzip
     zip
     elmPackages.elm
+    elmPackages.elm-format
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
