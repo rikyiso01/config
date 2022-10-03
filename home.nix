@@ -75,6 +75,7 @@ rec {
     jdk
     unzip
     zip
+    elmPackages.elm
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
