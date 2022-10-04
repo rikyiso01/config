@@ -202,7 +202,7 @@ rec {
     executable=true;
   };
   home.file.".local/bin/jupyter-server"={
-    text="#!/usr/bin/env bash\ndocker build -f ${home.homeDirectory}/.config/nixpkgs/jupyter -t jupyter:latest ${home.homeDirectory}/.config/nixpkgs\nexec nohup docker run --rm -p 127.0.0.1:8888:8888 jupyter:latest > /dev/null 2> /dev/null &";
+    text="#!/usr/bin/env bash\ndocker build -f ${home.homeDirectory}/.config/nixpkgs/jupyter -t jupyter:latest ${home.homeDirectory}/.config/nixpkgs\nexec nohup docker run -p 127.0.0.1:8888:8888 jupyter:latest > /dev/null 2> /dev/null &";
     executable=true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
