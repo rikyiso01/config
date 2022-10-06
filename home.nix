@@ -78,6 +78,8 @@ rec {
     elmPackages.elm
     elmPackages.elm-format
     inotify-tools
+    gradle
+    nodePackages.typescript
     (pkgs.callPackage ./downloadhelper.nix {})
     (let 
       my-python-packages = python-packages: with python-packages; [
