@@ -62,7 +62,7 @@ fix 'org.gnome.Logs'
 
 flatpak override --user --filesystem='~/.themes:ro'
 
-flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
+flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/bin:$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
 
