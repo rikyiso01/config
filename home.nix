@@ -195,6 +195,10 @@ rec {
     text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
     executable=true;
   };
+  home.file.".local/bin/chrome"={
+    text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
+    executable=true;
+  };
   home.file.".local/bin/global_black"={
     text="#!/usr/bin/env bash\nexec black $@";
     executable=true;
