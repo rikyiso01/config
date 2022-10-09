@@ -79,6 +79,7 @@ rec {
     gradle
     nodePackages.typescript
     nixpkgs-fmt
+    ngrok
     (pkgs.callPackage ./downloadhelper.nix { })
     (
       let
