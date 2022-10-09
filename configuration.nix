@@ -6,7 +6,8 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
       <nixos-hardware/common/pc/laptop/ssd>
       <nixos-hardware/common/pc/laptop>
@@ -18,7 +19,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  boot.blacklistedKernelModules=["pcspkr"];
+  boot.blacklistedKernelModules = [ "pcspkr" ];
 
   networking.hostName = "thinkpad"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -93,8 +94,8 @@
   users.users.riky = {
     isNormalUser = true;
     description = "riky";
-    extraGroups = [ "networkmanager" "wheel" "docker" "vboxusers"];
-    shell=pkgs.zsh;
+    extraGroups = [ "networkmanager" "wheel" "docker" "vboxusers" ];
+    shell = pkgs.zsh;
   };
 
   # Allow unfree packages
@@ -104,7 +105,7 @@
   # $ nix search wget
   # environment.systemPackages = with pkgs; [android-tools];
 
-  services.udev.extraRules="SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0666\", GROUP=\"users\"";
+  services.udev.extraRules = "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0666\", GROUP=\"users\"";
 
   environment.gnome.excludePackages = (with pkgs; [
     gnome-photos
@@ -164,12 +165,12 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.05"; # Did you read the comment?
 
-  programs.zsh.enable=true;
-  programs.git.enable=true;
+  programs.zsh.enable = true;
+  programs.git.enable = true;
 
-  programs.gamemode.enable=true;
+  programs.gamemode.enable = true;
 
-  networking.firewall.enable=false;
+  networking.firewall.enable = false;
 
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
 
@@ -179,11 +180,11 @@
   # virtualisation.virtualbox.host.enableExtensionPack = true;
 
   services.flatpak.enable = true;
-  services.tlp.enable=true;
-  services.power-profiles-daemon.enable=false;
+  services.tlp.enable = true;
+  services.power-profiles-daemon.enable = false;
 
-  networking.hosts={
-    "0.0.0.0"=[
+  networking.hosts = {
+    "0.0.0.0" = [
       "overseauspider.yuanshen.com"
       "log-upload-os.hoyoverse.com"
       "prd-lender.cdp.internal.unity3d.com"
@@ -201,9 +202,9 @@
     options = "--delete-older-than 30d";
   };
 
-  programs.gnupg.agent.enable=true;
-  system.autoUpgrade={
-    enable=true;
-    dates="weekly";
+  programs.gnupg.agent.enable = true;
+  system.autoUpgrade = {
+    enable = true;
+    dates = "weekly";
   };
 }

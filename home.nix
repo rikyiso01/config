@@ -40,10 +40,8 @@ rec {
     chromedriver
     ffmpeg
     libsecret
-    cargo
-    rustc
+    rustup
     rust-analyzer
-    rustfmt
     pkg-config
     xorg.libX11
     xorg.libXi
@@ -81,44 +79,46 @@ rec {
     gradle
     nodePackages.typescript
     nixpkgs-fmt
-    (pkgs.callPackage ./downloadhelper.nix {})
-    (let 
-      my-python-packages = python-packages: with python-packages; [
-        poetry
-        pudb
-        ipython
-        ipykernel
-        pandas
-        scipy
-        numpy
-        plotly
-        black
-        pyyaml
-        scikit-learn
-        httpx
-        pwntools
-        beautifulsoup4
-        pycryptodome
-        pytest
-        pillow
-      ];
-      python-with-my-packages = python310.withPackages my-python-packages;
-    in
-    python-with-my-packages)
+    (pkgs.callPackage ./downloadhelper.nix { })
+    (
+      let
+        my-python-packages = python-packages: with python-packages; [
+          poetry
+          pudb
+          ipython
+          ipykernel
+          pandas
+          scipy
+          numpy
+          plotly
+          black
+          pyyaml
+          scikit-learn
+          httpx
+          pwntools
+          beautifulsoup4
+          pycryptodome
+          pytest
+          pillow
+        ];
+        python-with-my-packages = python310.withPackages my-python-packages;
+      in
+      python-with-my-packages
+    )
     dotnet-sdk
   ];
 
   programs.git = {
-  	enable=true;
-  	userName="rikyiso01";
-  	userEmail="riky.isola@gmail.com";
-  	signing={
-  	  key="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
-  	  signByDefault=true;
-  	};
-    extraConfig={
-      init.defaultBranch="main";
-      gpg.format="ssh";
+    enable = true;
+    userName = "rikyiso01";
+    userEmail = "riky.isola@gmail.com";
+    signing = {
+      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
+      signByDefault = true;
+    };
+    extraConfig = {
+      init.defaultBranch = "main";
+      gpg.format = "ssh";
     };
   };
 
@@ -128,28 +128,28 @@ rec {
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
-    CHROME_EXECUTABLE="chromium";
-    MANPATH="$HOME/.npm-packages/share/man";
-    NIXPKGS_ALLOW_UNFREE="1";
+    CHROME_EXECUTABLE = "chromium";
+    MANPATH = "$HOME/.npm-packages/share/man";
+    NIXPKGS_ALLOW_UNFREE = "1";
   };
 
   fonts.fontconfig.enable = true;
-  programs.bat.enable=true;
-  programs.exa.enable=true;
-  programs.gh.enable=true;
+  programs.bat.enable = true;
+  programs.exa.enable = true;
+  programs.gh.enable = true;
 
   programs.zsh = {
-    enable=true;
-    initExtra=''source $HOME/.config/nixpkgs/theme.zsh
-    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH'';
-    shellAliases={
-      cat="bat";
-      ls="exa";
-      du="dust";
-      find="fd";
-      ps="procs";
-      curl="curlie";
-      gdb="gef";
+    enable = true;
+    initExtra = ''source $HOME/.config/nixpkgs/theme.zsh
+    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH'';
+    shellAliases = {
+      cat = "bat";
+      ls = "exa";
+      du = "dust";
+      find = "fd";
+      ps = "procs";
+      curl = "curlie";
+      gdb = "gef";
     };
     zplug = {
       enable = true;
@@ -161,7 +161,7 @@ rec {
 
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "sudo"];
+      plugins = [ "git" "sudo" ];
     };
   };
 
@@ -180,66 +180,66 @@ rec {
 
   nixpkgs.config.allowUnfree = true;
 
-  qt={
-    enable=true;
-    platformTheme="gnome";
-    style={
-      name="adwaita-dark";
-      package=pkgs.adwaita-qt;
+  qt = {
+    enable = true;
+    platformTheme = "gnome";
+    style = {
+      name = "adwaita-dark";
+      package = pkgs.adwaita-qt;
     };
   };
 
-  home.file.".face".source=./logo.png;
-  home.file.".local/bin/update".source=./update.sh;
+  home.file.".face".source = ./logo.png;
+  home.file.".local/bin/update".source = ./update.sh;
 
-  home.file.".local/bin/chromium"={
-    text="#!/usr/bin/env bash\nexec com.brave.Browser $@";
-    executable=true;
+  home.file.".local/bin/chromium" = {
+    text = "#!/usr/bin/env bash\nexec com.brave.Browser $@";
+    executable = true;
   };
-  home.file.".local/bin/global_black"={
-    text="#!/usr/bin/env bash\nexec black $@";
-    executable=true;
+  home.file.".local/bin/global_black" = {
+    text = "#!/usr/bin/env bash\nexec black $@";
+    executable = true;
   };
-  home.file.".local/bin/node"={
-    text="#!/usr/bin/env bash\nexec yarn node $@";
-    executable=true;
+  home.file.".local/bin/node" = {
+    text = "#!/usr/bin/env bash\nexec yarn node $@";
+    executable = true;
   };
-  home.file.".local/bin/jupyter-server"={
-    text="#!/usr/bin/env bash\ndocker build -f ${home.homeDirectory}/.config/nixpkgs/jupyter -t jupyter:latest ${home.homeDirectory}/.config/nixpkgs\nexec nohup docker run -p 127.0.0.1:8888:8888 jupyter:latest > /dev/null 2> /dev/null &";
-    executable=true;
+  home.file.".local/bin/jupyter-server" = {
+    text = "#!/usr/bin/env bash\ndocker build -f ${home.homeDirectory}/.config/nixpkgs/jupyter -t jupyter:latest ${home.homeDirectory}/.config/nixpkgs\nexec nohup docker run -p 127.0.0.1:8888:8888 jupyter:latest > /dev/null 2> /dev/null &";
+    executable = true;
   };
-  home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text=''
-  {
-    "name": "net.downloadhelper.coapp",
-    "description": "Video DownloadHelper companion app",
-    "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",
-    "type": "stdio",
-    "allowed_origins": [
-        "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
-    ]
-  }
+  home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
+    {
+      "name": "net.downloadhelper.coapp",
+      "description": "Video DownloadHelper companion app",
+      "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",
+      "type": "stdio",
+      "allowed_origins": [
+          "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
+      ]
+    }
   '';
 
-  home.file.".local/flatpak/git".source=./normal-spawn.sh;
-  home.file.".local/flatpak/nix-instantiate".source=./normal-spawn.sh;
-  home.file.".local/flatpak/nixpkgs-fmt".source=./normal-spawn.sh;
-  home.file.".local/flatpak/chromium".source=./normal-spawn.sh;
-  home.file.".local/flatpak/code"={
-    text="#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
-    executable=true;
+  home.file.".local/flatpak/git".source = ./normal-spawn.sh;
+  home.file.".local/flatpak/nix-instantiate".source = ./normal-spawn.sh;
+  home.file.".local/flatpak/nixpkgs-fmt".source = ./normal-spawn.sh;
+  home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
+  home.file.".local/flatpak/code" = {
+    text = "#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
+    executable = true;
   };
-  home.file.".local/flatpak/zsh".source=./host-spawn;
-  home.file.".local/share/applications/micro.desktop"={
-    text="";
+  home.file.".local/flatpak/zsh".source = ./host-spawn;
+  home.file.".local/share/applications/micro.desktop" = {
+    text = "";
   };
 
   #imports = [ ./dconf.nix ];
 
-  services.home-manager.autoUpgrade={
-    enable=true;
-    frequency="weekly";
+  services.home-manager.autoUpgrade = {
+    enable = true;
+    frequency = "weekly";
   };
 
-  nix.package=pkgs.nix;
-  nix.settings={experimental-features=["nix-command"];};
+  nix.package = pkgs.nix;
+  nix.settings = { experimental-features = [ "nix-command" ]; };
 }

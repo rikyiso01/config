@@ -1,6 +1,6 @@
 { stdenv, fetchzip }:
 stdenv.mkDerivation rec {
-  name    = "downloadhelper-${version}";
+  name = "downloadhelper-${version}";
   version = "1.6.3";
 
   src = fetchzip {
