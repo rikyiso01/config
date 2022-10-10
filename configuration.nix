@@ -209,22 +209,20 @@
     dates = "weekly";
   };
 
-  networking.wireguard.interfaces = {
+  networking.wg-quick.interfaces = {
     wg0 = {
-      ips = [ "10.13.13.1/24" ];
-      listenPort = 51820;
+      address = [ "10.13.13.1" ];
+      dns = [ "8.8.8.8" ];
       privateKey = "wKBu4cx1I6xbNjmsfwPlgWEqCGvo8Enb151gBeJpUGY=";
+      postUp = "iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth+ -j MASQUERADE";
+      postDown = "iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth+ -j MASQUERADE";
 
       peers = [
-        # For a client configuration, one peer entry for the server will suffice.
-
         {
-          # Public key of the server (not a file path).
           publicKey = "p6qkBi3rqoyTIxZXOLQo7GbEwLvg9gsgmyCQFB423G8=";
+          presharedKey = "O5ubNfK8eHNcSAebrj1bDimF2P+Ev58AX24RSV5gRms=";
           allowedIPs = [ "0.0.0.0/0" ];
-          endpoint = "rikyisola.duckdns.org:51820"; # ToDo: route to endpoint not automatically configured https://wiki.archlinux.org/index.php/WireGuard#Loop_routing https://discourse.nixos.org/t/solved-minimal-firewall-setup-for-wireguard-client/7577
-
-          # Send keepalives every 25 seconds. Important to keep NAT tables alive.
+          endpoint = "rikyisola.duckdns.org:51820";
           persistentKeepalive = 25;
         }
       ];
