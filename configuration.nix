@@ -13,6 +13,7 @@
       <nixos-hardware/common/pc/laptop>
       <nixos-hardware/common/pc/laptop/acpi_call.nix>
       <nixos-hardware/common/cpu/intel>
+      /etc/nixos/wireguard.nix
     ];
 
   # Bootloader.
@@ -210,8 +211,4 @@
   };
 
   disabledModules = [ "services/networking/wireguard.nix" ];
-  imports = [
-    # rest of the imports
-    /etc/nixos/wireguard.nix
-  ];
 }
