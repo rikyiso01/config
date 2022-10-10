@@ -13,7 +13,6 @@
       <nixos-hardware/common/pc/laptop>
       <nixos-hardware/common/pc/laptop/acpi_call.nix>
       <nixos-hardware/common/cpu/intel>
-      /etc/nixos/wireguard.nix
     ];
 
   # Bootloader.
@@ -210,5 +209,25 @@
     dates = "weekly";
   };
 
-  disabledModules = [ "services/networking/wireguard.nix" ];
+  networking.wireguard.interfaces = {
+    wg0 = {
+      ips = [ "10.13.13.1/24" ];
+      listenPort = 51820;
+      privateKey = "wKBu4cx1I6xbNjmsfwPlgWEqCGvo8Enb151gBeJpUGY=";
+
+      peers = [
+        # For a client configuration, one peer entry for the server will suffice.
+
+        {
+          # Public key of the server (not a file path).
+          publicKey = "p6qkBi3rqoyTIxZXOLQo7GbEwLvg9gsgmyCQFB423G8=";
+          allowedIPs = [ "0.0.0.0/0" ];
+          endpoint = "rikyisola.duckdns.org:51820"; # ToDo: route to endpoint not automatically configured https://wiki.archlinux.org/index.php/WireGuard#Loop_routing https://discourse.nixos.org/t/solved-minimal-firewall-setup-for-wireguard-client/7577
+
+          # Send keepalives every 25 seconds. Important to keep NAT tables alive.
+          persistentKeepalive = 25;
+        }
+      ];
+    };
+  };
 }
