@@ -208,24 +208,4 @@
     enable = true;
     dates = "weekly";
   };
-
-  networking.wg-quick.interfaces = {
-    wg0 = {
-      address = [ "10.13.13.1" ];
-      dns = [ "8.8.8.8" ];
-      privateKey = "wKBu4cx1I6xbNjmsfwPlgWEqCGvo8Enb151gBeJpUGY=";
-      postUp = "iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth+ -j MASQUERADE";
-      postDown = "iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth+ -j MASQUERADE";
-
-      peers = [
-        {
-          publicKey = "p6qkBi3rqoyTIxZXOLQo7GbEwLvg9gsgmyCQFB423G8=";
-          presharedKey = "O5ubNfK8eHNcSAebrj1bDimF2P+Ev58AX24RSV5gRms=";
-          allowedIPs = [ "0.0.0.0/0" ];
-          endpoint = "rikyisola.duckdns.org:51820";
-          persistentKeepalive = 25;
-        }
-      ];
-    };
-  };
 }
