@@ -39,6 +39,7 @@ rest.insomnia.Insomnia
 org.ghidra_sre.Ghidra
 org.wireshark.Wireshark
 io.typora.Typora
+org.octave.Octave
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
