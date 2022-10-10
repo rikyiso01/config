@@ -208,4 +208,10 @@
     enable = true;
     dates = "weekly";
   };
+
+  disabledModules = [ "services/networking/wireguard.nix" ];
+  imports = [
+    # rest of the imports
+    /etc/nixos/wireguard.nix
+  ];
 }
