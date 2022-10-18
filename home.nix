@@ -108,6 +108,7 @@ rec {
       python-with-my-packages
     )
     dotnet-sdk
+    dotnetPackages.NUnit3
   ];
 
   programs.git = {
