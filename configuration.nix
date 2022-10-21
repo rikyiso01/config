@@ -183,6 +183,7 @@
   services.flatpak.enable = true;
   services.tlp.enable = true;
   services.power-profiles-daemon.enable = false;
+  services.gnome.tracker-miners.enable = false;
 
   networking.hosts = {
     "0.0.0.0" = [
