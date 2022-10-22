@@ -185,11 +185,7 @@
   services.power-profiles-daemon.enable = false;
   services.gnome.tracker-miners.enable = false;
   services.thermald.enable = true;
-  services.tlp.settings = {
-    CPU_SCALING_GOVERNOR_ON_AC = false;
-    CPU_SCALING_GOVERNOR_ON_BAT = false;
-  };
-  services.auto-cpufreq.enable = true;
+  services.tlp.settings = { };
 
   networking.hosts = {
     "0.0.0.0" = [
