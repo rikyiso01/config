@@ -67,7 +67,7 @@ flatpak override --user --filesystem='~/.themes:ro'
 flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/bin:$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
-flatpak override 'com.brave.Browser' --user --env"PATH=/app/bin:$HOME/.local/flatpak:/usr/bin"
+flatpak override 'com.brave.Browser' --user --env="PATH=/app/bin:$HOME/.local/flatpak:/usr/bin"
 
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
 flatpak install --user --or-update -y flathub-beta 'net.lutris.Lutris'
