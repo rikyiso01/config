@@ -233,7 +233,7 @@ rec {
     executable = true;
   };
   home.file.".local/flatpak/brave" = {
-    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --ignore-gpu-blocklist=enabled $@";
+    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled $@";
     executable = true;
   };
   home.file.".local/flatpak/zsh".source = ./host-spawn;
