@@ -28,7 +28,6 @@ rec {
     gnomeExtensions.gsconnect
     gnomeExtensions.disconnect-wifi
     gnomeExtensions.refresh-wifi-connections
-    gnomeExtensions.dim-on-battery-power
     file
     roboto
     fira-code
