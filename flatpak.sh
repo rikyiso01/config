@@ -19,7 +19,6 @@ flatpak remote-add --user --if-not-exists flathub 'https://flathub.org/repo/flat
 flathub='
 com.github.marktext.marktext
 com.brave.Browser
-org.godotengine.Godot
 com.google.AndroidStudio
 com.github.tchx84.Flatseal
 org.gnome.Evince
@@ -41,6 +40,10 @@ org.wireshark.Wireshark
 io.typora.Typora
 org.octave.Octave
 net.ankiweb.Anki
+org.mapeditor.Tiled
+org.raspberrypi.rpi-imager
+io.dbeaver.DBeaverCommunity
+com.obsproject.Studio
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -67,6 +70,7 @@ flatpak override --user --filesystem='~/.themes:ro'
 flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/bin:$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
+flatpak override 'com.brave.Browser' --user --filesystem="$HOME/.local/flatpak:ro"
 flatpak override 'com.brave.Browser' --user --env="PATH=/app/bin:$HOME/.local/flatpak:/usr/bin"
 
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
