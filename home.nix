@@ -229,7 +229,7 @@ rec {
   home.file.".local/flatpak/nixpkgs-fmt".source = ./normal-spawn.sh;
   home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
   home.file.".local/flatpak/code" = {
-    text = "#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code --enable-features=UseOzonePlatform --ozone-platform=wayland $@";
+    text = "#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
     executable = true;
   };
   home.file.".local/flatpak/brave" = {
