@@ -188,7 +188,6 @@
   services.tlp.settings = {
     CPU_SCALING_GOVERNOR_ON_AC = "powersave";
     CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-    CPU_MAX_PERF_ON_BAT = 30;
     CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
     CPU_HWP_ON_BAT = "power";
     CPU_BOOST_ON_BAT = 0;
@@ -204,9 +203,6 @@
     SOUND_POWER_SAVE_CONTROLLER = "Y";
     RUNTIME_PM_ON_BAT = "auto";
     USB_AUTOSUSPEND = 1;
-    DEVICES_TO_DISABLE_ON_BAT = "bluetooth";
-    INTEL_GPU_MAX_FREQ_ON_BAT = 800;
-    INTEL_GPU_BOOST_FREQ_ON_BAT = 800;
     MAX_LOST_WORK_SECS_ON_BAT = 180;
   };
 
