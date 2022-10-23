@@ -44,6 +44,7 @@ org.mapeditor.Tiled
 org.raspberrypi.rpi-imager
 io.dbeaver.DBeaverCommunity
 com.obsproject.Studio
+net.lutris.Lutris
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -73,10 +74,7 @@ flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
 flatpak override 'com.brave.Browser' --user --filesystem="$HOME/.local/flatpak:ro"
 flatpak override 'com.brave.Browser' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin"
 
-flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
-flatpak install --user --or-update -y flathub-beta 'net.lutris.Lutris'
-
-flatpak override 'net.lutris.Lutris' --user --env="PATH=/app/bin:/usr/bin:/app/utils/bin:/usr/lib/extensions/vulkan/MangoHud/bin/:/app/jre/bin/"
+#flatpak override 'net.lutris.Lutris' --user --env="PATH=/app/bin:/usr/bin:/app/utils/bin:/usr/lib/extensions/vulkan/MangoHud/bin/:/app/jre/bin/"
 flatpak override 'net.lutris.Lutris' --user --filesystem='/nix/store:ro'
 
 flatpak update -y

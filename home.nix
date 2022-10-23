@@ -62,7 +62,8 @@ rec {
     nmap
     flyctl
     gef
-    php
+    php81
+    php81Packages.psalm
     wireguard-tools
     binutils
     ghc
