@@ -64,6 +64,7 @@ rec {
     gef
     php81
     php81Packages.psalm
+    php81Packages.composer
     wireguard-tools
     binutils
     ghc
