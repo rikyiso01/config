@@ -226,6 +226,7 @@ rec {
   '';
 
   home.file.".local/flatpak/git".source = ./normal-spawn.sh;
+  home.file.".local/flatpak/xdg-mime".source = ./normal-spawn.sh;
   home.file.".local/flatpak/nix-instantiate".source = ./normal-spawn.sh;
   home.file.".local/flatpak/nixpkgs-fmt".source = ./normal-spawn.sh;
   home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
