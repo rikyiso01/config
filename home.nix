@@ -28,7 +28,6 @@ rec {
     gnomeExtensions.gsconnect
     gnomeExtensions.disconnect-wifi
     gnomeExtensions.refresh-wifi-connections
-    gnomeExtensions.easyScreenCast
     file
     roboto
     fira-code
