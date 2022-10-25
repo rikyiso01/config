@@ -45,6 +45,7 @@ org.raspberrypi.rpi-imager
 io.dbeaver.DBeaverCommunity
 com.obsproject.Studio
 net.lutris.Lutris
+org.libretro.RetroArch
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
