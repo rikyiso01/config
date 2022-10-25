@@ -74,7 +74,7 @@ flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
 flatpak override 'com.brave.Browser' --user --filesystem="$HOME/.local/flatpak:ro"
 flatpak override 'com.brave.Browser' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin"
 
-#flatpak override 'net.lutris.Lutris' --user --env="PATH=/app/bin:/usr/bin:/app/utils/bin:/usr/lib/extensions/vulkan/MangoHud/bin/:/app/jre/bin/"
-flatpak override 'net.lutris.Lutris' --user --filesystem='/nix/store:ro'
+flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
+flatpak install --user --or-update -y launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
 
 flatpak update -y

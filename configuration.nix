@@ -204,18 +204,10 @@
     RUNTIME_PM_ON_BAT = "auto";
     USB_AUTOSUSPEND = 1;
     MAX_LOST_WORK_SECS_ON_BAT = 180;
-  };
-
-  networking.hosts = {
-    "0.0.0.0" = [
-      "overseauspider.yuanshen.com"
-      "log-upload-os.hoyoverse.com"
-      "prd-lender.cdp.internal.unity3d.com"
-      "thind-prd-knob.data.ie.unity3d.com"
-      "thind-gke-usc.prd.data.corp.unity3d.com"
-      "cdp.cloud.unity3d.com"
-      "remote-config-proxy-prd.uca.cloud.unity3d.com"
-    ];
+    CPU_MAX_PERF_ON_BAT = 30;
+    DEVICES_TO_ENABLE_ON_SHUTDOWN = "bluetooth";
+    INTEL_GPU_MAX_FREQ_ON_BAT = 800;
+    INTEL_GPU_BOOST_FREQ_ON_BAT = 800;
   };
 
 
