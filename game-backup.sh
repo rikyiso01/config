@@ -15,5 +15,5 @@ cp -r "$HOME/.var/app/org.libretro.RetroArch/config" '/tmp/backup/org.libretro.R
 mkdir '/tmp/backup/Games'
 cp -r "$HOME/Games" '/tmp/backup/Games'
 
-zip -r './backup.zip' '/tmp/backup'
+zip -ry './backup.zip' '/tmp/backup'
 rm -rf '/tmp/backup'
