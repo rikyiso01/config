@@ -16,3 +16,4 @@ mkdir '/tmp/backup/Games'
 cp -r "$HOME/Games" '/tmp/backup/Games'
 
 zip -r './backup.zip' '/tmp/backup'
+rm -rf '/tmp/backup'

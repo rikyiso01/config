@@ -196,6 +196,7 @@ rec {
 
   home.file.".face".source = ./logo.png;
   home.file.".local/bin/update".source = ./update.sh;
+  home.file.".local/bin/game-backup".source = ./game-backup.sh;
   home.file.".local/bin/conservative".source = ./conservative.sh;
 
   home.file.".local/bin/chromium" = {
