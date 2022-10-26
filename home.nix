@@ -62,7 +62,16 @@ rec {
     nmap
     flyctl
     gef
-    php81
+    php81.buildEnv
+    {
+      extensions = ({ enabled, all }: enabled ++ (with all; [
+        xdebug
+      ]));
+      extraConfig = ''
+        xdebug.mode = debug
+        xdebug.start_with_request = yes
+      '';
+    }
     php81Packages.composer
     wireguard-tools
     binutils
