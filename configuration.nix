@@ -185,6 +185,8 @@
   services.power-profiles-daemon.enable = false;
   services.gnome.tracker-miners.enable = false;
   services.thermald.enable = true;
+  services.undervolt.enable = true;
+  services.undervolt.uncoreOffset = -90;
   services.tlp.settings = {
     CPU_SCALING_GOVERNOR_ON_AC = "powersave";
     CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
