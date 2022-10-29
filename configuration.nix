@@ -58,8 +58,6 @@
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
-  services.xserver.desktopManager.plasma5.enable = true;
-
   # Configure keymap in X11
   services.xserver = {
     layout = "it";
@@ -187,8 +185,8 @@
   services.power-profiles-daemon.enable = false;
   services.gnome.tracker-miners.enable = false;
   services.thermald.enable = true;
-  services.undervolt.enable = true;
-  services.undervolt.uncoreOffset = -90;
+  #services.undervolt.enable = true;
+  #services.undervolt.uncoreOffset = -90;
   services.tlp.settings = {
     CPU_SCALING_GOVERNOR_ON_AC = "powersave";
     CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
@@ -216,8 +214,8 @@
     USB_AUTOSUSPEND = 1;
     MAX_LOST_WORK_SECS_ON_BAT = 180;
     MAX_LOST_WORK_SECS_ON_AC = 15;
-    CPU_MAX_PERF_ON_BAT = 50;
-    CPU_MAX_PERF_ON_AC = 100;
+    #CPU_MAX_PERF_ON_BAT = 50;
+    #CPU_MAX_PERF_ON_AC = 100;
     DEVICES_TO_ENABLE_ON_SHUTDOWN = "bluetooth";
     #INTEL_GPU_MAX_FREQ_ON_BAT = 300;
     #INTEL_GPU_BOOST_FREQ_ON_BAT = 300;
