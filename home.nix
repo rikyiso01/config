@@ -9,12 +9,12 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
-#    du-dust
-#    fd
-#    procs
-#    curlie
-#    gdb
-#    wget
+    du-dust
+    fd
+    procs
+    curlie
+    gdb
+    wget
 #    curl
 #    dconf2nix
 #    gnome.gnome-tweaks
@@ -34,14 +34,14 @@ rec {
 #    noto-fonts
 #    bibata-cursors
 #    materia-theme
-#    docker-compose
+    docker-compose
 #    steam-run
 #    gcc
-#    chromedriver
+    chromedriver
 #    ffmpeg
 #    libsecret
-#    rustup
-#    rust-analyzer
+    rustup
+    rust-analyzer
 #    pkg-config
 #    xorg.libX11
 #    xorg.libXi
@@ -52,73 +52,73 @@ rec {
 #    gtk4
 #    gobject-introspection
 #    lsof
-#    micro
+    micro
 #    powertop
 #    usbutils
-#    yarn
+    yarn
 #    xdelta
 #    xterm
-#    android-tools
-#    nmap
+    android-tools
+    nmap
 #    flyctl
-#    gef
-#    (php81.buildEnv
-#      {
-#        extensions = ({ enabled, all }: enabled ++ (with all; [
-#          xdebug
-#        ]));
-#        extraConfig = ''
-#          xdebug.mode = debug
-#          xdebug.start_with_request = yes
-#        '';
-#      })
-#    php81Packages.composer
-#    wireguard-tools
+    gef
+    (php81.buildEnv
+      {
+        extensions = ({ enabled, all }: enabled ++ (with all; [
+          xdebug
+        ]));
+        extraConfig = ''
+          xdebug.mode = debug
+          xdebug.start_with_request = yes
+        '';
+      })
+    php81Packages.composer
+    wireguard-tools
 #    binutils
 #    ghc
 #    haskell-language-server
-#    binwalk
-#    exiftool
-#    imagemagick
-#    jdk
+    binwalk
+    exiftool
+    imagemagick
+    jdk
 #    unzip
 #    zip
-#    elmPackages.elm
-#    elmPackages.elm-format
-#    inotify-tools
-#    gradle
-#    nodePackages.typescript
-#    nixpkgs-fmt
-#    ngrok
-#    (pkgs.callPackage ./downloadhelper.nix { })
-#    (
-#      let
-#        my-python-packages = python-packages: with python-packages; [
-#          poetry
-#          pudb
-#          ipython
-#          ipykernel
-#          pandas
-#          scipy
-#          numpy
-#          plotly
-#          black
-#          pyyaml
-#          scikit-learn
-#          httpx
-#          pwntools
-#          beautifulsoup4
-#          pycryptodome
-#          pytest
-#          pillow
-#          matplotlib
-#          nbformat
-#        ];
-#        python-with-my-packages = python310.withPackages my-python-packages;
-#      in
-#      python-with-my-packages
-#    )
-#    dotnet-sdk
+    elmPackages.elm
+    elmPackages.elm-format
+    inotify-tools
+    gradle
+    nodePackages.typescript
+    nixpkgs-fmt
+    ngrok
+    (pkgs.callPackage ./downloadhelper.nix { })
+    (
+      let
+        my-python-packages = python-packages: with python-packages; [
+          poetry
+          pudb
+          ipython
+          ipykernel
+          pandas
+          scipy
+          numpy
+          plotly
+          black
+          pyyaml
+          scikit-learn
+          httpx
+          pwntools
+          beautifulsoup4
+          pycryptodome
+          pytest
+          pillow
+          matplotlib
+          nbformat
+        ];
+        python-with-my-packages = python310.withPackages my-python-packages;
+      in
+      python-with-my-packages
+    )
+    dotnet-sdk
   ];
 
   programs.git = {

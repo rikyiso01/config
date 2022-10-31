@@ -53,10 +53,10 @@ then
     ln -s "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
 fi
 
-if [ ! -d "$HOME/.themes" ]
-then
-    ln -s "$HOME/.nix-profile/share/themes" "$HOME/.themes"
-fi
+#if [ ! -d "$HOME/.themes" ]
+#then
+#    ln -s "$HOME/.nix-profile/share/themes" "$HOME/.themes"
+#fi
 
 flatpak install --user --or-update -y flathub $flathub
 
@@ -67,7 +67,7 @@ fix 'org.gnome.seahorse.Application'
 fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
 
-flatpak override --user --filesystem='~/.themes:ro'
+#flatpak override --user --filesystem='~/.themes:ro'
 
 flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/bin:$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
