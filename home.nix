@@ -9,116 +9,116 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
-    du-dust
-    fd
-    procs
-    curlie
-    gdb
-    wget
-    curl
-    dconf2nix
-    gnome.gnome-tweaks
-    gnomeExtensions.caffeine
-    gnomeExtensions.dash-to-dock
-    gnomeExtensions.alphabetical-app-grid
-    gnomeExtensions.appindicator
-    gnomeExtensions.compiz-windows-effect
-    gnomeExtensions.compiz-alike-magic-lamp-effect
-    gnomeExtensions.ddterm
-    gnomeExtensions.gsconnect
-    gnomeExtensions.disconnect-wifi
-    gnomeExtensions.refresh-wifi-connections
-    file
-    roboto
+#    du-dust
+#    fd
+#    procs
+#    curlie
+#    gdb
+#    wget
+#    curl
+#    dconf2nix
+#    gnome.gnome-tweaks
+#    gnomeExtensions.caffeine
+#    gnomeExtensions.dash-to-dock
+#    gnomeExtensions.alphabetical-app-grid
+#    gnomeExtensions.appindicator
+#    gnomeExtensions.compiz-windows-effect
+#    gnomeExtensions.compiz-alike-magic-lamp-effect
+#    gnomeExtensions.ddterm
+#    gnomeExtensions.gsconnect
+#    gnomeExtensions.disconnect-wifi
+#    gnomeExtensions.refresh-wifi-connections
+#    file
+#    roboto
     fira-code
-    noto-fonts
-    bibata-cursors
-    materia-theme
-    docker-compose
-    steam-run
-    gcc
-    chromedriver
-    ffmpeg
-    libsecret
-    rustup
-    rust-analyzer
-    pkg-config
-    xorg.libX11
-    xorg.libXi
-    mesa
-    alsa-lib
-    pkgconfig
-    cairo
-    gtk4
-    gobject-introspection
-    lsof
-    micro
-    powertop
-    usbutils
-    yarn
-    xdelta
-    xterm
-    android-tools
-    nmap
-    flyctl
-    gef
-    (php81.buildEnv
-      {
-        extensions = ({ enabled, all }: enabled ++ (with all; [
-          xdebug
-        ]));
-        extraConfig = ''
-          xdebug.mode = debug
-          xdebug.start_with_request = yes
-        '';
-      })
-    php81Packages.composer
-    wireguard-tools
-    binutils
-    ghc
-    haskell-language-server
-    binwalk
-    exiftool
-    imagemagick
-    jdk
-    unzip
-    zip
-    elmPackages.elm
-    elmPackages.elm-format
-    inotify-tools
-    gradle
-    nodePackages.typescript
-    nixpkgs-fmt
-    ngrok
-    (pkgs.callPackage ./downloadhelper.nix { })
-    (
-      let
-        my-python-packages = python-packages: with python-packages; [
-          poetry
-          pudb
-          ipython
-          ipykernel
-          pandas
-          scipy
-          numpy
-          plotly
-          black
-          pyyaml
-          scikit-learn
-          httpx
-          pwntools
-          beautifulsoup4
-          pycryptodome
-          pytest
-          pillow
-          matplotlib
-          nbformat
-        ];
-        python-with-my-packages = python310.withPackages my-python-packages;
-      in
-      python-with-my-packages
-    )
-    dotnet-sdk
+#    noto-fonts
+#    bibata-cursors
+#    materia-theme
+#    docker-compose
+#    steam-run
+#    gcc
+#    chromedriver
+#    ffmpeg
+#    libsecret
+#    rustup
+#    rust-analyzer
+#    pkg-config
+#    xorg.libX11
+#    xorg.libXi
+#    mesa
+#    alsa-lib
+#    pkgconfig
+#    cairo
+#    gtk4
+#    gobject-introspection
+#    lsof
+#    micro
+#    powertop
+#    usbutils
+#    yarn
+#    xdelta
+#    xterm
+#    android-tools
+#    nmap
+#    flyctl
+#    gef
+#    (php81.buildEnv
+#      {
+#        extensions = ({ enabled, all }: enabled ++ (with all; [
+#          xdebug
+#        ]));
+#        extraConfig = ''
+#          xdebug.mode = debug
+#          xdebug.start_with_request = yes
+#        '';
+#      })
+#    php81Packages.composer
+#    wireguard-tools
+#    binutils
+#    ghc
+#    haskell-language-server
+#    binwalk
+#    exiftool
+#    imagemagick
+#    jdk
+#    unzip
+#    zip
+#    elmPackages.elm
+#    elmPackages.elm-format
+#    inotify-tools
+#    gradle
+#    nodePackages.typescript
+#    nixpkgs-fmt
+#    ngrok
+#    (pkgs.callPackage ./downloadhelper.nix { })
+#    (
+#      let
+#        my-python-packages = python-packages: with python-packages; [
+#          poetry
+#          pudb
+#          ipython
+#          ipykernel
+#          pandas
+#          scipy
+#          numpy
+#          plotly
+#          black
+#          pyyaml
+#          scikit-learn
+#          httpx
+#          pwntools
+#          beautifulsoup4
+#          pycryptodome
+#          pytest
+#          pillow
+#          matplotlib
+#          nbformat
+#        ];
+#        python-with-my-packages = python310.withPackages my-python-packages;
+#      in
+#      python-with-my-packages
+#    )
+#    dotnet-sdk
   ];
 
   programs.git = {
@@ -126,7 +126,7 @@ rec {
     userName = "rikyiso01";
     userEmail = "riky.isola@gmail.com";
     signing = {
-      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
+      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUzwLKLo95CSEzbFXEGVDlv6yoKWUYxPGG2w7CRxhrx riky.isola@gmail.com";
       signByDefault = true;
     };
     extraConfig = {
@@ -137,7 +137,7 @@ rec {
 
   home.sessionVariables = {
     MOZ_ENABLE_WAYLAND = 1;
-    NIX_PATH = "$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
+    #NIX_PATH = "$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
@@ -149,7 +149,12 @@ rec {
   fonts.fontconfig.enable = true;
   programs.bat.enable = true;
   programs.exa.enable = true;
-  programs.gh.enable = true;
+  programs.gh={
+      enable = true;
+      settings={
+          git_protocol = "ssh";
+      };
+  };
 
   programs.zsh = {
     enable = true;
@@ -192,16 +197,16 @@ rec {
 
   nixpkgs.config.allowUnfree = true;
 
-  qt = {
-    enable = true;
-    platformTheme = "gnome";
-    style = {
-      name = "adwaita-dark";
-      package = pkgs.adwaita-qt;
-    };
-  };
+#  qt = {
+#    enable = true;
+#    platformTheme = "gnome";
+#    style = {
+#      name = "adwaita-dark";
+#      package = pkgs.adwaita-qt;
+#    };
+#  };
 
-  home.file.".face".source = ./logo.png;
+#  home.file.".face".source = ./logo.png;
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/game-backup".source = ./game-backup.sh;
   home.file.".local/bin/conservative".source = ./conservative.sh;
