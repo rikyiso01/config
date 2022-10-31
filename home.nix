@@ -15,52 +15,15 @@ rec {
     curlie
     gdb
     wget
-#    curl
-#    dconf2nix
-#    gnome.gnome-tweaks
-#    gnomeExtensions.caffeine
-#    gnomeExtensions.dash-to-dock
-#    gnomeExtensions.alphabetical-app-grid
-#    gnomeExtensions.appindicator
-#    gnomeExtensions.compiz-windows-effect
-#    gnomeExtensions.compiz-alike-magic-lamp-effect
-#    gnomeExtensions.ddterm
-#    gnomeExtensions.gsconnect
-#    gnomeExtensions.disconnect-wifi
-#    gnomeExtensions.refresh-wifi-connections
-#    file
-#    roboto
     fira-code
-#    noto-fonts
-#    bibata-cursors
-#    materia-theme
     docker-compose
-#    steam-run
-#    gcc
     chromedriver
-#    ffmpeg
-#    libsecret
     rustup
     rust-analyzer
-#    pkg-config
-#    xorg.libX11
-#    xorg.libXi
-#    mesa
-#    alsa-lib
-#    pkgconfig
-#    cairo
-#    gtk4
-#    gobject-introspection
-#    lsof
     micro
-#    powertop
-#    usbutils
     yarn
-#    xdelta
-#    xterm
     android-tools
     nmap
-#    flyctl
     gef
     (php81.buildEnv
       {
@@ -74,15 +37,10 @@ rec {
       })
     php81Packages.composer
     wireguard-tools
-#    binutils
-#    ghc
-#    haskell-language-server
     binwalk
     exiftool
     imagemagick
     jdk
-#    unzip
-#    zip
     elmPackages.elm
     elmPackages.elm-format
     inotify-tools
@@ -137,28 +95,28 @@ rec {
 
   home.sessionVariables = {
     MOZ_ENABLE_WAYLAND = 1;
-    #NIX_PATH = "$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
     NIXOS_OZONE_WL = "1";
     CHROME_EXECUTABLE = "chromium";
-    MANPATH = "$HOME/.npm-packages/share/man";
+    MANPATH = "/usr/share/man:$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE = "1";
   };
 
   fonts.fontconfig.enable = true;
   programs.bat.enable = true;
   programs.exa.enable = true;
-  programs.gh={
-      enable = true;
-      settings={
-          git_protocol = "ssh";
-      };
+  programs.gh = {
+    enable = true;
+    settings = {
+      git_protocol = "ssh";
+    };
   };
 
   programs.zsh = {
     enable = true;
     initExtra = ''source $HOME/.config/nixpkgs/theme.zsh
+    if [ -f $HOME/.ssh/environment ]; then source $HOME/.ssh/environment;fi
     PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH'';
     shellAliases = {
       cat = "bat";
@@ -196,19 +154,9 @@ rec {
   programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfree = true;
-
-#  qt = {
-#    enable = true;
-#    platformTheme = "gnome";
-#    style = {
-#      name = "adwaita-dark";
-#      package = pkgs.adwaita-qt;
-#    };
-#  };
-
-#  home.file.".face".source = ./logo.png;
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/game-backup".source = ./game-backup.sh;
+  home.file.".local/bin/start-ssh-agent".source = ./start-ssh-agent.sh;
   home.file.".local/bin/conservative".source = ./conservative.sh;
 
   home.file.".local/bin/chromium" = {
@@ -248,16 +196,13 @@ rec {
     executable = true;
   };
   home.file.".local/flatpak/brave" = {
-    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled $@";
+    text = "#!/usr/bin/env bash\nexec /app/bin/brave --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled $@";
     executable = true;
   };
   home.file.".local/flatpak/zsh".source = ./host-spawn;
   home.file.".local/share/applications/micro.desktop" = {
     text = "";
   };
-
-  #imports = [ ./dconf.nix ];
-
   services.home-manager.autoUpgrade = {
     enable = true;
     frequency = "weekly";
