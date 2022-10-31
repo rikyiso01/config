@@ -33,7 +33,7 @@ fi
 
 flatpak install --user --or-update -y flathub $flathub
 
-flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/bin:$HOME/.local/flatpak/:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
+flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak:$HOME/.local/bin:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
 
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
 flatpak override 'com.brave.Browser' --user --filesystem="$HOME/.local/flatpak:ro"

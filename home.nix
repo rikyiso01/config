@@ -84,7 +84,7 @@ rec {
     userName = "rikyiso01";
     userEmail = "riky.isola@gmail.com";
     signing = {
-      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUzwLKLo95CSEzbFXEGVDlv6yoKWUYxPGG2w7CRxhrx riky.isola@gmail.com";
+      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
       signByDefault = true;
     };
     extraConfig = {
@@ -187,7 +187,10 @@ rec {
     }
   '';
 
-  home.file.".local/flatpak/git".source = ./normal-spawn.sh;
+  home.file.".local/flatpak/git" = {
+    text = "#!/usr/bin/env bash\nsource $HOME/.ssh/environment;exec flatpak-spawn --env=SSH_AUTH_SOCK=$SSH_AUTH_SOCK --env=SSH_AGENT_PID=$SSH_AGENT_PID --host git $@";
+    executable = true;
+  };
   home.file.".local/flatpak/nix-instantiate".source = ./normal-spawn.sh;
   home.file.".local/flatpak/nixpkgs-fmt".source = ./normal-spawn.sh;
   home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
