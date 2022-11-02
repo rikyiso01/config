@@ -27,10 +27,8 @@ rec {
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
-    #gnomeExtensions.gsconnect
     gnomeExtensions.disconnect-wifi
     gnomeExtensions.refresh-wifi-connections
-    #gnomeExtensions.user-themes
     file
     fira-code
     bibata-cursors
@@ -235,6 +233,9 @@ rec {
     enable = true;
     frequency = "weekly";
   };
+  home.file.".local/share/applications/micro.desktop".text = "";
+  home.file.".local/share/applications/qv4l2.desktop".text = "";
+  home.file.".local/share/applications/avahi-discover.desktop".text = "";
 
   nix.package = pkgs.nix;
   nix.settings = { experimental-features = [ "nix-command" ]; };
