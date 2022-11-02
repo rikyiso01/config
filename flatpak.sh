@@ -24,6 +24,15 @@ io.dbeaver.DBeaverCommunity
 com.obsproject.Studio
 net.lutris.Lutris
 org.libretro.RetroArch
+org.gnome.Evince
+org.gnome.FileRoller
+org.gnome.Shotwell
+org.gnome.baobab
+org.gnome.TextEditor
+org.gnome.seahorse.Application
+org.gnome.Characters
+org.gnome.Logs
+org.gnome.dfeet
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
