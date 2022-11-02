@@ -3,8 +3,8 @@
 set -euo pipefail
 
 sudo bash -c 'modprobe -r pcspkr && echo "blacklist pcspkr" >> /etc/modprobe.d/50-blacklist.conf'
-sudo pamac remove firefox gwenview python-pip npm yarn wget
-sudo pamac install docker flatpak gamemode nix plasma-wayland-session tlp virtualbox virtualbox-ext-oracle
+sudo pamac remove firefox wget gnome-calculator gnome-calendar file-roller firefox-gnome-theme-maia gedit gparted gthumb gnome-user-docs gnome-logs lollypop gnome-system-monitor totem gnome-weather sushi evince manjaro-hello htop manjaro-settings-manager-notifier
+sudo pamac install docker flatpak gamemode nix tlp virtualbox xdg-desktop-portal-gnome virtualbox-host-dkms manjaro-settings-manager
 sudo usermod -aG nix-users "$USER"
 sudo systemctl enable nix-daemon
 sudo systemctl start nix-daemon

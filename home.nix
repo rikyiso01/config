@@ -9,17 +9,39 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
+    gnome.gnome-system-monitor
+    gnome.gnome-disk-utility
     du-dust
     fd
     procs
     curlie
     gdb
     wget
+    curl
+    dconf2nix
+    gnome.gnome-tweaks
+    gnomeExtensions.caffeine
+    gnomeExtensions.dash-to-dock
+    gnomeExtensions.alphabetical-app-grid
+    gnomeExtensions.appindicator
+    gnomeExtensions.compiz-windows-effect
+    gnomeExtensions.compiz-alike-magic-lamp-effect
+    gnomeExtensions.ddterm
+    #gnomeExtensions.gsconnect
+    gnomeExtensions.disconnect-wifi
+    gnomeExtensions.refresh-wifi-connections
+    #gnomeExtensions.user-themes
+    file
     fira-code
+    bibata-cursors
+    materia-theme
     docker-compose
+    gcc
     chromedriver
+    ffmpeg
     rustup
     rust-analyzer
+    powertop
     micro
     yarn
     android-tools
@@ -37,10 +59,15 @@ rec {
       })
     php81Packages.composer
     wireguard-tools
+    binutils
+    ghc
+    haskell-language-server
     binwalk
     exiftool
     imagemagick
     jdk
+    unzip
+    zip
     elmPackages.elm
     elmPackages.elm-format
     inotify-tools
@@ -101,6 +128,7 @@ rec {
     CHROME_EXECUTABLE = "chromium";
     MANPATH = "/usr/share/man:$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE = "1";
+    XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
   };
 
   fonts.fontconfig.enable = true;
@@ -203,9 +231,6 @@ rec {
     executable = true;
   };
   home.file.".local/flatpak/zsh".source = ./host-spawn;
-  home.file.".local/share/applications/micro.desktop" = {
-    text = "";
-  };
   services.home-manager.autoUpgrade = {
     enable = true;
     frequency = "weekly";
