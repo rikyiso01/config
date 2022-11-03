@@ -180,6 +180,18 @@ rec {
   programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfree = true;
+
+  qt = {
+    enable = true;
+    platformTheme = "gnome";
+    style = {
+      name = "adwaita-dark";
+      package = pkgs.adwaita-qt;
+    };
+  };
+
+  #  home.file.".face".source = ./logo.png;
+
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/game-backup".source = ./game-backup.sh;
   home.file.".local/bin/start-ssh-agent".source = ./start-ssh-agent.sh;
@@ -225,7 +237,7 @@ rec {
     executable = true;
   };
   home.file.".local/flatpak/brave" = {
-    text = "#!/usr/bin/env bash\nexec /app/bin/brave --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled $@";
+    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled $@";
     executable = true;
   };
   home.file.".local/flatpak/zsh".source = ./host-spawn;
@@ -235,7 +247,15 @@ rec {
   };
   home.file.".local/share/applications/micro.desktop".text = "";
   home.file.".local/share/applications/qv4l2.desktop".text = "";
+  home.file.".local/share/applications/qvidcap.desktop".text = "";
+  home.file.".local/share/applications/bssh.desktop".text = "";
   home.file.".local/share/applications/avahi-discover.desktop".text = "";
+  home.file.".local/share/applications/bvnc.desktop".text = "";
+  home.file.".local/share/applications/assistant.desktop".text = "";
+  home.file.".local/share/applications/designer.desktop".text = "";
+  home.file.".local/share/applications/linguist.desktop".text = "";
+  home.file.".local/share/applications/qdbusviewer.desktop".text = "";
+  home.file.".local/share/applications/lstopo.desktop".text = "";
 
   nix.package = pkgs.nix;
   nix.settings = { experimental-features = [ "nix-command" ]; };

@@ -33,6 +33,8 @@ org.gnome.seahorse.Application
 org.gnome.Characters
 org.gnome.Logs
 org.gnome.dfeet
+ca.desrt.dconf-editor
+org.gnome.PowerStats
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
