@@ -130,6 +130,8 @@ rec {
     MANPATH = "/usr/share/man:$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE = "1";
     XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
+    VISUAL = "micro";
+    EDITOR = "micro";
   };
 
   fonts.fontconfig.enable = true;
