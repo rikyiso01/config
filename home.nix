@@ -29,6 +29,7 @@ rec {
     gnomeExtensions.ddterm
     gnomeExtensions.disconnect-wifi
     gnomeExtensions.refresh-wifi-connections
+    gnomeExtensions.duckduckgo-search-provider
     file
     fira-code
     bibata-cursors
@@ -73,6 +74,7 @@ rec {
     nodePackages.typescript
     nixpkgs-fmt
     ngrok
+    brightnessctl
     (pkgs.callPackage ./downloadhelper.nix { })
     (
       let
@@ -96,6 +98,7 @@ rec {
           pillow
           matplotlib
           nbformat
+          scikitimage
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
@@ -194,7 +197,14 @@ rec {
 
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/game-backup".source = ./game-backup.sh;
-  home.file.".local/bin/start-ssh-agent".source = ./start-ssh-agent.sh;
+  home.file.".local/bin/startup".source = ./startup.sh;
+  home.file.".config/autostart/startup.desktop".text = ''
+    [Desktop Entry]
+    Exec=startup
+    Name=startup
+    Comment=Startup
+    Type=Application
+    Icon=nautilus'';
   home.file.".local/bin/conservative".source = ./conservative.sh;
 
   home.file.".local/bin/chromium" = {
