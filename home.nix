@@ -42,7 +42,7 @@ rec {
     rust-analyzer
     powertop
     micro
-    yarn
+    nodePackages.pnpm
     android-tools
     nmap
     gef
@@ -75,6 +75,7 @@ rec {
     nixpkgs-fmt
     ngrok
     brightnessctl
+    netcat
     (pkgs.callPackage ./downloadhelper.nix { })
     (
       let
@@ -215,10 +216,6 @@ rec {
   };
   home.file.".local/bin/global_black" = {
     text = "#!/usr/bin/env bash\nexec black $@";
-    executable = true;
-  };
-  home.file.".local/bin/node" = {
-    text = "#!/usr/bin/env bash\nexec yarn node $@";
     executable = true;
   };
   home.file.".local/bin/jupyter-server" = {
