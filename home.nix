@@ -45,6 +45,7 @@ rec {
     android-tools
     nmap
     gef
+    mysql80
     (php81.buildEnv
       {
         extensions = ({ enabled, all }: enabled ++ (with all; [
