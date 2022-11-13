@@ -29,7 +29,6 @@ rec {
     gnomeExtensions.ddterm
     gnomeExtensions.disconnect-wifi
     gnomeExtensions.refresh-wifi-connections
-    gnomeExtensions.duckduckgo-search-provider
     file
     fira-code
     bibata-cursors
