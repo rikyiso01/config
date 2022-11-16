@@ -27,8 +27,6 @@ rec {
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
-    gnomeExtensions.disconnect-wifi
-    gnomeExtensions.refresh-wifi-connections
     file
     fira-code
     bibata-cursors
