@@ -74,6 +74,12 @@ rec {
     ngrok
     brightnessctl
     netcat
+    wineWowPackages.stable
+    docker
+    flatpak
+    nano
+    vim
+    tlp
     (pkgs.callPackage ./downloadhelper.nix { })
     (
       let
@@ -143,8 +149,14 @@ rec {
     };
   };
 
+  programs.bash = {
+    enable = true;
+    initExtra = "zsh";
+  };
+
   programs.zsh = {
     enable = true;
+    enableAutosuggestions = true;
     initExtra = ''source $HOME/.config/nixpkgs/theme.zsh
     if [ -f $HOME/.ssh/environment ]; then source $HOME/.ssh/environment;fi
     PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH'';
@@ -160,7 +172,6 @@ rec {
     zplug = {
       enable = true;
       plugins = [
-        { name = "zsh-users/zsh-autosuggestions"; } # Simple plugin installation
         { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; } # Installations with additional options. For the list of options, please refer to Zplug README.
       ];
     };
@@ -199,6 +210,7 @@ rec {
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/game-backup".source = ./game-backup.sh;
   home.file.".local/bin/startup".source = ./startup.sh;
+  home.file.".local/bin/start-docker".source = ./start-docker.sh;
   home.file.".config/autostart/startup.desktop".text = ''
     [Desktop Entry]
     Exec=startup
