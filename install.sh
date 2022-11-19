@@ -23,6 +23,6 @@ PCIE_ASPM_ON_BAT=powersupersave" >> /etc/tlp.conf'
 ln -s "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
 systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
 tracker3 reset -s -r
-sudo bash -c "echo $USER ALL=(ALL) NOPASSWD:$HOME/.nix-profile/bin/tlp init start, $HOME/.local/bin/start-docker '' >> /etc/sudoers"
+sudo bash -c "echo $USER ALL=(ALL) NOPASSWD:$HOME/.nix-profile/bin/tlp init start, $HOME/.local/bin/start-docker >> /etc/sudoers"
 poetry config virtualenvs.in-project true
 sudo usermod --shell /bin/bash "$USER"

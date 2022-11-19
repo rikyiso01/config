@@ -104,6 +104,7 @@ rec {
           matplotlib
           nbformat
           scikitimage
+          numba
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
@@ -151,7 +152,7 @@ rec {
 
   programs.bash = {
     enable = true;
-    initExtra = "zsh";
+    initExtra = "exec zsh";
   };
 
   programs.zsh = {
