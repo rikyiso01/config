@@ -35,6 +35,7 @@ org.gnome.Logs
 org.gnome.dfeet
 ca.desrt.dconf-editor
 org.gnome.PowerStats
+org.gnome.Boxes
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]

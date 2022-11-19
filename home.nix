@@ -150,6 +150,7 @@ rec {
     };
   };
 
+
   programs.bash = {
     enable = true;
     initExtra = "exec zsh";
@@ -181,6 +182,14 @@ rec {
       enable = true;
       plugins = [ "git" "sudo" ];
     };
+  };
+
+  programs.nix-index.enable = true;
+
+  programs.oh-my-posh = {
+    enable = true;
+    enableZshIntegration = false;
+    useTheme = "powerlevel10k_lean";
   };
 
   # This value determines the Home Manager release that your
@@ -223,6 +232,10 @@ rec {
 
   home.file.".local/bin/chromium" = {
     text = "#!/usr/bin/env bash\nexec com.brave.Browser $@";
+    executable = true;
+  };
+  home.file.".local/bin/nix-shell" = {
+    text = "#!/usr/bin/env bash\nexec /usr/bin/nix-shell $@ --run zsh";
     executable = true;
   };
   home.file.".local/bin/global_black" = {
