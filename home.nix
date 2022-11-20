@@ -31,6 +31,7 @@ rec {
     fira-code
     bibata-cursors
     materia-theme
+    docker
     docker-compose
     gcc
     chromedriver
@@ -74,8 +75,6 @@ rec {
     ngrok
     brightnessctl
     netcat
-    wineWowPackages.stable
-    docker
     flatpak
     nano
     vim
