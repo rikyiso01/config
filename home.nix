@@ -41,6 +41,8 @@ rec {
     powertop
     micro
     nodePackages.pnpm
+    nodejs-slim
+    shellcheck
     android-tools
     nmap
     gef
@@ -160,7 +162,7 @@ rec {
     enableAutosuggestions = true;
     initExtra = ''source $HOME/.config/nixpkgs/theme.zsh
     if [ -f $HOME/.ssh/environment ]; then source $HOME/.ssh/environment;fi
-    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH'';
+    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin'';
     shellAliases = {
       cat = "bat";
       ls = "exa";

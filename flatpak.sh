@@ -37,6 +37,7 @@ ca.desrt.dconf-editor
 org.gnome.PowerStats
 org.gnome.Boxes
 com.usebottles.bottles
+org.gnome.GHex
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
