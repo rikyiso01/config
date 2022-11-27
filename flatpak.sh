@@ -22,7 +22,6 @@ org.mapeditor.Tiled
 org.raspberrypi.rpi-imager
 io.dbeaver.DBeaverCommunity
 com.obsproject.Studio
-net.lutris.Lutris
 org.libretro.RetroArch
 org.gnome.Evince
 org.gnome.FileRoller
