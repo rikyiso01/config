@@ -162,7 +162,7 @@ rec {
     enableAutosuggestions = true;
     initExtra = ''source $HOME/.config/nixpkgs/theme.zsh
     if [ -f $HOME/.ssh/environment ]; then source $HOME/.ssh/environment;fi
-    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin'';
+    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin:$PATH'';
     shellAliases = {
       cat = "bat";
       ls = "exa";
