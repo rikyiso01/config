@@ -60,7 +60,6 @@ rec {
     php81Packages.composer
     wireguard-tools
     binutils
-    ghc
     haskell-language-server
     binwalk
     exiftool
@@ -81,6 +80,8 @@ rec {
     nano
     vim
     tlp
+    julia
+    traceroute
     (pkgs.callPackage ./downloadhelper.nix { })
     (
       let
@@ -106,11 +107,13 @@ rec {
           nbformat
           scikitimage
           numba
+          opencv4
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
       python-with-my-packages
     )
+    (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
     dotnet-sdk
   ];
 
