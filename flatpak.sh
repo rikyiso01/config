@@ -37,6 +37,7 @@ org.gnome.PowerStats
 org.gnome.Boxes
 com.usebottles.bottles
 org.gnome.GHex
+org.audacityteam.Audacity
 '
 
 if [ ! -d "$HOME/.local/share/fonts" ]
