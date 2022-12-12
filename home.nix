@@ -33,7 +33,6 @@ rec {
     materia-theme
     docker
     docker-compose
-    gcc
     chromedriver
     ffmpeg
     rustup
@@ -59,7 +58,6 @@ rec {
       })
     php81Packages.composer
     wireguard-tools
-    binutils
     haskell-language-server
     binwalk
     exiftool

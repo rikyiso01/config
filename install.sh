@@ -4,7 +4,7 @@ set -euo pipefail
 
 sudo bash -c 'modprobe -r pcspkr && echo "blacklist pcspkr" >> /etc/modprobe.d/50-blacklist.conf'
 sudo pamac remove --no-confirm firefox wget gnome-calculator gnome-calendar file-roller firefox-gnome-theme-maia gedit gparted gthumb gnome-user-docs gnome-logs lollypop gnome-system-monitor totem gnome-weather sushi evince manjaro-hello htop manjaro-settings-manager-notifier manjaro-application-utility manjaro-artwork gnome-shell-extensions nano-syntax-highlighting vi powertop manjaro-zsh-config
-sudo pamac install --no-confirm flatpak nix xdg-desktop-portal-gnome manjaro-settings-manager xdg-desktop-portal-wlr pipewire-media-session manjaro-pipewire
+sudo pamac install --no-confirm flatpak nix xdg-desktop-portal-gnome manjaro-settings-manager xdg-desktop-portal-wlr pipewire-media-session manjaro-pipewire pkgconf
 sudo usermod -aG nix-users "$USER"
 sudo systemctl enable nix-daemon
 sudo systemctl start nix-daemon
