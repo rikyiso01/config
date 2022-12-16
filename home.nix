@@ -83,6 +83,7 @@ rec {
     julia-bin
     texlive.combined.scheme-full
     pandoc
+    gnumake
     (pkgs.callPackage ./downloadhelper.nix { })
     (
       let
