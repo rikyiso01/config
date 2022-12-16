@@ -2,6 +2,12 @@
 
 set -euo pipefail
 
+fix()
+{
+    grep -v 'DBusActivatable=true' < "$HOME/.local/share/flatpak/exports/share/applications/$1.desktop" > "$HOME/.local/share/applications/$1.desktop"
+    chmod +x "$HOME/.local/share/applications/$1.desktop"
+}
+
 flatpak remote-add --user --if-not-exists flathub 'https://flathub.org/repo/flathub.flatpakrepo'
 
 flathub='
@@ -39,6 +45,12 @@ com.usebottles.bottles
 org.gnome.GHex
 org.audacityteam.Audacity
 '
+
+fix 'org.gnome.TextEditor'
+fix 'org.gnome.Characters'
+fix 'org.gnome.Logs'
+fix 'org.gnome.Boxes'
+
 
 if [ ! -d "$HOME/.local/share/fonts" ]
 then

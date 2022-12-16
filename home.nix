@@ -81,6 +81,8 @@ rec {
     traceroute
     poetry
     julia-bin
+    texlive.combined.scheme-full
+    pandoc
     (pkgs.callPackage ./downloadhelper.nix { })
     (
       let
@@ -106,6 +108,7 @@ rec {
           scikitimage
           numba
           opencv4
+          notebook
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
