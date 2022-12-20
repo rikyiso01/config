@@ -4,7 +4,8 @@ set -euo pipefail
 
 readonly FILE='/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode'
 
-readonly status="$(cat "$FILE")"
+readonly status;
+status="$(cat "$FILE")"
 
 if [[ $status = 1 ]]
 then

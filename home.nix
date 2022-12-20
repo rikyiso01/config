@@ -235,6 +235,7 @@ rec {
     Type=Application
     Icon=nautilus'';
   home.file.".local/bin/conservative".source = ./conservative.sh;
+  home.file.".local/bin/cast-audio".source = ./cast-audio.sh;
 
   home.file.".local/bin/chromium" = {
     text = "#!/usr/bin/env bash\nexec com.brave.Browser $@";
