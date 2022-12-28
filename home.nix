@@ -106,7 +106,7 @@ rec {
           pillow
           matplotlib
           nbformat
-          scikitimage
+          #scikitimage
           numba
           opencv4
           notebook
@@ -296,6 +296,8 @@ rec {
   home.file.".local/share/applications/linguist.desktop".text = "";
   home.file.".local/share/applications/qdbusviewer.desktop".text = "";
   home.file.".local/share/applications/lstopo.desktop".text = "";
+  home.file.".local/share/applications/julia.desktop".text = "";
+  home.file.".local/share/applications/org.gnome.Extensions.desktop".text = "";
 
   nix.package = pkgs.nix;
   nix.settings = { experimental-features = [ "nix-command" ]; };
