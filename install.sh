@@ -4,10 +4,14 @@ set -euo pipefail
 
 sudo bash -c 'modprobe -r pcspkr && echo "blacklist pcspkr" >> /etc/modprobe.d/50-blacklist.conf'
 sudo pamac remove --no-confirm firefox wget gnome-calculator gnome-calendar file-roller firefox-gnome-theme-maia gedit gparted gthumb gnome-user-docs gnome-logs lollypop gnome-system-monitor totem gnome-weather sushi evince manjaro-hello htop manjaro-settings-manager-notifier manjaro-application-utility manjaro-artwork gnome-shell-extensions nano-syntax-highlighting vi powertop manjaro-zsh-config
-sudo pamac install --no-confirm flatpak nix xdg-desktop-portal-gnome manjaro-settings-manager xdg-desktop-portal-wlr pipewire-media-session manjaro-pipewire pkgconf
-sudo usermod -aG nix-users "$USER"
-sudo systemctl enable nix-daemon
-sudo systemctl start nix-daemon
+sudo pamac install --no-confirm flatpak nix xdg-desktop-portal-gnome manjaro-settings-manager xdg-desktop-portal-wlr pipewire-media-session manjaro-pipewire pkgconf manjaro-printer system-config-printer
+sudo gpasswd -a "$USER" sys
+sudo gpasswd -a "$USER" nix-users
+sudo systemctl enable --now nix-daemon
+sudo systemctl enable --now cups.service
+sudo systemctl enable --now cups.socket
+sudo systemctl enable --now cups.path
+sudo systemctl enable --now avahi-daemon.service
 nix-channel --add https://nixos.org/channels/nixpkgs-unstable
 nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
 nix-channel --update

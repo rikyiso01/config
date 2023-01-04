@@ -1,0 +1,5 @@
+com.google.AndroidStudio
+org.ghidra_sre.Ghidra
+Manjaro Settings
+com.github.marktext.marktext
+org.videolan.VLC

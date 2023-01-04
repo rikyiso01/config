@@ -8,6 +8,18 @@ fix()
     chmod +x "$HOME/.local/share/applications/$1.desktop"
 }
 
+add-wayland()
+{
+    if [[ "$2" == 'true' ]]
+    then
+        flags='--enable-features=WaylandWindowDecorations --ozone-platform-hint=auto'
+    else
+        flags='--enable-features=UseOzonePlatform --ozone-platform=wayland'
+    fi
+    sed "s/Exec=.*/& $flags/g" < "$HOME/.local/share/flatpak/exports/share/applications/$1.desktop" > "$HOME/.local/share/applications/$1.desktop"
+    chmod +x "$HOME/.local/share/applications/$1.desktop"
+}
+
 flatpak remote-add --user --if-not-exists flathub 'https://flathub.org/repo/flathub.flatpakrepo'
 
 flathub='
@@ -16,7 +28,6 @@ com.brave.Browser
 com.google.AndroidStudio
 com.github.tchx84.Flatseal
 org.videolan.VLC
-org.gimp.GIMP
 com.visualstudio.code
 rest.insomnia.Insomnia
 org.ghidra_sre.Ghidra
@@ -52,6 +63,8 @@ fix 'org.gnome.TextEditor'
 fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
 fix 'org.gnome.Boxes'
+fix 'ca.desrt.dconf-editor'
+fix 'org.gnome.baobab'
 
 
 if [ ! -d "$HOME/.local/share/fonts" ]
@@ -65,9 +78,23 @@ flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak
 
 flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
 flatpak override 'com.brave.Browser' --user --filesystem="$HOME/.local/flatpak:ro"
+flatpak override 'com.brave.Browser' --user --filesystem="$HOME/.nix-profile/bin:ro"
 flatpak override 'com.brave.Browser' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin"
 
+flatpak override 'org.audacityteam.Audacity' --user --socket='wayland'
+flatpak override 'org.raspberrypi.rpi-imager' --user --socket='wayland'
+flatpak override 'net.ankiweb.Anki' --user --env='ANKI_WAYLAND=1'
+add-wayland 'rest.insomnia.Insomnia' true
+add-wayland 'io.typora.Typora' false
+flatpak override 'com.visualstudio.code' --user --socket='wayland'
+add-wayland 'com.visualstudio.code' true
+
 flatpak override 'org.wireshark.Wireshark' --user --filesystem='home'
+
+
+flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
+flatpak install --user --or-update -y flathub-beta 'org.gimp.GIMP'
+
 
 flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
 flatpak install --user --or-update -y launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
