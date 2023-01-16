@@ -85,6 +85,7 @@ rec {
     pandoc
     gnumake
     (pkgs.callPackage ./downloadhelper.nix { })
+    (pkgs.callPackage ./tlauncher.nix { })
     (
       let
         my-python-packages = python-packages: with python-packages; [
