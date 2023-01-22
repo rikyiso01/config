@@ -107,7 +107,7 @@ rec {
           pillow
           matplotlib
           nbformat
-          #scikitimage
+          scikitimage
           numba
           opencv4
           notebook

@@ -55,7 +55,6 @@ org.gnome.Boxes
 com.usebottles.bottles
 org.gnome.GHex
 org.audacityteam.Audacity
-ch.tlaun.TL
 com.mattjakeman.ExtensionManager
 '
 
