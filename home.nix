@@ -79,7 +79,7 @@ rec {
     vim
     tlp
     traceroute
-    poetry
+    #poetry
     julia-bin
     texlive.combined.scheme-full
     pandoc
