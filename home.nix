@@ -87,6 +87,7 @@ rec {
     gnumake
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
+    (pkgs.callPackage ./marp.nix { })
     (
       let
         my-python-packages = python-packages: with python-packages; [
