@@ -227,7 +227,7 @@ rec {
   #  home.file.".face".source = ./logo.png;
 
   home.file.".local/bin/update".source = ./update.sh;
-  home.file.".local/bin/game-backup".source = ./game-backup.sh;
+  home.file.".local/bin/backup".source = ./backup.sh;
   home.file.".local/bin/startup".source = ./startup.sh;
   home.file.".local/bin/start-docker".source = ./start-docker.sh;
   home.file.".config/autostart/startup.desktop".text = ''
@@ -300,6 +300,8 @@ rec {
   home.file.".local/share/applications/qdbusviewer.desktop".text = "";
   home.file.".local/share/applications/lstopo.desktop".text = "";
   home.file.".local/share/applications/julia.desktop".text = "";
+  home.file.".local/share/applications/jupyter-notebook.desktop".text = "";
+  home.file.".local/share/applications/jupyter-nbclassic.desktop".text = "";
   home.file.".local/share/applications/org.gnome.Extensions.desktop".text = "";
 
   nix.package = pkgs.nix;

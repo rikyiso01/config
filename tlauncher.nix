@@ -1,11 +1,11 @@
 { stdenv, fetchurl, jre }:
 stdenv.mkDerivation rec {
   name = "tlauncher-${version}";
-  version = "2.873";
+  version = "2.875";
 
   src = fetchurl {
     url = "https://securerepository.net/client/TLauncher-${version}_pre.jar";
-    sha256 = "sha256-OLQ0M2uWh6M3/82ciJ7OZr8PS7WgWmu8sT6KqNcj3dE=";
+    sha256 = "sha256-D7I3sRldyxnI/xztCEbwjkZlh8zh3aiBadZfJWq009w=";
   };
 
   phases = [ "installPhase" ];
@@ -24,4 +24,4 @@ stdenv.mkDerivation rec {
   '';
 }
 
-# https://repo.tlauncher.org/update/lch/update_2.0.json
+# https://repo.tlauncher.org/update/lch/update_test_master_2.0.json
