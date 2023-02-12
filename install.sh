@@ -32,6 +32,3 @@ tracker3 reset -s -r
 sudo bash -c "echo $USER ALL=(ALL) NOPASSWD:$HOME/.nix-profile/bin/tlp init start, $HOME/.local/bin/start-docker >> /etc/sudoers"
 poetry config virtualenvs.in-project true
 sudo usermod --shell /bin/bash riky
-# pagedjs
-mkdir "$HOME/.pnpm"
-pnpm install -g pagedjs-cli

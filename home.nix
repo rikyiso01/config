@@ -147,7 +147,6 @@ rec {
     XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
     VISUAL = "micro";
     EDITOR = "micro";
-    PNPM_HOME = "$HOME/.pnpm";
   };
 
   fonts.fontconfig.enable = true;
@@ -171,7 +170,7 @@ rec {
     enableAutosuggestions = true;
     initExtra = ''source $HOME/.config/nixpkgs/theme.zsh
     if [ -f $HOME/.ssh/environment ]; then source $HOME/.ssh/environment;fi
-    PATH=$HOME/.pnpm:$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin:$PATH'';
+    PATH=$HOME/.local/bin:$HOME/.local/flutter/bin:$HOME/.cargo/bin:$PATH'';
     shellAliases = {
       cat = "bat";
       ls = "exa";
