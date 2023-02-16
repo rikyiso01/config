@@ -23,7 +23,6 @@ add-wayland()
 flatpak remote-add --user --if-not-exists flathub 'https://flathub.org/repo/flathub.flatpakrepo'
 
 flathub='
-com.github.marktext.marktext
 com.brave.Browser
 com.google.AndroidStudio
 com.github.tchx84.Flatseal
@@ -32,7 +31,6 @@ com.visualstudio.code
 rest.insomnia.Insomnia
 org.ghidra_sre.Ghidra
 org.wireshark.Wireshark
-io.typora.Typora
 org.octave.Octave
 net.ankiweb.Anki
 org.mapeditor.Tiled
