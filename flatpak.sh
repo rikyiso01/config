@@ -60,7 +60,6 @@ fix 'org.gnome.Characters'
 fix 'org.gnome.Logs'
 fix 'org.gnome.Boxes'
 fix 'ca.desrt.dconf-editor'
-fix 'org.gnome.baobab'
 
 
 if [ ! -d "$HOME/.local/share/fonts" ]
