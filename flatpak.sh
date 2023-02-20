@@ -31,7 +31,6 @@ com.visualstudio.code
 rest.insomnia.Insomnia
 org.ghidra_sre.Ghidra
 org.wireshark.Wireshark
-org.octave.Octave
 net.ankiweb.Anki
 org.mapeditor.Tiled
 org.raspberrypi.rpi-imager

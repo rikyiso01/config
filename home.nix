@@ -45,38 +45,22 @@ rec {
     android-tools
     nmap
     gef
-    mysql80
-    (php81.buildEnv
-      {
-        extensions = ({ enabled, all }: enabled ++ (with all; [
-          xdebug
-        ]));
-        extraConfig = ''
-          xdebug.mode = debug
-          xdebug.start_with_request = yes
-        '';
-      })
-    php81Packages.composer
     wireguard-tools
     haskell-language-server
     binwalk
     exiftool
     imagemagick
-    jdk
+    jre
     unzip
     zip
     elmPackages.elm
     elmPackages.elm-format
     inotify-tools
-    gradle
-    nodePackages.typescript
     nixpkgs-fmt
     ngrok
     brightnessctl
     netcat
     flatpak
-    nano
-    vim
     tlp
     traceroute
     poetry
@@ -118,7 +102,6 @@ rec {
       python-with-my-packages
     )
     (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
-    dotnet-sdk
   ];
 
   programs.git = {
@@ -136,10 +119,8 @@ rec {
   };
 
   home.sessionVariables = {
-    MOZ_ENABLE_WAYLAND = 1;
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
-    NIXOS_OZONE_WL = "1";
     CHROME_EXECUTABLE = "chromium";
     MANPATH = "/usr/share/man:$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE = "1";
