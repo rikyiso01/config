@@ -96,6 +96,7 @@ rec {
           numba
           opencv4
           notebook
+          networkx
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
