@@ -78,7 +78,6 @@ flatpak override 'org.audacityteam.Audacity' --user --socket='wayland'
 flatpak override 'org.raspberrypi.rpi-imager' --user --socket='wayland'
 flatpak override 'net.ankiweb.Anki' --user --env='ANKI_WAYLAND=1'
 add-wayland 'rest.insomnia.Insomnia' true
-add-wayland 'io.typora.Typora' false
 flatpak override 'com.visualstudio.code' --user --socket='wayland'
 add-wayland 'com.visualstudio.code' true
 
