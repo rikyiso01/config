@@ -40,7 +40,6 @@ com.obsproject.Studio
 org.gnome.Evince
 org.gnome.FileRoller
 org.gnome.Shotwell
-org.gnome.baobab
 org.gnome.TextEditor
 org.gnome.seahorse.Application
 org.gnome.Characters
