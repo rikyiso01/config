@@ -53,7 +53,7 @@ com.usebottles.bottles
 org.gnome.GHex
 org.audacityteam.Audacity
 com.mattjakeman.ExtensionManager
-flathub org.x.Warpinator
+org.localsend.localsend_app
 '
 
 fix 'org.gnome.TextEditor'
