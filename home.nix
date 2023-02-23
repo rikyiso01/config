@@ -20,7 +20,8 @@ rec {
     curl
     dconf2nix
     gnome.gnome-tweaks
-    gnomeExtensions.caffeine
+    #gnomeExtensions.caffeine
+    gnomeExtensions.espresso
     gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
     gnomeExtensions.appindicator
@@ -71,6 +72,17 @@ rec {
     gnumake
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
+    mysql80
+    (php81.buildEnv
+      {
+        extensions = ({ enabled, all }: enabled ++ (with all; [
+          xdebug
+        ]));
+        extraConfig = ''
+          xdebug.mode = debug
+          xdebug.start_with_request = yes
+        '';
+      })
     (
       let
         my-python-packages = python-packages: with python-packages; [
@@ -97,6 +109,7 @@ rec {
           opencv4
           notebook
           networkx
+          kaggle
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
