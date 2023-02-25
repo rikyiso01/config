@@ -87,8 +87,4 @@ flatpak override 'org.wireshark.Wireshark' --user --filesystem='home'
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
 flatpak install --user --or-update -y flathub-beta 'org.gimp.GIMP'
 
-
-flatpak remote-add --user --if-not-exists launcher.moe 'https://gol.launcher.moe/gol.launcher.moe.flatpakrepo'
-flatpak install --user --or-update -y launcher.moe 'com.gitlab.KRypt0n_.an-anime-game-launcher'
-
 flatpak update -y

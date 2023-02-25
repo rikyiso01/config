@@ -24,6 +24,7 @@ CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance
 CPU_ENERGY_PERF_POLICY_ON_BAT=power
 PCIE_ASPM_ON_AC=default
 PCIE_ASPM_ON_BAT=powersupersave" >> /etc/tlp.conf'
+sudo bash -c 'echo "auto-optimise-store = true" >> /etc/nix/nix.conf'
 mkdir -p "$HOME/Games/Minecraft/tlauncher"
 ln -s "$HOME/Games/Minecraft/tlauncher" "$HOME/.tlauncher"
 ln -s "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
