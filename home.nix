@@ -28,6 +28,7 @@ rec {
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
+    gnomeExtensions.focus-changer
     file
     fira-code
     bibata-cursors
