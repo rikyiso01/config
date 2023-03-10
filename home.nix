@@ -9,6 +9,17 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
+    unixtools.xxd
+    unixtools.top
+    unixtools.arp
+    unixtools.wall
+    unixtools.ping
+    unixtools.watch
+    unixtools.util-linux
+    man
+    which
+    iproute2
+    coreutils
     gnome.gnome-system-monitor
     gnome.gnome-disk-utility
     du-dust
@@ -20,7 +31,6 @@ rec {
     curl
     dconf2nix
     gnome.gnome-tweaks
-    #gnomeExtensions.caffeine
     gnomeExtensions.espresso
     gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
@@ -71,6 +81,7 @@ rec {
     texlive.combined.scheme-full
     pandoc
     gnumake
+    neovim
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
     mysql80
@@ -111,6 +122,7 @@ rec {
           notebook
           networkx
           kaggle
+          opensimplex
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
@@ -236,15 +248,15 @@ rec {
   home.file.".local/bin/cast-audio".source = ./cast-audio.sh;
 
   home.file.".local/bin/chromium" = {
-    text = "#!/usr/bin/env bash\nexec com.brave.Browser $@";
+    text = "#!/usr/bin/env bash\nexec com.brave.Browser \"$@\"";
     executable = true;
   };
   home.file.".local/bin/nix-shell" = {
-    text = "#!/usr/bin/env bash\nexec /usr/bin/nix-shell $@ --run zsh";
+    text = "#!/usr/bin/env bash\nexec /usr/bin/nix-shell \"$@\" --run zsh";
     executable = true;
   };
   home.file.".local/bin/global_black" = {
-    text = "#!/usr/bin/env bash\nexec black $@";
+    text = "#!/usr/bin/env bash\nexec black \"$@\"";
     executable = true;
   };
   home.file.".local/bin/jupyter-server" = {
@@ -264,18 +276,18 @@ rec {
   '';
 
   home.file.".local/flatpak/git" = {
-    text = "#!/usr/bin/env bash\nsource $HOME/.ssh/environment;exec flatpak-spawn --env=SSH_AUTH_SOCK=$SSH_AUTH_SOCK --env=SSH_AGENT_PID=$SSH_AGENT_PID --host git $@";
+    text = "#!/usr/bin/env bash\nsource $HOME/.ssh/environment;exec flatpak-spawn --env=SSH_AUTH_SOCK=$SSH_AUTH_SOCK --env=SSH_AGENT_PID=$SSH_AGENT_PID --host git \"$@\"";
     executable = true;
   };
   home.file.".local/flatpak/nix-instantiate".source = ./normal-spawn.sh;
   home.file.".local/flatpak/nixpkgs-fmt".source = ./normal-spawn.sh;
   home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
   home.file.".local/flatpak/code" = {
-    text = "#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code $@";
+    text = "#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code \"$@\"";
     executable = true;
   };
   home.file.".local/flatpak/brave" = {
-    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled $@";
+    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled \"$@\"";
     executable = true;
   };
   home.file.".local/flatpak/zsh".source = ./host-spawn;
