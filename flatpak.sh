@@ -2,24 +2,6 @@
 
 set -euo pipefail
 
-fix()
-{
-    grep -v 'DBusActivatable=true' < "$HOME/.local/share/flatpak/exports/share/applications/$1.desktop" > "$HOME/.local/share/applications/$1.desktop"
-    chmod +x "$HOME/.local/share/applications/$1.desktop"
-}
-
-add-wayland()
-{
-    if [[ "$2" == 'true' ]]
-    then
-        flags='--enable-features=WaylandWindowDecorations --ozone-platform-hint=auto'
-    else
-        flags='--enable-features=UseOzonePlatform --ozone-platform=wayland'
-    fi
-    sed "s/Exec=.*/& $flags/g" < "$HOME/.local/share/flatpak/exports/share/applications/$1.desktop" > "$HOME/.local/share/applications/$1.desktop"
-    chmod +x "$HOME/.local/share/applications/$1.desktop"
-}
-
 flatpak remote-add --user --if-not-exists flathub 'https://flathub.org/repo/flathub.flatpakrepo'
 
 flathub='
@@ -39,12 +21,7 @@ com.obsproject.Studio
 org.gnome.Evince
 org.gnome.FileRoller
 org.gnome.Shotwell
-org.gnome.TextEditor
 org.gnome.seahorse.Application
-org.gnome.Characters
-org.gnome.Logs
-org.gnome.dfeet
-ca.desrt.dconf-editor
 org.gnome.PowerStats
 org.gnome.Boxes
 com.usebottles.bottles
@@ -54,35 +31,7 @@ com.mattjakeman.ExtensionManager
 org.localsend.localsend_app
 '
 
-fix 'org.gnome.TextEditor'
-fix 'org.gnome.Characters'
-fix 'org.gnome.Logs'
-fix 'org.gnome.Boxes'
-fix 'ca.desrt.dconf-editor'
-
-
-if [ ! -d "$HOME/.local/share/fonts" ]
-then
-    ln -s "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
-fi
-
 flatpak install --user --or-update -y flathub $flathub
-
-flatpak override 'com.visualstudio.code' --user --env="PATH=$HOME/.local/flatpak:$HOME/.local/bin:$HOME/.nix-profile/bin:/app/bin:/usr/bin:$HOME/.var/app/com.visualstudio.code/data/node_modules/bin"
-
-flatpak override 'com.brave.Browser' --user --filesystem='/nix/store:ro'
-flatpak override 'com.brave.Browser' --user --filesystem='home'
-flatpak override 'com.brave.Browser' --user --env="PATH=$HOME/.local/flatpak:/app/bin:/usr/bin"
-
-flatpak override 'org.audacityteam.Audacity' --user --socket='wayland'
-flatpak override 'org.raspberrypi.rpi-imager' --user --socket='wayland'
-flatpak override 'net.ankiweb.Anki' --user --env='ANKI_WAYLAND=1'
-add-wayland 'rest.insomnia.Insomnia' true
-flatpak override 'com.visualstudio.code' --user --socket='wayland'
-add-wayland 'com.visualstudio.code' true
-
-flatpak override 'org.wireshark.Wireshark' --user --filesystem='home'
-
 
 flatpak remote-add --user --if-not-exists flathub-beta 'https://flathub.org/beta-repo/flathub-beta.flatpakrepo'
 flatpak install --user --or-update -y flathub-beta 'org.gimp.GIMP'

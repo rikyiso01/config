@@ -2,17 +2,14 @@
 
 set -euo pipefail
 
-eval "$(ssh-agent -s)"
-echo "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK;export SSH_AGENT_PID=$SSH_AGENT_PID" > "$HOME/.ssh/environment"
-ssh-add "$HOME/.ssh/id_ed25519"
+"$HOME/.nix-profile/bin/systemctl" start --user 'tlp'
+"$HOME/.nix-profile/bin/systemctl" start --user 'ssh'
 
-sudo tlp init start
-
-if [[ $(cat '/sys/class/power_supply/BAT1/status') == 'Discharging' ]]
+if [[ $("$HOME/.nix-profile/bin/cat" '/sys/class/power_supply/BAT1/status') == 'Discharging' ]]
 then
-    rfkill block bluetooth
-    brightnessctl -d intel_backlight set 15%
+    "$HOME/.nix-profile/bin/rfkill" block 'bluetooth'
+    "$HOME/.nix-profile/bin/brightnessctl" -d 'intel_backlight' set '15%'
 else
-    rfkill unblock bluetooth
-    sudo start-docker
+    "$HOME/.nix-profile/bin/rfkill" unblock 'bluetooth'
+    "$HOME/.nix-profile/bin/systemctl" start --user 'docker'
 fi
