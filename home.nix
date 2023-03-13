@@ -23,13 +23,6 @@ rec {
     systemdMinimal
     util-linux
     pkg-config
-    # Flatpak dbus
-    gnome-text-editor
-    gnome.gnome-characters
-    gnome.gnome-logs
-    gnome.gnome-boxes
-    gnome.dconf-editor
-    #
     gnome.gnome-system-monitor
     gnome.gnome-disk-utility
     du-dust
@@ -453,6 +446,7 @@ rec {
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/backup".source = ./backup.sh;
   home.file.".local/bin/startup".source = ./startup.sh;
+  home.file.".local/bin/flatpak-switch".source = ./flatpak-switch.py;
   home.file.".config/autostart/startup.desktop".text = ''
     [Desktop Entry]
     Exec=startup
@@ -520,6 +514,84 @@ rec {
   home.file.".local/share/applications/nvim.desktop".text = "";
   home.file.".local/share/applications/cups.desktop".text = "";
 
+  home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = ''
+    [Desktop Entry]
+    Categories=GNOME;GTK;Utility;TextEditor;
+    Keywords=write;notepad;
+    DBusActivatable=false
+    Exec=flatpak run --branch=stable --arch=x86_64 --command=gnome-text-editor --file-forwarding org.gnome.TextEditor @@u %U @@
+    MimeType=text/plain;
+    Name=Text Editor
+    GenericName=Text Editor
+    Comment=View and edit text files
+    Icon=org.gnome.TextEditor
+    StartupNotify=true
+    Terminal=false
+    Type=Application
+    X-Flatpak-RenamedFrom=gnome-text-editor
+    X-Flatpak=org.gnome.TextEditor
+  '';
+  home.file.".local/share/applications/org.gnome.Boxes.desktop".text = ''
+    [Desktop Entry]
+    Name=Boxes
+    GenericName=Virtual machine viewer/manager
+    Comment=View and use virtual machines
+    Keywords=virtual machine;vm;
+    Exec=flatpak run --branch=stable --arch=x86_64 --command=gnome-boxes --file-forwarding org.gnome.Boxes @@u %U @@
+    Icon=org.gnome.Boxes
+    Terminal=false
+    Type=Application
+    StartupNotify=true
+    Categories=GNOME;GTK;System;Development;Emulator;
+    MimeType=application/x-cd-image;
+    DBusActivatable=false
+    X-Flatpak=org.gnome.Boxes
+  '';
+  home.file.".local/share/applications/org.gnome.Logs.desktop".text = ''
+    [Desktop Entry]
+    Name=Logs
+    GenericName=Log Viewer
+    Comment=View detailed event logs for the system
+    Keywords=log;journal;debug;error;
+    Type=Application
+    Categories=GTK;GNOME;System;Monitor;Utility;X-GNOME-Utilities;
+    Exec=flatpak run --branch=stable --arch=x86_64 --command=gnome-logs org.gnome.Logs
+    Icon=org.gnome.Logs
+    Terminal=false
+    StartupNotify=true
+    DBusActivatable=false
+    X-Flatpak=org.gnome.Logs
+  '';
+  home.file.".local/share/applications/org.gnome.Characters.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Characters
+    Comment=Utility application to find and insert unusual characters
+    Icon=org.gnome.Characters
+    Exec=flatpak run --branch=stable --arch=x86_64 --command=/app/bin/gnome-characters org.gnome.Characters
+    DBusActivatable=false
+    StartupNotify=true
+    Categories=GNOME;GTK;Utility;X-GNOME-Utilities;
+    Keywords=characters;unicode;punctuation;math;letters;emoji;emoticon;symbols;
+    X-Purism-FormFactor=Workstation;Mobile;
+    X-Flatpak=org.gnome.Characters
+  '';
+  home.file.".local/share/applications/ca.desrt.dconf-editor.desktop".text = ''
+    [Desktop Entry]
+    Name=dconf Editor
+    GenericName=Configuration editor for dconf
+    Comment=Directly edit your entire configuration database
+    Keywords=settings;configuration;
+    Exec=flatpak run --branch=stable --arch=x86_64 --command=dconf-editor ca.desrt.dconf-editor
+    Terminal=false
+    Type=Application
+    StartupNotify=true
+    Categories=GNOME;GTK;System;
+    DBusActivatable=false
+    Icon=ca.desrt.dconf-editor
+    X-Flatpak=ca.desrt.dconf-editor
+  '';
+
   home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
     [Context]
     filesystems=home;/nix/store:ro;
@@ -555,6 +627,48 @@ rec {
     filesystems=home;
   '';
 
+  home.file.".config/flatpak.json".text = builtins.toJSON {
+    flathub = {
+      url = "https://flathub.org/repo/flathub.flatpakrepo";
+      packages = [
+        "org.gnome.TextEditor"
+        "org.gnome.Characters"
+        "org.gnome.Logs"
+        "org.gnome.Boxes"
+        "ca.desrt.dconf-editor"
+        "com.brave.Browser"
+        "com.google.AndroidStudio"
+        "com.github.tchx84.Flatseal"
+        "org.videolan.VLC"
+        "com.visualstudio.code"
+        "rest.insomnia.Insomnia"
+        "org.ghidra_sre.Ghidra"
+        "org.wireshark.Wireshark"
+        "net.ankiweb.Anki"
+        "org.mapeditor.Tiled"
+        "org.raspberrypi.rpi-imager"
+        "io.dbeaver.DBeaverCommunity"
+        "com.obsproject.Studio"
+        "org.gnome.Evince"
+        "org.gnome.FileRoller"
+        "org.gnome.Shotwell"
+        "org.gnome.seahorse.Application"
+        "org.gnome.PowerStats"
+        "org.gnome.Boxes"
+        "com.usebottles.bottles"
+        "org.gnome.GHex"
+        "org.audacityteam.Audacity"
+        "com.mattjakeman.ExtensionManager"
+        "org.localsend.localsend_app"
+        "org.gnome.dfeet"
+      ];
+    };
+    flathub-beta = {
+      url = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
+      packages = [ "org.gimp.GIMP" ];
+    };
+  };
+
   nix.package = pkgs.nix;
   nix.settings = { experimental-features = [ "nix-command" ]; };
 
@@ -566,6 +680,7 @@ rec {
       "$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/dbus-1" "$HOME/.local/share/dbus-1"
       "$HOME/.nix-profile/bin/systemctl" --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
       '/usr/bin/tracker3' reset -s -r > '/dev/null'
+      "$HOME/.local/bin/flatpak-switch"
     '';
   };
 }
