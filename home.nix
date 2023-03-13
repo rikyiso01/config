@@ -196,7 +196,6 @@ rec {
     '';
   };
 
-  programs.obs-studio.enable = true;
   programs.pandoc.enable = true;
 
   programs.ssh = {
