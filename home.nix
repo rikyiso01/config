@@ -673,8 +673,8 @@ rec {
       button-layout = "appmenu:minimize,maximize,close";
     };
     "org/gnome/mutter/keybindings" = {
-      toggle-tiled-left = true;
-      toggle-tiled-right = true;
+      toggle-tiled-left = [ "<Control><Alt>Left" ];
+      toggle-tiled-right = [ "<Control><Alt>Right" ];
     };
     "org/gnome/settings-daemon/plugins/media-keys" = {
       custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" ];
