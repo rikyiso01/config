@@ -1,5 +1,23 @@
 { config, pkgs, lib, ... }:
 
+let
+
+  fixDbus = id: name: lib.generators.toINI { } {
+    "Desktop Entry" = {
+      DBusActivatable = false;
+      Exec = "flatpak run --branch=stable --arch=x86_64 --file-forwarding ${id} @@u %U @@";
+      Name = name;
+      "Generic Name" = name;
+      Icon = id;
+      StartupNotify = true;
+      Terminal = false;
+      Type = "Application";
+      X-Flatpak = id;
+    };
+  };
+
+in
+
 rec {
 
   # Home Manager needs a bit of information about you and the
@@ -217,7 +235,7 @@ rec {
   programs.zsh = {
     enable = true;
     enableAutosuggestions = true;
-    initExtra = ''source $HOME/.config/nixpkgs/theme.zsh
+    initExtra = ''source $HOME/.config/theme.zsh
     PATH=$HOME/.local/bin:$PATH'';
     shellAliases = {
       cat = "bat";
@@ -419,11 +437,11 @@ rec {
   };
 
   home.file.".config/tlp.conf".text = ''
-    USB_EXCLUDE_BTUSB=1
-    CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance
-    CPU_ENERGY_PERF_POLICY_ON_BAT=power
-    PCIE_ASPM_ON_AC=default
-    PCIE_ASPM_ON_BAT=powersupersave
+    USB_EXCLUDE_BTUSB = 1
+    CPU_ENERGY_PERF_POLICY_ON_AC = balance_performance
+    CPU_ENERGY_PERF_POLICY_ON_BAT = power
+    PCIE_ASPM_ON_AC = default
+    PCIE_ASPM_ON_BAT = powersupersave
   '';
   home.file.".config/avahi-daemon.conf".text = ''
     [server]
@@ -438,10 +456,12 @@ rec {
     publish-hinfo=no
     publish-workstation=no
   '';
-  home.file.".config/pypoetry/config.toml".text = ''
-    [virtualenvs]
-    in-project = true
-  '';
+  home.file.".config/pypoetry/config.toml".text = lib.generators.toINI { } {
+    virtualenvs = {
+      in-project = true;
+    };
+  };
+  home.file.".config/theme.zsh".source = ./theme.zsh;
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/backup".source = ./backup.sh;
   home.file.".local/bin/startup".source = ./startup.sh;
@@ -513,118 +533,56 @@ rec {
   home.file.".local/share/applications/nvim.desktop".text = "";
   home.file.".local/share/applications/cups.desktop".text = "";
 
-  home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = ''
-    [Desktop Entry]
-    Categories=GNOME;GTK;Utility;TextEditor;
-    Keywords=write;notepad;
-    DBusActivatable=false
-    Exec=flatpak run --branch=stable --arch=x86_64 --command=gnome-text-editor --file-forwarding org.gnome.TextEditor @@u %U @@
-    MimeType=text/plain;
-    Name=Text Editor
-    GenericName=Text Editor
-    Comment=View and edit text files
-    Icon=org.gnome.TextEditor
-    StartupNotify=true
-    Terminal=false
-    Type=Application
-    X-Flatpak-RenamedFrom=gnome-text-editor
-    X-Flatpak=org.gnome.TextEditor
-  '';
-  home.file.".local/share/applications/org.gnome.Boxes.desktop".text = ''
-    [Desktop Entry]
-    Name=Boxes
-    GenericName=Virtual machine viewer/manager
-    Comment=View and use virtual machines
-    Keywords=virtual machine;vm;
-    Exec=flatpak run --branch=stable --arch=x86_64 --command=gnome-boxes --file-forwarding org.gnome.Boxes @@u %U @@
-    Icon=org.gnome.Boxes
-    Terminal=false
-    Type=Application
-    StartupNotify=true
-    Categories=GNOME;GTK;System;Development;Emulator;
-    MimeType=application/x-cd-image;
-    DBusActivatable=false
-    X-Flatpak=org.gnome.Boxes
-  '';
-  home.file.".local/share/applications/org.gnome.Logs.desktop".text = ''
-    [Desktop Entry]
-    Name=Logs
-    GenericName=Log Viewer
-    Comment=View detailed event logs for the system
-    Keywords=log;journal;debug;error;
-    Type=Application
-    Categories=GTK;GNOME;System;Monitor;Utility;X-GNOME-Utilities;
-    Exec=flatpak run --branch=stable --arch=x86_64 --command=gnome-logs org.gnome.Logs
-    Icon=org.gnome.Logs
-    Terminal=false
-    StartupNotify=true
-    DBusActivatable=false
-    X-Flatpak=org.gnome.Logs
-  '';
-  home.file.".local/share/applications/org.gnome.Characters.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=Characters
-    Comment=Utility application to find and insert unusual characters
-    Icon=org.gnome.Characters
-    Exec=flatpak run --branch=stable --arch=x86_64 --command=/app/bin/gnome-characters org.gnome.Characters
-    DBusActivatable=false
-    StartupNotify=true
-    Categories=GNOME;GTK;Utility;X-GNOME-Utilities;
-    Keywords=characters;unicode;punctuation;math;letters;emoji;emoticon;symbols;
-    X-Purism-FormFactor=Workstation;Mobile;
-    X-Flatpak=org.gnome.Characters
-  '';
-  home.file.".local/share/applications/ca.desrt.dconf-editor.desktop".text = ''
-    [Desktop Entry]
-    Name=dconf Editor
-    GenericName=Configuration editor for dconf
-    Comment=Directly edit your entire configuration database
-    Keywords=settings;configuration;
-    Exec=flatpak run --branch=stable --arch=x86_64 --command=dconf-editor ca.desrt.dconf-editor
-    Terminal=false
-    Type=Application
-    StartupNotify=true
-    Categories=GNOME;GTK;System;
-    DBusActivatable=false
-    Icon=ca.desrt.dconf-editor
-    X-Flatpak=ca.desrt.dconf-editor
-  '';
+  home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = fixDbus "org.gnome.TextEditor" "Text Editor";
+  home.file.".local/share/applications/org.gnome.Boxes.desktop".text = fixDbus "org.gnome.Boxes" "Boxes";
+  home.file.".local/share/applications/org.gnome.Logs.desktop".text = fixDbus "org.gnome.Logs" "Logs";
+  home.file.".local/share/applications/org.gnome.Characters.desktop".text = fixDbus "org.gnome.Characters" "Characters";
+  home.file.".local/share/applications/ca.desrt.dconf-editor.desktop".text = fixDbus "ca.desrt.dconf-editor" "dconf Editor";
 
-  home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
-    [Context]
-    filesystems=home;/nix/store:ro;
-    [Environment]
-    PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-  '';
-  home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = ''
-    [Environment]
-    ANKI_WAYLAND=1
-  '';
-  home.file.".local/share/flatpak/overrides/org.raspberrypi.rpi-imager".text = ''
-    [Context]
-    sockets=wayland;
-  '';
-  home.file.".local/share/flatpak/overrides/rest.insomnia.Insomnia".text = ''
-    [Context]
-    filesystems=${home.homeDirectory}/.local/flatpak:ro;/nix/store:ro;
-    [Environment]
-    PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-  '';
-  home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = ''
-    [Context]
-    sockets=wayland;
-    [Environment]
-    PATH=${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin
-  '';
-  home.file.".local/share/flatpak/overrides/org.audacityteam.Audacity".text = ''
-    [Context]
-    sockets=wayland;
-  '';
-  home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = ''
-    [Context]
-    filesystems=home;
-  '';
+  home.file.".local/share/flatpak/overrides/com.brave.Browser".text = lib.generators.toINI { } {
+    Context = {
+      filesystems = "home;/nix/store:ro;";
+    };
+    Environment = {
+      PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
+    };
+  };
+  home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = lib.generators.toINI { } {
+    Environment = {
+      ANKI_WAYLAND = 1;
+    };
+  };
+  home.file.".local/share/flatpak/overrides/org.raspberrypi.rpi-imager".text = lib.generators.toINI { } {
+    Context = {
+      sockets = "wayland";
+    };
+  };
+  home.file.".local/share/flatpak/overrides/rest.insomnia.Insomnia".text = lib.generators.toINI { } {
+    Context = {
+      filesystems = "${home.homeDirectory}/.local/flatpak:ro;/nix/store:ro;";
+    };
+    Environment = {
+      PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
+    };
+  };
+  home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = lib.generators.toINI { } {
+    Context = {
+      sockets = "wayland";
+    };
+    Environment = {
+      PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin";
+    };
+  };
+  home.file.".local/share/flatpak/overrides/org.audacityteam.Audacity".text = lib.generators.toINI { } {
+    Context = {
+      sockets = "wayland";
+    };
+  };
+  home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = lib.generators.toINI { } {
+    Context = {
+      filesystems = "home";
+    };
+  };
 
   home.file.".config/flatpak.json".text = builtins.toJSON {
     flathub = {
@@ -668,8 +626,116 @@ rec {
     };
   };
 
+  home.file.".local/share/backgrounds/background.jpg".source = ./wallpaper.jpg;
+
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      clock-show-date = true;
+      clock-show-seconds = false;
+      clock-show-weekday = true;
+      color-scheme = "prefer-dark";
+      font-antialiasing = "grayscale";
+      font-hinting = "slight";
+      show-battery-percentage = true;
+      toolkit-accessibility = false;
+    };
+    "org/gnome/desktop/peripherals/touchpad" = {
+      click-method = "areas";
+      speed = 0.00512820512820511;
+      tap-and-drag = true;
+      tap-to-click = true;
+      two-finger-scrolling-enabled = true;
+    };
+    "org/gnome/desktop/screensaver" = {
+      color-shading-type = "solid";
+      picture-options = "zoom";
+      picture-uri = "file://${home.homeDirectory}/.local/share/backgrounds/background.jpg";
+      primary-color = "#000000000000";
+      secondary-color = "#000000000000";
+    };
+    "org/gnome/desktop/session" = {
+      idle-delay = 300;
+    };
+    "org/gnome/desktop/sound" = {
+      allow-volume-above-100-percent = true;
+      event-sounds = true;
+      theme-name = "__custom";
+    };
+    "org/gnome/desktop/wm/keybindings" = {
+      move-to-monitor-left = [ ];
+      move-to-monitor-right = [ ];
+      switch-input-source = [ ];
+      switch-input-source-backward = [ ];
+      switch-to-workspace-left = [ ];
+      switch-to-workspace-right = [ ];
+    };
+    "org/gnome/desktop/wm/preferences" = {
+      button-layout = "appmenu:minimize,maximize,close";
+    };
+    "org/gnome/mutter/keybindings" = {
+      toggle-tiled-left = true;
+      toggle-tiled-right = true;
+    };
+    "org/gnome/settings-daemon/plugins/media-keys" = {
+      custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" ];
+      next = [ "<Super>Right" ];
+      play = [ "<Super>space" ];
+      previous = [ "<Super>Left" ];
+    };
+    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+      binding = "<Control><Alt>t";
+      command = "gnome-terminal";
+      name = "Terminal";
+    };
+    "org/gnome/settings-daemon/plugins/power" = {
+      idle-brightness = 20;
+      power-button-action = "interactive";
+      sleep-inactive-battery-timeout = 300;
+    };
+    "org/gnome/shell" = {
+      enabled-extensions = [
+        "pamac-updates@manjaro.org"
+        "dash-to-dock@micxgx.gmail.com"
+        "appindicatorsupport@rgcjonas.gmail.com"
+        "compiz-alike-magic-lamp-effect@hermes83.github.com"
+        "compiz-windows-effect@hermes83.github.com"
+        "ddterm@amezin.github.com"
+        "AlphabeticalAppGrid@stuarthayhurst"
+        "espresso@coadmunkee.github.com"
+        "focus-changer@heartmire"
+      ];
+      favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.visualstudio.code.desktop" ];
+    };
+    "org/gnome/shell/extensions/dash-to-dock" = {
+      apply-custom-theme = true;
+      background-opacity = 0.8;
+      custom-theme-shrink = false;
+      dash-max-icon-size = 48;
+      dock-position = "BOTTOM";
+      extend-height = false;
+      height-fraction = 0.9;
+      intellihide-mode = "FOCUS_APPLICATION_WINDOWS";
+      preferred-monitor = -2;
+      running-indicator-style = "DEFAULT";
+      show-mounts = false;
+      show-trash = false;
+    };
+    "org/gnome/shell/extensions/espresso" = {
+      has-battery = true;
+      show-notifications = false;
+    };
+    "org/gnome/shell/extensions/focus-changer" = {
+      focus-down = [ "<Shift><Alt>Down" ];
+      focus-left = [ "<Shift><Alt>Left" ];
+      focus-right = [ "<Shift><Alt>Right" ];
+      focus-up = [ "<Shift><Alt>Up" ];
+    };
+  };
+
   nix.package = pkgs.nix;
-  nix.settings = { experimental-features = [ "nix-command" ]; };
+  nix.settings = {
+    experimental-features = [ "nix-command" ];
+  };
 
   home.activation = {
     setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
