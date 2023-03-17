@@ -137,6 +137,8 @@ rec {
           networkx
           kaggle
           opensimplex
+          jupytext
+          ptpython
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
@@ -172,7 +174,6 @@ rec {
   };
 
   fonts.fontconfig.enable = true;
-  programs.matplotlib.enable = true;
   programs.bat.enable = true;
   programs.gnome-terminal = {
     enable = true;
@@ -199,7 +200,7 @@ rec {
   };
   programs.neovim = {
     enable = true;
-    plugins = with pkgs.vimPlugins; [ coc-pyright auto-save-nvim nerdtree ];
+    plugins = with pkgs.vimPlugins; [ coc-pyright auto-save-nvim vim-plug ];
     coc = {
       enable = true;
       settings = {
@@ -207,11 +208,21 @@ rec {
         "coc.preferences.formatOnSaveFiletypes" = [ "python" ];
         "python.formatting.provider" = "black";
         "python.analysis.typeCheckingMode" = "strict";
+        "python.analysis.stubPath" = "${home.homeDirectory}/Documents/Projects/Python/common-stubs";
       };
     };
+    #extraPython3Packages = p: with p; [ jupyter-client pynvim jupyter-client ueberzug pillow cairosvg pnglatex plotly ];
     extraConfig = ''
+      nnoremap <space>w :execute "!tmux send-keys -t 1 '" . getline('.') . "' ENTER"<CR><CR>j
       set number
+      source ${pkgs.vimPlugins.vim-plug}/plug.vim
+      call plug#begin()
+      call plug#end()
     '';
+  };
+  programs.matplotlib = {
+    enable = true;
+    config = { backend = "TkAgg"; };
   };
 
   programs.pandoc.enable = true;
@@ -220,7 +231,11 @@ rec {
     enable = true;
     extraConfig = "AddKeysToAgent yes";
   };
-  programs.tmux.enable = true;
+  programs.tmux = {
+    enable = true;
+    mouse = true;
+    extraConfig = "set -g default-terminal \"screen-256color\"";
+  };
 
   programs.texlive = {
     enable = true;
@@ -456,11 +471,13 @@ rec {
     publish-hinfo=no
     publish-workstation=no
   '';
-  home.file.".config/pypoetry/config.toml".text = lib.generators.toINI { } {
-    virtualenvs = {
-      in-project = true;
+  home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
+    { }
+    {
+      virtualenvs = {
+        in-project = true;
+      };
     };
-  };
   home.file.".config/theme.zsh".source = ./theme.zsh;
   home.file.".local/bin/update".source = ./update.sh;
   home.file.".local/bin/backup".source = ./backup.sh;
@@ -533,98 +550,123 @@ rec {
   home.file.".local/share/applications/nvim.desktop".text = "";
   home.file.".local/share/applications/cups.desktop".text = "";
 
-  home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = fixDbus "org.gnome.TextEditor" "Text Editor";
-  home.file.".local/share/applications/org.gnome.Boxes.desktop".text = fixDbus "org.gnome.Boxes" "Boxes";
-  home.file.".local/share/applications/org.gnome.Logs.desktop".text = fixDbus "org.gnome.Logs" "Logs";
-  home.file.".local/share/applications/org.gnome.Characters.desktop".text = fixDbus "org.gnome.Characters" "Characters";
-  home.file.".local/share/applications/ca.desrt.dconf-editor.desktop".text = fixDbus "ca.desrt.dconf-editor" "dconf Editor";
+  home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = fixDbus
+    "org.gnome.TextEditor"
+    "Text Editor";
+  home.file.".local/share/applications/org.gnome.Boxes.desktop".text = fixDbus
+    "org.gnome.Boxes"
+    "Boxes";
+  home.file.".local/share/applications/org.gnome.Logs.desktop".text = fixDbus
+    "org.gnome.Logs"
+    "Logs";
+  home.file.".local/share/applications/org.gnome.Characters.desktop".text = fixDbus
+    "org.gnome.Characters"
+    "Characters";
+  home.file.".local/share/applications/ca.desrt.dconf-editor.desktop".text = fixDbus
+    "ca.desrt.dconf-editor"
+    "dconf Editor";
 
-  home.file.".local/share/flatpak/overrides/com.brave.Browser".text = lib.generators.toINI { } {
-    Context = {
-      filesystems = "home;/nix/store:ro;";
+  home.file.".local/share/flatpak/overrides/com.brave.Browser".text = lib.generators.toINI
+    { }
+    {
+      Context = {
+        filesystems = "home;/nix/store:ro;";
+      };
+      Environment = {
+        PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
+      };
     };
-    Environment = {
-      PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
+  home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = lib.generators.toINI
+    { }
+    {
+      Environment = {
+        ANKI_WAYLAND = 1;
+      };
     };
-  };
-  home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = lib.generators.toINI { } {
-    Environment = {
-      ANKI_WAYLAND = 1;
+  home.file.".local/share/flatpak/overrides/org.raspberrypi.rpi-imager".text = lib.generators.toINI
+    { }
+    {
+      Context = {
+        sockets = "wayland";
+      };
     };
-  };
-  home.file.".local/share/flatpak/overrides/org.raspberrypi.rpi-imager".text = lib.generators.toINI { } {
-    Context = {
-      sockets = "wayland";
+  home.file.".local/share/flatpak/overrides/rest.insomnia.Insomnia".text = lib.generators.toINI
+    { }
+    {
+      Context = {
+        filesystems = "${home.homeDirectory}/.local/flatpak:ro;/nix/store:ro;";
+      };
+      Environment = {
+        PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
+      };
     };
-  };
-  home.file.".local/share/flatpak/overrides/rest.insomnia.Insomnia".text = lib.generators.toINI { } {
-    Context = {
-      filesystems = "${home.homeDirectory}/.local/flatpak:ro;/nix/store:ro;";
+  home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = lib.generators.toINI
+    { }
+    {
+      Context = {
+        sockets = "wayland";
+      };
+      Environment = {
+        PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin";
+      };
     };
-    Environment = {
-      PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
+  home.file.".local/share/flatpak/overrides/org.audacityteam.Audacity".text = lib.generators.toINI
+    { }
+    {
+      Context = {
+        sockets = "wayland";
+      };
     };
-  };
-  home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = lib.generators.toINI { } {
-    Context = {
-      sockets = "wayland";
+  home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = lib.generators.toINI
+    { }
+    {
+      Context = {
+        filesystems = "home";
+      };
     };
-    Environment = {
-      PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin";
-    };
-  };
-  home.file.".local/share/flatpak/overrides/org.audacityteam.Audacity".text = lib.generators.toINI { } {
-    Context = {
-      sockets = "wayland";
-    };
-  };
-  home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = lib.generators.toINI { } {
-    Context = {
-      filesystems = "home";
-    };
-  };
 
-  home.file.".config/flatpak.json".text = builtins.toJSON {
-    flathub = {
-      url = "https://flathub.org/repo/flathub.flatpakrepo";
-      packages = [
-        "org.gnome.TextEditor"
-        "org.gnome.Characters"
-        "org.gnome.Logs"
-        "org.gnome.Boxes"
-        "ca.desrt.dconf-editor"
-        "com.brave.Browser"
-        "com.google.AndroidStudio"
-        "com.github.tchx84.Flatseal"
-        "org.videolan.VLC"
-        "com.visualstudio.code"
-        "rest.insomnia.Insomnia"
-        "org.ghidra_sre.Ghidra"
-        "org.wireshark.Wireshark"
-        "net.ankiweb.Anki"
-        "org.mapeditor.Tiled"
-        "org.raspberrypi.rpi-imager"
-        "io.dbeaver.DBeaverCommunity"
-        "com.obsproject.Studio"
-        "org.gnome.Evince"
-        "org.gnome.FileRoller"
-        "org.gnome.Shotwell"
-        "org.gnome.seahorse.Application"
-        "org.gnome.PowerStats"
-        "org.gnome.Boxes"
-        "com.usebottles.bottles"
-        "org.gnome.GHex"
-        "org.audacityteam.Audacity"
-        "com.mattjakeman.ExtensionManager"
-        "org.localsend.localsend_app"
-        "org.gnome.dfeet"
-      ];
+  home.file.".config/flatpak.json".text = builtins.toJSON
+    {
+      flathub = {
+        url = "https://flathub.org/repo/flathub.flatpakrepo";
+        packages = [
+          "org.gnome.TextEditor"
+          "org.gnome.Characters"
+          "org.gnome.Logs"
+          "org.gnome.Boxes"
+          "ca.desrt.dconf-editor"
+          "com.brave.Browser"
+          "com.google.AndroidStudio"
+          "com.github.tchx84.Flatseal"
+          "org.videolan.VLC"
+          "com.visualstudio.code"
+          "rest.insomnia.Insomnia"
+          "org.ghidra_sre.Ghidra"
+          "org.wireshark.Wireshark"
+          "net.ankiweb.Anki"
+          "org.mapeditor.Tiled"
+          "org.raspberrypi.rpi-imager"
+          "io.dbeaver.DBeaverCommunity"
+          "com.obsproject.Studio"
+          "org.gnome.Evince"
+          "org.gnome.FileRoller"
+          "org.gnome.Shotwell"
+          "org.gnome.seahorse.Application"
+          "org.gnome.PowerStats"
+          "org.gnome.Boxes"
+          "com.usebottles.bottles"
+          "org.gnome.GHex"
+          "org.audacityteam.Audacity"
+          "com.mattjakeman.ExtensionManager"
+          "org.localsend.localsend_app"
+          "org.gnome.dfeet"
+        ];
+      };
+      flathub-beta = {
+        url = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
+        packages = [ "org.gimp.GIMP" ];
+      };
     };
-    flathub-beta = {
-      url = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
-      packages = [ "org.gimp.GIMP" ];
-    };
-  };
 
   home.file.".local/share/backgrounds/background.jpg".source = ./wallpaper.jpg;
 
