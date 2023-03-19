@@ -64,7 +64,6 @@ rec {
     materia-theme
     docker
     docker-compose
-    chromedriver
     ffmpeg
     rustup
     rust-analyzer
@@ -97,6 +96,7 @@ rec {
     poetry
     pypy38
     gnumake
+    tesseract
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
     mysql80
@@ -139,6 +139,9 @@ rec {
           opensimplex
           jupytext
           ptpython
+          playwright
+          aiofile
+          fonttools
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
