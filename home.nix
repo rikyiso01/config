@@ -97,19 +97,12 @@ rec {
     pypy38
     gnumake
     tesseract
+    php82Packages.composer
+    texlive.combined.scheme-full
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
     mysql80
-    (php81.buildEnv
-      {
-        extensions = ({ enabled, all }: enabled ++ (with all; [
-          xdebug
-        ]));
-        extraConfig = ''
-          xdebug.mode = debug
-          xdebug.start_with_request = yes
-        '';
-      })
+    php82
     (
       let
         my-python-packages = python-packages: with python-packages; [
@@ -214,7 +207,6 @@ rec {
         "python.analysis.stubPath" = "${home.homeDirectory}/Documents/Projects/Python/common-stubs";
       };
     };
-    #extraPython3Packages = p: with p; [ jupyter-client pynvim jupyter-client ueberzug pillow cairosvg pnglatex plotly ];
     extraConfig = ''
       nnoremap <space>w :execute "!tmux send-keys -t 1 '" . getline('.') . "' ENTER"<CR><CR>j
       set number
@@ -238,11 +230,6 @@ rec {
     enable = true;
     mouse = true;
     extraConfig = "set -g default-terminal \"screen-256color\"";
-  };
-
-  programs.texlive = {
-    enable = true;
-    packageSet = pkgs.texlive; #.combined.scheme-full;
   };
 
   programs.bash = {
@@ -663,6 +650,7 @@ rec {
           "com.mattjakeman.ExtensionManager"
           "org.localsend.localsend_app"
           "org.gnome.dfeet"
+          "net.sonic_pi.SonicPi"
         ];
       };
       flathub-beta = {
