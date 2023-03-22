@@ -101,8 +101,6 @@ rec {
     texlive.combined.scheme-full
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
-    (pkgs.callPackage ./carbonyl.nix { })
-    lynx
     mysql80
     php82
     (
@@ -133,7 +131,6 @@ rec {
           kaggle
           opensimplex
           jupytext
-          ptpython
           playwright
           aiofile
           fonttools
@@ -196,50 +193,12 @@ rec {
     enable = true;
     generateCaches = true;
   };
-  programs.neovim = {
-    enable = true;
-    plugins = with pkgs.vimPlugins; [ coc-pyright auto-save-nvim vim-plug coc-sh vim-nix ];
-    coc = {
-      enable = true;
-      settings = {
-        "coc.preferences.formatOnType" = true;
-        "coc.preferences.formatOnSaveFiletypes" = [ "python" ];
-        "python.formatting.provider" = "black";
-        "python.analysis.typeCheckingMode" = "strict";
-        "python.analysis.stubPath" = "${home.homeDirectory}/Documents/Projects/Python/common-stubs";
-      };
-    };
-    extraConfig = ''
-      nnoremap <space>w :execute "!tmux send-keys -t 1 '" . getline('.') . "' ENTER"<CR><CR>j
-      nnoremap <space>q :execute "!tmux send-keys -t 1 'plt.show()' ENTER"<CR>
-      vnoremap <space>w :w !xargs -0 -I {} tmux send-keys -t 1 '{}' ENTER
-      set number
-      source ${pkgs.vimPlugins.vim-plug}/plug.vim
-      call plug#begin()
-      call plug#end()
-      augroup vimrc
-        " Remove all vimrc autocommands
-        autocmd!
-        autocmd BufWritePost *.nix !nixpkgs-fmt <afile>
-      augroup END
-      inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-    '';
-  };
-  programs.matplotlib = {
-    enable = true;
-    config = { backend = "TkAgg"; };
-  };
 
   programs.pandoc.enable = true;
 
   programs.ssh = {
     enable = true;
     extraConfig = "AddKeysToAgent yes";
-  };
-  programs.tmux = {
-    enable = true;
-    mouse = true;
-    extraConfig = "set -g default-terminal \"screen-256color\"";
   };
 
   programs.bash = {
@@ -259,7 +218,6 @@ rec {
       ps = "procs";
       curl = "curlie";
       gdb = "gef";
-      ipython = "ptipython";
     };
     zplug = {
       enable = true;
@@ -503,10 +461,6 @@ rec {
   };
   home.file.".local/bin/global_black" = {
     text = "#!/usr/bin/env bash\nexec black \"$@\"";
-    executable = true;
-  };
-  home.file.".local/bin/ddgr" = {
-    text = "#!/usr/bin/env bash\nexec lynx \"https://lite.duckduckgo.com/lite/?q=$@\"";
     executable = true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
