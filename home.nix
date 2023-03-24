@@ -508,6 +508,7 @@ rec {
   home.file.".local/share/applications/org.gnome.Extensions.desktop".text = "";
   home.file.".local/share/applications/nvim.desktop".text = "";
   home.file.".local/share/applications/cups.desktop".text = "";
+  home.file.".local/share/applications/xdvi.desktop".text = "";
 
   home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = fixDbus
     "org.gnome.TextEditor"
@@ -584,14 +585,6 @@ rec {
       };
     };
 
-  home.file.".local/share/flatpak/overrides/net.sonic_pi.SonicPi".text = lib.generators.toINI
-    { }
-    {
-      Context = {
-        sockets = "wayland";
-      };
-    };
-
   home.file.".config/flatpak.json".text = builtins.toJSON
     {
       flathub = {
@@ -627,7 +620,7 @@ rec {
           "com.mattjakeman.ExtensionManager"
           "org.localsend.localsend_app"
           "org.gnome.dfeet"
-          "net.sonic_pi.SonicPi"
+
         ];
       };
       flathub-beta = {
