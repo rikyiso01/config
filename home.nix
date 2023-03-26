@@ -102,7 +102,6 @@ rec {
     texlive.combined.scheme-full
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
-    (pkgs.callPackage ./chess5d.nix { })
     mysql80
     php82
     (
@@ -521,6 +520,14 @@ rec {
   home.file.".local/share/applications/nvim.desktop".text = "";
   home.file.".local/share/applications/cups.desktop".text = "";
   home.file.".local/share/applications/xdvi.desktop".text = "";
+  home.file.".local/share/applications/net.chessin5d.desktop".text = ''[Desktop Entry]
+    Encoding=UTF-8
+    Version=1.0
+    Type=Application
+    Terminal=false
+    Exec=${home.homeDirectory}/Games/5dchesswithmultiversetimetravel/5dchesswithmultiversetimetravel
+    Name=5D Chess With Multiverse Time Travel
+    Icon=${home.homeDirectory}/Games/5dchesswithmultiversetimetravel/5dchesswithmultiversetimetravel.png'';
 
   home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = fixDbus
     "org.gnome.TextEditor"
