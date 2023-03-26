@@ -748,6 +748,7 @@ rec {
       "$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/dbus-1" "$HOME/.local/share/dbus-1"
       "$HOME/.nix-profile/bin/systemctl" --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
       '/usr/bin/tracker3' reset -s -r > '/dev/null'
+      "$HOME/.nix-profile/bin/systemctl" disable --user evolution-source-registry.service evolution-calendar-factory.service evolution-addressbook-factory.service
       "$HOME/.local/bin/flatpak-switch"
     '';
   };
