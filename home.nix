@@ -92,6 +92,7 @@ rec {
     netcat
     flatpak
     tlp
+    thermald
     traceroute
     poetry
     pypy38
@@ -101,6 +102,7 @@ rec {
     texlive.combined.scheme-full
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
+    (pkgs.callPackage ./chess5d.nix { })
     mysql80
     php82
     (
@@ -408,6 +410,14 @@ rec {
         ExecStart = "${home.homeDirectory}/.nix-profile/bin/ssh-agent -D -a $SSH_AUTH_SOCK";
       };
     };
+    thermald = {
+      Unit = {
+        Description = "Thermald";
+      };
+      Service = {
+        ExecStart = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/thermald --no-daemon --systemd";
+      };
+    };
   };
 
   home.file.".config/tlp.conf".text = ''
@@ -416,6 +426,8 @@ rec {
     CPU_ENERGY_PERF_POLICY_ON_BAT = power
     PCIE_ASPM_ON_AC = default
     PCIE_ASPM_ON_BAT = powersupersave
+    CPU_BOOST_ON_BAT = 0
+    INTEL_GPU_BOOST_FREQ_ON_BAT = 0
   '';
   home.file.".config/avahi-daemon.conf".text = ''
     [server]
@@ -743,6 +755,8 @@ rec {
     setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       "$HOME/.nix-profile/bin/mkdir" -p "$HOME/Games/Minecraft/tlauncher"
       "$HOME/.nix-profile/bin/ln" -sfT "$HOME/Games/Minecraft/tlauncher" "$HOME/.tlauncher"
+      "$HOME/.nix-profile/bin/mkdir" -p "$HOME/Games/5dchesswithmultiversetimetravel" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel"
+      "$HOME/.nix-profile/bin/ln" -sfT "$HOME/Games/5dchesswithmultiversetimetravel/settings_and_progress.txt" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel/settings_and_progress.txt"
       "$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
       "$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/dbus-1" "$HOME/.local/share/dbus-1"
       "$HOME/.nix-profile/bin/systemctl" --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service

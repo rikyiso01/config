@@ -3,6 +3,7 @@
 set -euo pipefail
 
 "$HOME/.nix-profile/bin/systemctl" start --user 'tlp'
+"$HOME/.nix-profile/bin/systemctl" start --user 'thermald'
 "$HOME/.nix-profile/bin/systemctl" start --user 'ssh'
 
 if [[ $("$HOME/.nix-profile/bin/cat" '/sys/class/power_supply/BAT1/status') == 'Discharging' ]]; then

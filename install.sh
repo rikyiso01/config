@@ -19,5 +19,5 @@ git clone 'https://gist.github.com/bfe678d14ce98713dd5242b5457c73b1.git' "$HOME/
 sudo ln -s "$HOME/.config/tlp.conf" /etc/tlp.conf
 sudo rm -f /etc/avahi/avahi-daemon.conf
 sudo ln -s "$HOME/.config/avahi-daemon.conf" /etc/avahi/avahi-daemon.conf
-sudo bash -c "echo $USER ALL=(ALL) NOPASSWD:$HOME/.nix-profile/bin/tlp, $HOME/.nix-profile/bin/dockerd -H unix\:///var/run/docker.sock, $HOME/.nix-profile/bin/systemctl start cups, $HOME/.nix-profile/bin/systemctl start avahi-daemon" >>/etc/sudoers
+sudo bash -c "echo $USER ALL=(ALL) NOPASSWD:$HOME/.nix-profile/bin/tlp, $HOME/.nix-profile/bin/dockerd -H unix\:///var/run/docker.sock, $HOME/.nix-profile/bin/systemctl start cups, $HOME/.nix-profile/bin/systemctl start avahi-daemon, $HOME/.nix-profile/bin/thermald --no-daemon --systemd" >>/etc/sudoers
 sudo usermod --shell /bin/bash "$USER"
