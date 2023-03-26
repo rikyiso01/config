@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-LOCAL="$HOME/.config/nixpkgs"
+LOCAL="$HOME/.config/home-manager"
 
 git -C "$LOCAL" pull
 nix-channel --update

@@ -619,8 +619,7 @@ rec {
           "org.audacityteam.Audacity"
           "com.mattjakeman.ExtensionManager"
           "org.localsend.localsend_app"
-          "org.gnome.dfeet"
-
+          "org.gnome.dspy"
         ];
       };
       flathub-beta = {
