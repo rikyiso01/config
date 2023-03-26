@@ -2,43 +2,10 @@
 
 set -euo pipefail
 
-REMOVE='
-bibata-cursor-theme
-evince
-file-roller
-firefox
-gedit
-gnome-calculator
-gnome-calendar
-gnome-disk-utility
-gnome-logs
-gnome-shell-extensions
-gnome-shell-maia
-gnome-system-monitor
-gnome-tour
-gnome-tweaks
-gnome-user-docs
-gnome-weather
-gthumb
-htop
-kvantum-manjaro
-lollypop
-man-db
-man-pages
-manjaro-hello
-manjaro-ranger-settings
-manjaro-zsh-config
-nano-syntax-highlighting
-plymouth-theme-manjaro
-sushi
-totem
-vi
-wget
-which
-'
 sudo bash -c 'echo "blacklist pcspkr" >> /etc/modprobe.d/50-blacklist.conf'
-sudo pacman -Rs --noconfirm $REMOVE
-sudo pacman -S --noconfirm flatpak nix xdg-desktop-portal-gnome manjaro-settings-manager xdg-desktop-portal-wlr pipewire-media-session manjaro-pipewire cups git
+sudo pacman -D --asdeps $(cat remote.txt)
+sudo pacman -S --noconfirm $(cat install.txt)
+pacman -Qttdq | sudo pacman -Rs -
 sudo gpasswd -a "$USER" sys
 sudo gpasswd -a "$USER" nix-users
 sudo systemctl enable --now nix-daemon
