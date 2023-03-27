@@ -4,7 +4,8 @@ set -euo pipefail
 
 "$HOME/.nix-profile/bin/systemctl" start --user 'tlp'
 "$HOME/.nix-profile/bin/systemctl" start --user 'thermald'
-"$HOME/.nix-profile/bin/systemctl" start --user 'ssh'
+"$HOME/.nix-profile/bin/systemctl" start --user 'ssh-agent'
+"$HOME/.nix-profile/bin/systemctl" start --user 'auto-cpufreq'
 
 if [[ $("$HOME/.nix-profile/bin/cat" '/sys/class/power_supply/BAT1/status') == 'Discharging' ]]; then
     "$HOME/.nix-profile/bin/rfkill" block 'bluetooth'

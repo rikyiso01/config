@@ -104,6 +104,7 @@ rec {
     (pkgs.callPackage ./tlauncher.nix { })
     mysql80
     php82
+    auto-cpufreq
     (
       let
         my-python-packages = python-packages: with python-packages; [
@@ -400,9 +401,9 @@ rec {
         ExecStop = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/tlp init stop";
       };
     };
-    ssh = {
+    ssh-agent = {
       Unit = {
-        Description = "SSH";
+        Description = "SSH Agent";
       };
       Service = {
         Environment = "SSH_AUTH_SOCK=%t/ssh-agent.socket";
@@ -417,16 +418,20 @@ rec {
         ExecStart = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/thermald --no-daemon --systemd";
       };
     };
+    auto-cpufreq = {
+      Unit = {
+        Description = "auto-cpufreq";
+      };
+      Service = {
+        ExecStart = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/auto-cpufreq --daemon";
+      };
+    };
   };
 
   home.file.".config/tlp.conf".text = ''
     USB_EXCLUDE_BTUSB = 1
-    CPU_ENERGY_PERF_POLICY_ON_AC = balance_performance
-    CPU_ENERGY_PERF_POLICY_ON_BAT = power
     PCIE_ASPM_ON_AC = default
     PCIE_ASPM_ON_BAT = powersupersave
-    CPU_BOOST_ON_BAT = 0
-    INTEL_GPU_BOOST_FREQ_ON_BAT = 0
   '';
   home.file.".config/avahi-daemon.conf".text = ''
     [server]
@@ -472,6 +477,10 @@ rec {
   };
   home.file.".local/bin/global_black" = {
     text = "#!/usr/bin/env bash\nexec black \"$@\"";
+    executable = true;
+  };
+  home.file.".local/bin/egrep" = {
+    text = "#!/usr/bin/env bash\nexec grep -E \"$@\"";
     executable = true;
   };
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
