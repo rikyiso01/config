@@ -1,23 +1,5 @@
 { config, pkgs, lib, ... }:
 
-let
-
-  fixDbus = id: name: lib.generators.toINI { } {
-    "Desktop Entry" = {
-      DBusActivatable = false;
-      Exec = "flatpak run --branch=stable --arch=x86_64 --file-forwarding ${id} @@u %U @@";
-      Name = name;
-      "Generic Name" = name;
-      Icon = id;
-      StartupNotify = true;
-      Terminal = false;
-      Type = "Application";
-      X-Flatpak = id;
-    };
-  };
-
-in
-
 rec {
 
   # Home Manager needs a bit of information about you and the
@@ -27,30 +9,11 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
-    unixtools.xxd
-    unixtools.top
-    unixtools.arp
-    unixtools.wall
-    unixtools.ping
-    unixtools.watch
-    unixtools.util-linux
-    which
-    iproute2
-    coreutils
-    openssh
-    systemdMinimal
-    util-linux
-    pkg-config
-    gnome.gnome-system-monitor
-    gnome.gnome-disk-utility
     du-dust
     fd
     procs
     curlie
     gdb
-    wget
-    curl
-    gnome.gnome-tweaks
     gnomeExtensions.espresso
     gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
@@ -59,12 +22,8 @@ rec {
     gnomeExtensions.compiz-alike-magic-lamp-effect
     gnomeExtensions.ddterm
     gnomeExtensions.focus-changer
-    file
     fira-code
     materia-theme
-    docker
-    docker-compose
-    ffmpeg
     rustup
     rust-analyzer
     powertop
@@ -81,16 +40,12 @@ rec {
     exiftool
     imagemagick
     jre
-    unzip
-    zip
     elmPackages.elm
     elmPackages.elm-format
     inotify-tools
     nixpkgs-fmt
     ngrok
     brightnessctl
-    netcat
-    flatpak
     tlp
     thermald
     traceroute
@@ -99,12 +54,11 @@ rec {
     gnumake
     tesseract
     php82Packages.composer
-    texlive.combined.scheme-full
+    #texlive.combined.scheme-full
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
-    mysql80
+    #mysql80
     php82
-    auto-cpufreq
     (
       let
         my-python-packages = python-packages: with python-packages; [
@@ -158,13 +112,14 @@ rec {
     };
   };
 
+  home.sessionPath = [ "$HOME/.local/bin" "$HOME/.nix-profile/bin" "$HOME/.local/share/flatpak/exports/bin" ];
+
   home.sessionVariables = {
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
-    CHROME_EXECUTABLE = "chromium";
-    MANPATH = "/usr/share/man:$HOME/.npm-packages/share/man";
+    #MANPATH = "/usr/share/man:$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE = "1";
-    XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
+    #XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
     VISUAL = "micro";
     EDITOR = "micro";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent.socket";
@@ -205,14 +160,18 @@ rec {
 
   programs.bash = {
     enable = true;
-    initExtra = "exec zsh";
+    initExtra = "
+    PATH=$HOME/.nix-profile/bin:$PATH
+    [[ $- == *i* ]] && exec $HOME/.nix-profile/bin/zsh";
   };
 
   programs.zsh = {
     enable = true;
     enableAutosuggestions = true;
     initExtra = ''source $HOME/.config/theme.zsh
-    PATH=$HOME/.local/bin:$PATH'';
+    FPATH=$HOME/.nix-profile/share/zsh/site-functions:$FPATH
+    compinit
+    PATH=$HOME/.local/bin:$HOME/.local/share/flatpak/exports/bin:$PATH'';
     shellAliases = {
       cat = "bat";
       du = "dust";
@@ -236,12 +195,6 @@ rec {
 
   programs.nix-index.enable = true;
 
-  programs.oh-my-posh = {
-    enable = true;
-    enableZshIntegration = false;
-    useTheme = "powerlevel10k_lean";
-  };
-
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards
@@ -252,7 +205,7 @@ rec {
   home.stateVersion = "22.05";
 
   # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
+  # programs.home-manager.enable = true;
 
   nixpkgs.config.allowUnfree = true;
   home.enableNixpkgsReleaseCheck = true;
@@ -382,70 +335,17 @@ rec {
   };
 
   systemd.user.services = {
-    docker = {
-      Unit = {
-        Description = "Docker";
-      };
-      Service = {
-        ExecStart = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/dockerd -H 'unix:///var/run/docker.sock'";
-      };
-    };
-    tlp = {
-      Unit = {
-        Description = "TLP";
-      };
-      Service = {
-        Type = "oneshot";
-        RemainAfterExit = "yes";
-        ExecStart = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/tlp init start";
-        ExecStop = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/tlp init stop";
-      };
-    };
     ssh-agent = {
       Unit = {
         Description = "SSH Agent";
       };
       Service = {
         Environment = "SSH_AUTH_SOCK=%t/ssh-agent.socket";
-        ExecStart = "${home.homeDirectory}/.nix-profile/bin/ssh-agent -D -a $SSH_AUTH_SOCK";
-      };
-    };
-    thermald = {
-      Unit = {
-        Description = "Thermald";
-      };
-      Service = {
-        ExecStart = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/thermald --no-daemon --systemd";
-      };
-    };
-    auto-cpufreq = {
-      Unit = {
-        Description = "auto-cpufreq";
-      };
-      Service = {
-        ExecStart = "/usr/bin/sudo ${home.homeDirectory}/.nix-profile/bin/auto-cpufreq --daemon";
+        ExecStart = "/usr/bin/ssh-agent -D -a $SSH_AUTH_SOCK";
       };
     };
   };
 
-  home.file.".config/tlp.conf".text = ''
-    USB_EXCLUDE_BTUSB = 1
-    PCIE_ASPM_ON_AC = default
-    PCIE_ASPM_ON_BAT = powersupersave
-  '';
-  home.file.".config/avahi-daemon.conf".text = ''
-    [server]
-    use-ipv4=yes
-    use-ipv6=yes
-    enable-dbus=no
-    ratelimit-interval-usec=1000000
-    ratelimit-burst=1000
-    [wide-area]
-    enable-wide-area=yes
-    [publish]
-    publish-hinfo=no
-    publish-workstation=no
-  '';
   home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
     { }
     {
@@ -471,18 +371,7 @@ rec {
     text = "#!/usr/bin/env bash\nexec com.brave.Browser \"$@\"";
     executable = true;
   };
-  home.file.".local/bin/nix-shell" = {
-    text = "#!/usr/bin/env bash\nexec /usr/bin/nix-shell \"$@\" --run zsh";
-    executable = true;
-  };
-  home.file.".local/bin/global_black" = {
-    text = "#!/usr/bin/env bash\nexec black \"$@\"";
-    executable = true;
-  };
-  home.file.".local/bin/egrep" = {
-    text = "#!/usr/bin/env bash\nexec grep -E \"$@\"";
-    executable = true;
-  };
+
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
     {
       "name": "net.downloadhelper.coapp",
@@ -496,39 +385,16 @@ rec {
   '';
 
   home.file.".local/flatpak/git".source = ./normal-spawn.sh;
-  home.file.".local/flatpak/nix-instantiate".source = ./normal-spawn.sh;
-  home.file.".local/flatpak/nixpkgs-fmt".source = ./normal-spawn.sh;
   home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
   home.file.".local/flatpak/code" = {
-    text = "#!/usr/bin/env bash\ntouch /etc/shells\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
-    executable = true;
-  };
-  home.file.".local/flatpak/insomnia" = {
-    text = "#!/usr/bin/env bash\nexec /app/bin/insomnia --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
+    text = "#!/usr/bin/env bash\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
     executable = true;
   };
   home.file.".local/flatpak/brave" = {
-    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-raw-draw=enabled \"$@\"";
+    text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --enable-raw-draw=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-usermedia-screen-capturing \"$@\"";
     executable = true;
   };
-  home.file.".local/flatpak/zsh".source = ./host-spawn;
-  home.file.".local/share/applications/micro.desktop".text = "";
-  home.file.".local/share/applications/qv4l2.desktop".text = "";
-  home.file.".local/share/applications/qvidcap.desktop".text = "";
-  home.file.".local/share/applications/bssh.desktop".text = "";
-  home.file.".local/share/applications/avahi-discover.desktop".text = "";
-  home.file.".local/share/applications/bvnc.desktop".text = "";
-  home.file.".local/share/applications/assistant.desktop".text = "";
-  home.file.".local/share/applications/designer.desktop".text = "";
-  home.file.".local/share/applications/linguist.desktop".text = "";
-  home.file.".local/share/applications/qdbusviewer.desktop".text = "";
-  home.file.".local/share/applications/lstopo.desktop".text = "";
-  home.file.".local/share/applications/jupyter-notebook.desktop".text = "";
-  home.file.".local/share/applications/jupyter-nbclassic.desktop".text = "";
-  home.file.".local/share/applications/org.gnome.Extensions.desktop".text = "";
-  home.file.".local/share/applications/nvim.desktop".text = "";
-  home.file.".local/share/applications/cups.desktop".text = "";
-  home.file.".local/share/applications/xdvi.desktop".text = "";
+  home.file.".local/flatpak/host-spawn".source = ./host-spawn;
   home.file.".local/share/applications/net.chessin5d.desktop".text = ''[Desktop Entry]
     Encoding=UTF-8
     Version=1.0
@@ -537,22 +403,6 @@ rec {
     Exec=${home.homeDirectory}/Games/5dchesswithmultiversetimetravel/5dchesswithmultiversetimetravel
     Name=5D Chess With Multiverse Time Travel
     Icon=${home.homeDirectory}/Games/5dchesswithmultiversetimetravel/5dchesswithmultiversetimetravel.png'';
-
-  home.file.".local/share/applications/org.gnome.TextEditor.desktop".text = fixDbus
-    "org.gnome.TextEditor"
-    "Text Editor";
-  home.file.".local/share/applications/org.gnome.Boxes.desktop".text = fixDbus
-    "org.gnome.Boxes"
-    "Boxes";
-  home.file.".local/share/applications/org.gnome.Logs.desktop".text = fixDbus
-    "org.gnome.Logs"
-    "Logs";
-  home.file.".local/share/applications/org.gnome.Characters.desktop".text = fixDbus
-    "org.gnome.Characters"
-    "Characters";
-  home.file.".local/share/applications/ca.desrt.dconf-editor.desktop".text = fixDbus
-    "ca.desrt.dconf-editor"
-    "dconf Editor";
 
   home.file.".local/share/flatpak/overrides/com.brave.Browser".text = lib.generators.toINI
     { }
@@ -569,23 +419,6 @@ rec {
     {
       Environment = {
         ANKI_WAYLAND = 1;
-      };
-    };
-  home.file.".local/share/flatpak/overrides/org.raspberrypi.rpi-imager".text = lib.generators.toINI
-    { }
-    {
-      Context = {
-        sockets = "wayland";
-      };
-    };
-  home.file.".local/share/flatpak/overrides/rest.insomnia.Insomnia".text = lib.generators.toINI
-    { }
-    {
-      Context = {
-        filesystems = "${home.homeDirectory}/.local/flatpak:ro;/nix/store:ro;";
-      };
-      Environment = {
-        PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
       };
     };
   home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = lib.generators.toINI
@@ -632,8 +465,6 @@ rec {
           "org.ghidra_sre.Ghidra"
           "org.wireshark.Wireshark"
           "net.ankiweb.Anki"
-          "org.mapeditor.Tiled"
-          "org.raspberrypi.rpi-imager"
           "io.dbeaver.DBeaverCommunity"
           "com.obsproject.Studio"
           "org.gnome.Evince"
@@ -724,7 +555,6 @@ rec {
     };
     "org/gnome/shell" = {
       enabled-extensions = [
-        "pamac-updates@manjaro.org"
         "dash-to-dock@micxgx.gmail.com"
         "appindicatorsupport@rgcjonas.gmail.com"
         "compiz-alike-magic-lamp-effect@hermes83.github.com"
@@ -769,14 +599,14 @@ rec {
 
   home.activation = {
     setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      "$HOME/.nix-profile/bin/mkdir" -p "$HOME/Games/Minecraft/tlauncher"
-      "$HOME/.nix-profile/bin/ln" -sfT "$HOME/Games/Minecraft/tlauncher" "$HOME/.tlauncher"
-      "$HOME/.nix-profile/bin/mkdir" -p "$HOME/Games/5dchesswithmultiversetimetravel" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel"
-      "$HOME/.nix-profile/bin/ln" -sfT "$HOME/Games/5dchesswithmultiversetimetravel/settings_and_progress.txt" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel/settings_and_progress.txt"
-      "$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
-      "$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/dbus-1" "$HOME/.local/share/dbus-1"
-      "$HOME/.nix-profile/bin/systemctl" --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
-      '/usr/bin/tracker3' reset -s -r > '/dev/null'
+      mkdir -p "$HOME/Games/Minecraft/tlauncher"
+      ln -sfT "$HOME/Games/Minecraft/tlauncher" "$HOME/.tlauncher"
+      mkdir -p "$HOME/Games/5dchesswithmultiversetimetravel" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel"
+      ln -sfT "$HOME/Games/5dchesswithmultiversetimetravel/settings_and_progress.txt" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel/settings_and_progress.txt"
+      ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
+      ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
+      ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
+      #"$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/dbus-1" "$HOME/.local/share/dbus-1"
       "$HOME/.local/bin/flatpak-switch"
     '';
   };
