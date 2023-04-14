@@ -9,6 +9,8 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
+    man-pages
+    man-pages-posix
     gcc
     podman
     podman-compose
