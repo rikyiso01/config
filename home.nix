@@ -9,6 +9,9 @@ rec {
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
+    gcc
+    podman
+    podman-compose
     du-dust
     fd
     procs
@@ -23,7 +26,6 @@ rec {
     gnomeExtensions.ddterm
     gnomeExtensions.focus-changer
     fira-code
-    materia-theme
     rustup
     rust-analyzer
     powertop
@@ -39,25 +41,20 @@ rec {
     binwalk
     exiftool
     imagemagick
-    jre
+    jdk
     elmPackages.elm
     elmPackages.elm-format
     inotify-tools
     nixpkgs-fmt
     ngrok
     brightnessctl
-    tlp
-    thermald
     traceroute
     poetry
     pypy38
     gnumake
-    tesseract
     php82Packages.composer
-    #texlive.combined.scheme-full
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
-    #mysql80
     php82
     (
       let
@@ -65,6 +62,7 @@ rec {
           pudb
           ipython
           ipykernel
+          notebook
           pandas
           scipy
           numpy
@@ -78,23 +76,19 @@ rec {
           pycryptodome
           pytest
           pillow
-          nbformat
           scikitimage
           numba
           opencv4
-          notebook
-          networkx
-          kaggle
-          opensimplex
-          jupytext
           playwright
           aiofile
-          fonttools
         ];
         python-with-my-packages = python310.withPackages my-python-packages;
       in
       python-with-my-packages
     )
+    (pkgs.texlive.combine {
+      inherit (pkgs.texlive) scheme-minimal xetex tcolorbox pgf environ etoolbox pdfcol tools ltxcmds infwarerr parskip kvoptions kvsetkeys caption float geometry amsmath upquote eurosym fontspec unicode-math fancyvrb grffile adjustbox hyperref titling booktabs enumitem ulem jknapltx rsfs;
+    })
     (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
   ];
 
@@ -117,9 +111,7 @@ rec {
   home.sessionVariables = {
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PYTHONBREAKPOINT = "pudb.set_trace";
-    #MANPATH = "/usr/share/man:$HOME/.npm-packages/share/man";
     NIXPKGS_ALLOW_UNFREE = "1";
-    #XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
     VISUAL = "micro";
     EDITOR = "micro";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent.socket";
@@ -127,15 +119,6 @@ rec {
 
   fonts.fontconfig.enable = true;
   programs.bat.enable = true;
-  programs.gnome-terminal = {
-    enable = true;
-    profile = {
-      default = {
-        default = true;
-        visibleName = "Default";
-      };
-    };
-  };
   programs.exa = {
     enable = true;
     enableAliases = true;
@@ -162,7 +145,7 @@ rec {
     enable = true;
     initExtra = "
     PATH=$HOME/.nix-profile/bin:$PATH
-    [[ $- == *i* ]] && exec $HOME/.nix-profile/bin/zsh";
+    [[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
   };
 
   programs.zsh = {
@@ -179,6 +162,8 @@ rec {
       ps = "procs";
       curl = "curlie";
       gdb = "gef";
+      docker = "podman";
+      docker-compose = "podman-compose";
     };
     zplug = {
       enable = true;
@@ -261,7 +246,7 @@ rec {
           "application/x-desktop" = [ "org.gnome.TextEditor.desktop" ];
           "text/x-csharp" = [ "org.gnome.TextEditor.desktop" ];
           "application/x-php" = [ "org.gnome.TextEditor.desktop" ];
-          "text/html" = [ "org.gnome.TextEditor.desktop" "com.brave.Browser.desktop" ];
+          "text/html" = [ "com.brave.Browser.desktop" "org.gnome.TextEditor.desktop" ];
           "application/x-ipynb+json" = [ "com.visualstudio.code.desktop" ];
           "text/x-python" = [ "org.gnome.TextEditor.desktop" ];
           "application/octet-stream" = [ "org.gnome.TextEditor.desktop" ];
@@ -272,60 +257,60 @@ rec {
       };
       defaultApplications = {
         "application/x-wine-extension-ini" = [ "org.gnome.TextEditor.desktop" ];
-        "image/jpeg" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/png" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/jpg" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/pjpeg" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-3fr" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-adobe-dng" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-arw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-bay" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-bmp" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-canon-cr2" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-canon-crw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-cap" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-cr2" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-crw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-dcr" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-dcraw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-dcs" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-dng" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-drf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-eip" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-erf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-fff" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-fuji-raf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-iiq" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-k25" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-kdc" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-mef" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-minolta-mrw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-mos" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-mrw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-nef" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-nikon-nef" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-nrw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-olympus-orf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-orf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-panasonic-raw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-pef" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-pentax-pef" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-png" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-ptx" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-pxn" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-r3d" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-raf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-raw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-rw2" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-rwl" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-rwz" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-sigma-x3f" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-sony-arw" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-sony-sr2" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-sony-srf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-sr2" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-srf" = [ "org.gnome.Shotwell.Viewer.desktop" ];
-        "image/x-x3f" = [ "org.gnome.Shotwell.Viewer.desktop" ];
+        "image/jpeg" = [ "org.gnome.eog.desktop" ];
+        "image/png" = [ "org.gnome.eog.desktop" ];
+        "image/jpg" = [ "org.gnome.eog.desktop" ];
+        "image/pjpeg" = [ "org.gnome.eog.desktop" ];
+        "image/x-3fr" = [ "org.gnome.eog.desktop" ];
+        "image/x-adobe-dng" = [ "org.gnome.eog.desktop" ];
+        "image/x-arw" = [ "org.gnome.eog.desktop" ];
+        "image/x-bay" = [ "org.gnome.eog.desktop" ];
+        "image/x-bmp" = [ "org.gnome.eog.desktop" ];
+        "image/x-canon-cr2" = [ "org.gnome.eog.desktop" ];
+        "image/x-canon-crw" = [ "org.gnome.eog.desktop" ];
+        "image/x-cap" = [ "org.gnome.eog.desktop" ];
+        "image/x-cr2" = [ "org.gnome.eog.desktop" ];
+        "image/x-crw" = [ "org.gnome.eog.desktop" ];
+        "image/x-dcr" = [ "org.gnome.eog.desktop" ];
+        "image/x-dcraw" = [ "org.gnome.eog.desktop" ];
+        "image/x-dcs" = [ "org.gnome.eog.desktop" ];
+        "image/x-dng" = [ "org.gnome.eog.desktop" ];
+        "image/x-drf" = [ "org.gnome.eog.desktop" ];
+        "image/x-eip" = [ "org.gnome.eog.desktop" ];
+        "image/x-erf" = [ "org.gnome.eog.desktop" ];
+        "image/x-fff" = [ "org.gnome.eog.desktop" ];
+        "image/x-fuji-raf" = [ "org.gnome.eog.desktop" ];
+        "image/x-iiq" = [ "org.gnome.eog.desktop" ];
+        "image/x-k25" = [ "org.gnome.eog.desktop" ];
+        "image/x-kdc" = [ "org.gnome.eog.desktop" ];
+        "image/x-mef" = [ "org.gnome.eog.desktop" ];
+        "image/x-minolta-mrw" = [ "org.gnome.eog.desktop" ];
+        "image/x-mos" = [ "org.gnome.eog.desktop" ];
+        "image/x-mrw" = [ "org.gnome.eog.desktop" ];
+        "image/x-nef" = [ "org.gnome.eog.desktop" ];
+        "image/x-nikon-nef" = [ "org.gnome.eog.desktop" ];
+        "image/x-nrw" = [ "org.gnome.eog.desktop" ];
+        "image/x-olympus-orf" = [ "org.gnome.eog.desktop" ];
+        "image/x-orf" = [ "org.gnome.eog.desktop" ];
+        "image/x-panasonic-raw" = [ "org.gnome.eog.desktop" ];
+        "image/x-pef" = [ "org.gnome.eog.desktop" ];
+        "image/x-pentax-pef" = [ "org.gnome.eog.desktop" ];
+        "image/x-png" = [ "org.gnome.eog.desktop" ];
+        "image/x-ptx" = [ "org.gnome.eog.desktop" ];
+        "image/x-pxn" = [ "org.gnome.eog.desktop" ];
+        "image/x-r3d" = [ "org.gnome.eog.desktop" ];
+        "image/x-raf" = [ "org.gnome.eog.desktop" ];
+        "image/x-raw" = [ "org.gnome.eog.desktop" ];
+        "image/x-rw2" = [ "org.gnome.eog.desktop" ];
+        "image/x-rwl" = [ "org.gnome.eog.desktop" ];
+        "image/x-rwz" = [ "org.gnome.eog.desktop" ];
+        "image/x-sigma-x3f" = [ "org.gnome.eog.desktop" ];
+        "image/x-sony-arw" = [ "org.gnome.eog.desktop" ];
+        "image/x-sony-sr2" = [ "org.gnome.eog.desktop" ];
+        "image/x-sony-srf" = [ "org.gnome.eog.desktop" ];
+        "image/x-sr2" = [ "org.gnome.eog.desktop" ];
+        "image/x-srf" = [ "org.gnome.eog.desktop" ];
+        "image/x-x3f" = [ "org.gnome.eog.desktop" ];
         "application/xml" = [ "org.gnome.TextEditor.desktop" ];
         "text/markdown" = [ "org.gnome.TextEditor.desktop" ];
         "application/x-shellscript" = [ "org.gnome.TextEditor.desktop" ];
@@ -371,6 +356,10 @@ rec {
     text = "#!/usr/bin/env bash\nexec com.brave.Browser \"$@\"";
     executable = true;
   };
+  home.file.".local/bin/nix-shell" = {
+    text = "#!/usr/bin/env bash\nexec $HOME/.nix-profile/bin/nix-shell --run zsh \"$@\"";
+    executable = true;
+  };
 
   home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
     {
@@ -414,13 +403,6 @@ rec {
         PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
       };
     };
-  home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = lib.generators.toINI
-    { }
-    {
-      Environment = {
-        ANKI_WAYLAND = 1;
-      };
-    };
   home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = lib.generators.toINI
     { }
     {
@@ -429,13 +411,6 @@ rec {
       };
       Environment = {
         PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin";
-      };
-    };
-  home.file.".local/share/flatpak/overrides/org.audacityteam.Audacity".text = lib.generators.toINI
-    { }
-    {
-      Context = {
-        sockets = "wayland";
       };
     };
   home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = lib.generators.toINI
@@ -457,9 +432,7 @@ rec {
           "org.gnome.Boxes"
           "ca.desrt.dconf-editor"
           "com.brave.Browser"
-          "com.google.AndroidStudio"
           "com.github.tchx84.Flatseal"
-          "org.videolan.VLC"
           "com.visualstudio.code"
           "rest.insomnia.Insomnia"
           "org.ghidra_sre.Ghidra"
@@ -467,18 +440,17 @@ rec {
           "net.ankiweb.Anki"
           "io.dbeaver.DBeaverCommunity"
           "com.obsproject.Studio"
-          "org.gnome.Evince"
-          "org.gnome.FileRoller"
-          "org.gnome.Shotwell"
           "org.gnome.seahorse.Application"
           "org.gnome.PowerStats"
           "org.gnome.Boxes"
           "com.usebottles.bottles"
           "org.gnome.GHex"
-          "org.audacityteam.Audacity"
           "com.mattjakeman.ExtensionManager"
           "org.localsend.localsend_app"
           "org.gnome.dspy"
+          "org.gnome.Cheese"
+          "org.gnome.SoundRecorder"
+          "org.pitivi.Pitivi"
         ];
       };
       flathub-beta = {
@@ -486,6 +458,20 @@ rec {
         packages = [ "org.gimp.GIMP" ];
       };
     };
+
+  home.file.".config/containers/containers.conf".text = ''
+    [network]
+    cni_plugin_dirs = [
+      "/usr/local/libexec/cni",
+      "/usr/libexec/cni",
+      "/usr/local/lib/cni",
+      "/usr/lib/cni",
+      "/opt/cni/bin",
+      "${pkgs.dnsname-cni}/bin"
+    ]
+  '';
+  home.file.".config/containers/registries.conf".text = ''unqualified-search-registries = ["docker.io"]'';
+  home.file.".config/cni/net.d/87-podman.conflist".source = ./podman.json;
 
   home.file.".local/share/backgrounds/background.jpg".source = ./wallpaper.jpg;
 
@@ -510,7 +496,7 @@ rec {
     "org/gnome/desktop/screensaver" = {
       color-shading-type = "solid";
       picture-options = "zoom";
-      picture-uri = "file://${home.homeDirectory}/.local/share/backgrounds/background.jpg";
+      picture-uri = "file:///usr/share/backgrounds/gnome/adwaita-l.webp";
       primary-color = "#000000000000";
       secondary-color = "#000000000000";
     };
@@ -531,7 +517,7 @@ rec {
       switch-to-workspace-right = [ ];
     };
     "org/gnome/desktop/wm/preferences" = {
-      button-layout = "appmenu:minimize,maximize,close";
+      button-layout = ":minimize,maximize,close";
     };
     "org/gnome/mutter/keybindings" = {
       toggle-tiled-left = [ "<Control><Alt>Left" ];
@@ -606,6 +592,8 @@ rec {
       ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
       ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
       ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
+      mkdir -p "$HOME/.local/lib"
+      ln -sfT "${pkgs.jdk}/lib/openjdk" "$HOME/.local/lib/java"
       #"$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/dbus-1" "$HOME/.local/share/dbus-1"
       "$HOME/.local/bin/flatpak-switch"
     '';
