@@ -13,7 +13,8 @@ rec {
     man-pages-posix
     gcc
     podman
-    podman-compose
+    #podman-compose
+    docker-compose
     du-dust
     fd
     procs
@@ -117,6 +118,7 @@ rec {
     VISUAL = "micro";
     EDITOR = "micro";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent.socket";
+    DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
   };
 
   fonts.fontconfig.enable = true;
@@ -165,7 +167,6 @@ rec {
       curl = "curlie";
       gdb = "gef";
       docker = "podman";
-      docker-compose = "podman-compose";
     };
     zplug = {
       enable = true;
@@ -321,18 +322,6 @@ rec {
     };
   };
 
-  systemd.user.services = {
-    ssh-agent = {
-      Unit = {
-        Description = "SSH Agent";
-      };
-      Service = {
-        Environment = "SSH_AUTH_SOCK=%t/ssh-agent.socket";
-        ExecStart = "/usr/bin/ssh-agent -D -a $SSH_AUTH_SOCK";
-      };
-    };
-  };
-
   home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
     { }
     {
@@ -461,19 +450,7 @@ rec {
       };
     };
 
-  home.file.".config/containers/containers.conf".text = ''
-    [network]
-    cni_plugin_dirs = [
-      "/usr/local/libexec/cni",
-      "/usr/libexec/cni",
-      "/usr/local/lib/cni",
-      "/usr/lib/cni",
-      "/opt/cni/bin",
-      "${pkgs.dnsname-cni}/bin"
-    ]
-  '';
   home.file.".config/containers/registries.conf".text = ''unqualified-search-registries = ["docker.io"]'';
-  home.file.".config/cni/net.d/87-podman.conflist".source = ./podman.json;
 
   home.file.".local/share/backgrounds/background.jpg".source = ./wallpaper.jpg;
 
@@ -596,7 +573,8 @@ rec {
       ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
       mkdir -p "$HOME/.local/lib"
       ln -sfT "${pkgs.jdk}/lib/openjdk" "$HOME/.local/lib/java"
-      #"$HOME/.nix-profile/bin/ln" -sfT "$HOME/.nix-profile/share/dbus-1" "$HOME/.local/share/dbus-1"
+      mkdir -p "$HOME/.local/share/systemd"
+      ln -sfT "$HOME/.nix-profile/share/systemd/user" "$HOME/.local/share/systemd/user"
       "$HOME/.local/bin/flatpak-switch"
     '';
   };
