@@ -13,7 +13,6 @@ rec {
     man-pages-posix
     gcc
     podman
-    #podman-compose
     docker-compose
     du-dust
     fd
@@ -55,6 +54,7 @@ rec {
     poetry
     pypy38
     gnumake
+    maven
     php82Packages.composer
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
@@ -166,7 +166,6 @@ rec {
       ps = "procs";
       curl = "curlie";
       gdb = "gef";
-      docker = "podman";
     };
     zplug = {
       enable = true;
@@ -342,6 +341,11 @@ rec {
     Type=Application
     Icon=nautilus'';
   home.file.".local/bin/conservative".source = ./conservative.sh;
+  home.file.".local/bin/charge".source = ./charge.py;
+  home.file.".local/bin/docker" = {
+    text = "#!/usr/bin/env bash\nexec podman \"$@\"";
+    executable = true;
+  };
 
   home.file.".local/bin/chromium" = {
     text = "#!/usr/bin/env bash\nexec com.brave.Browser \"$@\"";
