@@ -19,6 +19,7 @@ rec {
     procs
     curlie
     gdb
+    libsecret
     gnomeExtensions.espresso
     gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
@@ -52,43 +53,66 @@ rec {
     brightnessctl
     traceroute
     poetry
-    pypy38
     gnumake
     maven
     php82Packages.composer
     (pkgs.callPackage ./downloadhelper.nix { })
     (pkgs.callPackage ./tlauncher.nix { })
+    (pkgs.callPackage ./podmandocker.nix { })
     php82
-    (
-      let
-        my-python-packages = python-packages: with python-packages; [
-          pudb
-          ipython
-          ipykernel
-          notebook
-          pandas
-          scipy
-          numpy
-          plotly
-          black
-          pyyaml
-          scikit-learn
-          httpx
-          pwntools
-          beautifulsoup4
-          pycryptodome
-          pytest
-          pillow
-          scikitimage
-          numba
-          opencv4
-          playwright
-          aiofile
-        ];
-        python-with-my-packages = python310.withPackages my-python-packages;
-      in
-      python-with-my-packages
-    )
+    pypy38
+    linux-wifi-hotspot
+    pkgs.python310Packages.ipython
+    # (
+    #   let
+    #     my-python-packages = python-packages: with python-packages; [
+    #       pudb
+    #       ipython
+    #       ipykernel
+    #       notebook
+    #       pandas
+    #       scipy
+    #       numpy
+    #       plotly
+    #       pyyaml
+    #       scikit-learn
+    #       httpx
+    #       pwntools
+    #       beautifulsoup4
+    #       pycryptodome
+    #       pytest
+    #       pillow
+    #       scikitimage
+    #       numba
+    #       opencv4
+    #       playwright
+    #       aiofile
+    #       bokeh
+    #       polars
+    #       (
+    #         buildPythonPackage rec {
+    #           pname = "pwntools-stubs";
+    #           version = "0.1.2";
+    #           src = fetchFromGitHub {
+    #             owner = "rikyiso01";
+    #             repo = "pwntools-stubs";
+    #             rev = version;
+    #             sha256 = "sha256-Ew5cm4h/fWNVgLWkrzTvOmmcUxUMpmhEniehOPvEvQA=";
+    #           };
+    #           doCheck = false;
+    #           format = "pyproject";
+    #           propagatedBuildInputs = [
+    #             pkgs.pwntools
+    #             pkgs.python3Packages.poetry-core
+    #             pkgs.poetry
+    #           ];
+    #         }
+    #       )
+    #     ];
+    #     python-with-my-packages = python310.withPackages my-python-packages;
+    #   in
+    #   python-with-my-packages
+    # )
     (pkgs.texlive.combine {
       inherit (pkgs.texlive) scheme-minimal xetex tcolorbox pgf environ etoolbox pdfcol tools ltxcmds infwarerr parskip kvoptions kvsetkeys caption float geometry amsmath upquote eurosym fontspec unicode-math fancyvrb grffile adjustbox hyperref titling booktabs enumitem ulem jknapltx rsfs;
     })
@@ -113,7 +137,7 @@ rec {
 
   home.sessionVariables = {
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
-    PYTHONBREAKPOINT = "pudb.set_trace";
+    #PYTHONBREAKPOINT = "pudb.set_trace";
     NIXPKGS_ALLOW_UNFREE = "1";
     VISUAL = "micro";
     EDITOR = "micro";
@@ -158,7 +182,14 @@ rec {
     initExtra = ''source $HOME/.config/theme.zsh
     FPATH=$HOME/.nix-profile/share/zsh/site-functions:$FPATH
     compinit
-    PATH=$HOME/.local/bin:$HOME/.local/share/flatpak/exports/bin:$PATH'';
+    PATH=$HOME/.local/bin:$HOME/.local/share/flatpak/exports/bin:$PATH
+    export ZPLUG_HOME=/home/riky/.zplug
+    source ${pkgs.zplug}/share/zplug/init.zsh
+    zplug "romkatv/powerlevel10k", as:theme, depth:1
+    if ! zplug check; then
+      zplug install
+    fi
+    zplug load'';
     shellAliases = {
       cat = "bat";
       du = "dust";
@@ -166,13 +197,14 @@ rec {
       ps = "procs";
       curl = "curlie";
       gdb = "gef";
+      sudo = "sudo env \"PATH=$PATH\"";
     };
-    zplug = {
-      enable = true;
-      plugins = [
-        { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; } # Installations with additional options. For the list of options, please refer to Zplug README.
-      ];
-    };
+    # zplug = {
+    #   enable = true;
+    #   plugins = [
+    #     { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
+    #   ];
+    # };
 
     oh-my-zsh = {
       enable = true;
@@ -182,24 +214,13 @@ rec {
 
   programs.nix-index.enable = true;
 
-  # This value determines the Home Manager release that your
-  # configuration is compatible with. This helps avoid breakage
-  # when a new Home Manager release introduces backwards
-  # incompatible changes.
-  # You can update Home Manager without changing this value. See
-  # the Home Manager release notes for a list of state version
-  # changes in each release.
+  programs.home-manager.enable = true;
   home.stateVersion = "22.05";
-
-  # Let Home Manager install and manage itself.
-  # programs.home-manager.enable = true;
-
   nixpkgs.config.allowUnfree = true;
   home.enableNixpkgsReleaseCheck = true;
 
-  #home.keyboard.layout = "it";
-  #home.language.base = "en";
   news.display = "show";
+  #systemd.user.startServices = "legacy";
   nix.settings = {
     auto-optimise-store = true;
   };
@@ -227,10 +248,10 @@ rec {
       package = pkgs.gnome.gnome-themes-extra;
     };
     gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = 0;
+      gtk-application-prefer-dark-theme = 1;
     };
     gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = 0;
+      gtk-application-prefer-dark-theme = 1;
     };
   };
   xdg = {
@@ -321,6 +342,27 @@ rec {
     };
   };
 
+  systemd.user.services = {
+    keepass = {
+      Unit = {
+        Description = "KeepassXC";
+      };
+      Service = {
+        ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; ${home.homeDirectory}/.nix-profile/bin/secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
+      };
+      Install = { WantedBy = [ "graphical-session.target" ]; };
+    };
+    autotune = {
+      Unit = { Description = "Powertop autotune"; };
+      Service = {
+        Type = "oneshot";
+        RemainAfterExit = "yes";
+        ExecStart = "${home.homeDirectory}/.local/bin/autotune";
+      };
+      Install = { WantedBy = [ "default.target" ]; };
+    };
+  };
+
   home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
     { }
     {
@@ -342,10 +384,6 @@ rec {
     Icon=nautilus'';
   home.file.".local/bin/conservative".source = ./conservative.sh;
   home.file.".local/bin/charge".source = ./charge.py;
-  home.file.".local/bin/docker" = {
-    text = "#!/usr/bin/env bash\nexec podman \"$@\"";
-    executable = true;
-  };
 
   home.file.".local/bin/chromium" = {
     text = "#!/usr/bin/env bash\nexec com.brave.Browser \"$@\"";
@@ -367,8 +405,21 @@ rec {
       ]
     }
   '';
+  home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''
+        {
+        "allowed_origins": [
+            "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
+            "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
+        ],
+        "description": "KeePassXC integration with native messaging support",
+        "name": "org.keepassxc.keepassxc_browser",
+        "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",
+        "type": "stdio"
+    }
+  '';
 
   home.file.".local/flatpak/git".source = ./normal-spawn.sh;
+  home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
   home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
   home.file.".local/flatpak/code" = {
     text = "#!/usr/bin/env bash\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
@@ -397,6 +448,9 @@ rec {
       Environment = {
         PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
       };
+      "Session Bus Policy" = {
+        "org.freedesktop.Flatpak" = "talk";
+      };
     };
   home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = lib.generators.toINI
     { }
@@ -407,6 +461,9 @@ rec {
       Environment = {
         PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin";
       };
+      # Context = {
+      #   filesystems = "host;xdg-config/kdeglobals:ro;xdg-config/gtk-3.0;/run/user/1000/podman/podman.sock";
+      # };
     };
   home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = lib.generators.toINI
     { }
@@ -446,6 +503,8 @@ rec {
           "org.gnome.Cheese"
           "org.gnome.SoundRecorder"
           "org.pitivi.Pitivi"
+          "com.protonvpn.www"
+          "org.keepassxc.KeePassXC"
         ];
       };
       flathub-beta = {
@@ -506,6 +565,9 @@ rec {
       toggle-tiled-left = [ "<Control><Alt>Left" ];
       toggle-tiled-right = [ "<Control><Alt>Right" ];
     };
+    "org/gnome/settings-daemon/plugins/color" = {
+      night-light-enabled = true;
+    };
     "org/gnome/settings-daemon/plugins/media-keys" = {
       custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" ];
       next = [ "<Super>Right" ];
@@ -521,6 +583,7 @@ rec {
       idle-brightness = 20;
       power-button-action = "interactive";
       sleep-inactive-battery-timeout = 300;
+      sleep-inactive-ac-type = "nothing";
     };
     "org/gnome/shell" = {
       enabled-extensions = [
@@ -563,20 +626,21 @@ rec {
 
   nix.package = pkgs.nix;
   nix.settings = {
-    experimental-features = [ "nix-command" ];
+    experimental-features = [ "nix-command" "flakes" ];
   };
 
   home.activation = {
     setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p "$HOME/Games/Minecraft/tlauncher"
       ln -sfT "$HOME/Games/Minecraft/tlauncher" "$HOME/.tlauncher"
+      mkdir -p "$HOME/Games/Minecraft/minecraft"
+      ln -sfT "$HOME/Games/Minecraft/minecraft" "$HOME/.minecraft"
       mkdir -p "$HOME/Games/5dchesswithmultiversetimetravel" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel"
       ln -sfT "$HOME/Games/5dchesswithmultiversetimetravel/settings_and_progress.txt" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel/settings_and_progress.txt"
       ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
       ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
       ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
       mkdir -p "$HOME/.local/lib"
-      ln -sfT "${pkgs.jdk}/lib/openjdk" "$HOME/.local/lib/java"
       mkdir -p "$HOME/.local/share/systemd"
       ln -sfT "$HOME/.nix-profile/share/systemd/user" "$HOME/.local/share/systemd/user"
       "$HOME/.local/bin/flatpak-switch"
