@@ -1,11 +1,11 @@
 { stdenv, fetchurl, jre }:
 stdenv.mkDerivation rec {
   name = "tlauncher-${version}";
-  version = "2.884";
+  version = "2.885";
 
   src = fetchurl {
     url = "https://securerepository.net/client/TLauncher-${version}_pre.jar";
-    sha256 = "sha256-EiCIEcmM4nK8RG6OzGLaSAYjE08llGbqjsqiJg5ute0=";
+    sha256 = "sha256-8cElcYiBE3UeJe9Cm//autND+mPGIm3vdmASlrTFlgE=";
   };
 
   phases = [ "installPhase" ];

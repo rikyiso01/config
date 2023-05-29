@@ -11,14 +11,13 @@ rec {
   home.packages = with pkgs; [
     man-pages
     man-pages-posix
-    gcc
     podman
     docker-compose
     du-dust
     fd
     procs
+    p7zip
     curlie
-    gdb
     libsecret
     gnomeExtensions.espresso
     gnomeExtensions.dash-to-dock
@@ -29,7 +28,6 @@ rec {
     gnomeExtensions.ddterm
     gnomeExtensions.focus-changer
     fira-code
-    rustup
     rust-analyzer
     powertop
     micro
@@ -38,10 +36,8 @@ rec {
     shellcheck
     android-tools
     nmap
-    gef
     wireguard-tools
     haskell-language-server
-    binwalk
     exiftool
     imagemagick
     jdk
@@ -49,72 +45,19 @@ rec {
     elmPackages.elm-format
     inotify-tools
     nixpkgs-fmt
-    ngrok
     brightnessctl
     traceroute
     poetry
-    gnumake
     maven
-    php82Packages.composer
-    (pkgs.callPackage ./downloadhelper.nix { })
-    (pkgs.callPackage ./tlauncher.nix { })
-    (pkgs.callPackage ./podmandocker.nix { })
-    php82
+    (callPackage ./downloadhelper.nix { })
+    (callPackage ./tlauncher.nix { })
+    (callPackage ./podmandocker.nix { })
     pypy38
     linux-wifi-hotspot
-    pkgs.python310Packages.ipython
-    # (
-    #   let
-    #     my-python-packages = python-packages: with python-packages; [
-    #       pudb
-    #       ipython
-    #       ipykernel
-    #       notebook
-    #       pandas
-    #       scipy
-    #       numpy
-    #       plotly
-    #       pyyaml
-    #       scikit-learn
-    #       httpx
-    #       pwntools
-    #       beautifulsoup4
-    #       pycryptodome
-    #       pytest
-    #       pillow
-    #       scikitimage
-    #       numba
-    #       opencv4
-    #       playwright
-    #       aiofile
-    #       bokeh
-    #       polars
-    #       (
-    #         buildPythonPackage rec {
-    #           pname = "pwntools-stubs";
-    #           version = "0.1.2";
-    #           src = fetchFromGitHub {
-    #             owner = "rikyiso01";
-    #             repo = "pwntools-stubs";
-    #             rev = version;
-    #             sha256 = "sha256-Ew5cm4h/fWNVgLWkrzTvOmmcUxUMpmhEniehOPvEvQA=";
-    #           };
-    #           doCheck = false;
-    #           format = "pyproject";
-    #           propagatedBuildInputs = [
-    #             pkgs.pwntools
-    #             pkgs.python3Packages.poetry-core
-    #             pkgs.poetry
-    #           ];
-    #         }
-    #       )
-    #     ];
-    #     python-with-my-packages = python310.withPackages my-python-packages;
-    #   in
-    #   python-with-my-packages
-    # )
-    (pkgs.texlive.combine {
-      inherit (pkgs.texlive) scheme-minimal xetex tcolorbox pgf environ etoolbox pdfcol tools ltxcmds infwarerr parskip kvoptions kvsetkeys caption float geometry amsmath upquote eurosym fontspec unicode-math fancyvrb grffile adjustbox hyperref titling booktabs enumitem ulem jknapltx rsfs;
+    xdg-ninja
+    python310Packages.ipython
+    (texlive.combine {
+      inherit (texlive) scheme-minimal xetex tcolorbox pgf environ etoolbox pdfcol tools ltxcmds infwarerr parskip kvoptions kvsetkeys caption float geometry amsmath upquote eurosym fontspec unicode-math fancyvrb grffile adjustbox hyperref titling booktabs enumitem ulem jknapltx rsfs;
     })
     (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
   ];
@@ -143,6 +86,18 @@ rec {
     EDITOR = "micro";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent.socket";
     DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
+    CPATH = "${pkgs.opencl-headers}/include";
+    LIBRARY_PATH = "${pkgs.ocl-icd}/lib";
+    OCL_ICD_VENDORS = "${pkgs.intel-compute-runtime}/etc/OpenCL/vendors/intel-neo.icd";
+    ANDROID_HOME = "${config.xdg.dataHome}/android";
+    GNUPGHOME = "${config.xdg.dataHome}/gnupg";
+    GRADLE_USER_HOME = "${config.xdg.dataHome}/gradle";
+    IPYTHONDIR = "${config.xdg.configHome}/ipython";
+    JUPYTER_CONFIG_DIR = "${config.xdg.configHome}/jupyter";
+    LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
+    NODE_REPL_HISTORY = "${config.xdg.dataHome}/node_repl_history";
+    _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${config.xdg.configHome}/java";
+    RUSTUP_HOME = "${config.xdg.dataHome}/rustup";
   };
 
   fonts.fontconfig.enable = true;
@@ -166,14 +121,15 @@ rec {
 
   programs.ssh = {
     enable = true;
-    extraConfig = "AddKeysToAgent yes";
+    extraConfig = "AddKeysToAgent yes ";
   };
 
   programs.bash = {
     enable = true;
     initExtra = "
-    PATH=$HOME/.nix-profile/bin:$PATH
+      PATH=$HOME/.nix-profile/bin:$PATH
     [[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
+    historyFile = "${config.xdg.dataHome}/bash/bash_history";
   };
 
   programs.zsh = {
@@ -183,7 +139,7 @@ rec {
     FPATH=$HOME/.nix-profile/share/zsh/site-functions:$FPATH
     compinit
     PATH=$HOME/.local/bin:$HOME/.local/share/flatpak/exports/bin:$PATH
-    export ZPLUG_HOME=/home/riky/.zplug
+    export ZPLUG_HOME=${config.xdg.dataHome}/zplug
     source ${pkgs.zplug}/share/zplug/init.zsh
     zplug "romkatv/powerlevel10k", as:theme, depth:1
     if ! zplug check; then
@@ -196,14 +152,20 @@ rec {
       find = "fd";
       ps = "procs";
       curl = "curlie";
-      gdb = "gef";
       sudo = "sudo env \"PATH=$PATH\"";
+      wget = "wget --hsts-file=$XDG_DATA_HOME/wget-hsts";
+      zip = "7z a";
+      unzip = "7z x";
+      python = "pypy3";
     };
+    history.path = "${config.xdg.dataHome}/zsh/zsh_history";
+    dotDir = ".config/zsh";
     # zplug = {
     #   enable = true;
     #   plugins = [
     #     { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
     #   ];
+    #   zplugHome = "${config.xdg.dataHome}/zplug";
     # };
 
     oh-my-zsh = {
@@ -247,6 +209,7 @@ rec {
       name = "Adwaita-dark";
       package = pkgs.gnome.gnome-themes-extra;
     };
+    gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
     };
@@ -360,6 +323,13 @@ rec {
         ExecStart = "${home.homeDirectory}/.local/bin/autotune";
       };
       Install = { WantedBy = [ "default.target" ]; };
+    };
+    cat = {
+      Unit = { Description = "X11 Cat"; };
+      Service = {
+        ExecStart = "${pkgs.oneko}/bin/oneko -tora -bg 'dark gray'";
+      };
+      Install = { WantedBy = [ "gnome-session-x11-services.target" ]; };
     };
   };
 
@@ -505,6 +475,7 @@ rec {
           "org.pitivi.Pitivi"
           "com.protonvpn.www"
           "org.keepassxc.KeePassXC"
+          "com.google.AndroidStudio"
         ];
       };
       flathub-beta = {
@@ -633,8 +604,6 @@ rec {
     setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p "$HOME/Games/Minecraft/tlauncher"
       ln -sfT "$HOME/Games/Minecraft/tlauncher" "$HOME/.tlauncher"
-      mkdir -p "$HOME/Games/Minecraft/minecraft"
-      ln -sfT "$HOME/Games/Minecraft/minecraft" "$HOME/.minecraft"
       mkdir -p "$HOME/Games/5dchesswithmultiversetimetravel" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel"
       ln -sfT "$HOME/Games/5dchesswithmultiversetimetravel/settings_and_progress.txt" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel/settings_and_progress.txt"
       ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
