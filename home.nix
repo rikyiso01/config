@@ -333,6 +333,10 @@ rec {
     };
   };
 
+  home.file.".gdbinit".text = "source ${pkgs.gef}/share/gef/gef.py";
+  home.file."Templates/emptyfile.txt".text = "";
+  home.file."Templates/pwntools.py".source = ./pwntoolstemplate.py;
+
   home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
     { }
     {
