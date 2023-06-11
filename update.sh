@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+cd "$(dirname "$0")"
 
-LOCAL="$HOME/.config/home-manager"
-
-git -C "$LOCAL" pull
 nix-channel --update
-home-manager switch
+home-manager switch -f home.nix
 
 flatpak update -y

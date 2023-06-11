@@ -55,3 +55,6 @@ home-manager switch -f home.nix -b backup
 ghc powertop.hs -odir /tmp/autotune -hidir /tmp/autotune -o "$HOME/.local/bin/autotune"
 sudo chown root:root "$HOME/.local/bin/autotune"
 sudo chmod u+s "$HOME/.local/bin/autotune"
+
+flatpak remote-delete --system --force flathub
+flatpak remote-delete --system --force fedora

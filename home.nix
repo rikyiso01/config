@@ -11,6 +11,7 @@ rec {
   home.packages = with pkgs; [
     man-pages
     man-pages-posix
+    perl
     podman
     docker-compose
     du-dust
@@ -18,14 +19,12 @@ rec {
     procs
     p7zip
     curlie
-    libsecret
     gnomeExtensions.espresso
     gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
     gnomeExtensions.appindicator
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
-    gnomeExtensions.ddterm
     gnomeExtensions.focus-changer
     fira-code
     rust-analyzer
@@ -121,7 +120,7 @@ rec {
 
   programs.ssh = {
     enable = true;
-    extraConfig = "AddKeysToAgent yes ";
+    extraConfig = "AddKeysToAgent yes";
   };
 
   programs.bash = {
@@ -223,86 +222,6 @@ rec {
       createDirectories = true;
       enable = true;
     };
-    mimeApps = {
-      enable = true;
-      associations = {
-        added = {
-          "text/plain" = [ "org.gnome.TextEditor.desktop" ];
-          "application/pdf" = [ "org.gnome.Evince.desktop" ];
-          "application/x-desktop" = [ "org.gnome.TextEditor.desktop" ];
-          "text/x-csharp" = [ "org.gnome.TextEditor.desktop" ];
-          "application/x-php" = [ "org.gnome.TextEditor.desktop" ];
-          "text/html" = [ "com.brave.Browser.desktop" "org.gnome.TextEditor.desktop" ];
-          "application/x-ipynb+json" = [ "com.visualstudio.code.desktop" ];
-          "text/x-python" = [ "org.gnome.TextEditor.desktop" ];
-          "application/octet-stream" = [ "org.gnome.TextEditor.desktop" ];
-          "application/vnd.ms-publisher" = [ "org.gnome.TextEditor.desktop" ];
-          "application/x-wine-extension-ini" = [ "org.gnome.TextEditor.desktop" ];
-          "application/x-shellscript" = [ "org.gnome.TextEditor.desktop" ];
-        };
-      };
-      defaultApplications = {
-        "application/x-wine-extension-ini" = [ "org.gnome.TextEditor.desktop" ];
-        "image/jpeg" = [ "org.gnome.eog.desktop" ];
-        "image/png" = [ "org.gnome.eog.desktop" ];
-        "image/jpg" = [ "org.gnome.eog.desktop" ];
-        "image/pjpeg" = [ "org.gnome.eog.desktop" ];
-        "image/x-3fr" = [ "org.gnome.eog.desktop" ];
-        "image/x-adobe-dng" = [ "org.gnome.eog.desktop" ];
-        "image/x-arw" = [ "org.gnome.eog.desktop" ];
-        "image/x-bay" = [ "org.gnome.eog.desktop" ];
-        "image/x-bmp" = [ "org.gnome.eog.desktop" ];
-        "image/x-canon-cr2" = [ "org.gnome.eog.desktop" ];
-        "image/x-canon-crw" = [ "org.gnome.eog.desktop" ];
-        "image/x-cap" = [ "org.gnome.eog.desktop" ];
-        "image/x-cr2" = [ "org.gnome.eog.desktop" ];
-        "image/x-crw" = [ "org.gnome.eog.desktop" ];
-        "image/x-dcr" = [ "org.gnome.eog.desktop" ];
-        "image/x-dcraw" = [ "org.gnome.eog.desktop" ];
-        "image/x-dcs" = [ "org.gnome.eog.desktop" ];
-        "image/x-dng" = [ "org.gnome.eog.desktop" ];
-        "image/x-drf" = [ "org.gnome.eog.desktop" ];
-        "image/x-eip" = [ "org.gnome.eog.desktop" ];
-        "image/x-erf" = [ "org.gnome.eog.desktop" ];
-        "image/x-fff" = [ "org.gnome.eog.desktop" ];
-        "image/x-fuji-raf" = [ "org.gnome.eog.desktop" ];
-        "image/x-iiq" = [ "org.gnome.eog.desktop" ];
-        "image/x-k25" = [ "org.gnome.eog.desktop" ];
-        "image/x-kdc" = [ "org.gnome.eog.desktop" ];
-        "image/x-mef" = [ "org.gnome.eog.desktop" ];
-        "image/x-minolta-mrw" = [ "org.gnome.eog.desktop" ];
-        "image/x-mos" = [ "org.gnome.eog.desktop" ];
-        "image/x-mrw" = [ "org.gnome.eog.desktop" ];
-        "image/x-nef" = [ "org.gnome.eog.desktop" ];
-        "image/x-nikon-nef" = [ "org.gnome.eog.desktop" ];
-        "image/x-nrw" = [ "org.gnome.eog.desktop" ];
-        "image/x-olympus-orf" = [ "org.gnome.eog.desktop" ];
-        "image/x-orf" = [ "org.gnome.eog.desktop" ];
-        "image/x-panasonic-raw" = [ "org.gnome.eog.desktop" ];
-        "image/x-pef" = [ "org.gnome.eog.desktop" ];
-        "image/x-pentax-pef" = [ "org.gnome.eog.desktop" ];
-        "image/x-png" = [ "org.gnome.eog.desktop" ];
-        "image/x-ptx" = [ "org.gnome.eog.desktop" ];
-        "image/x-pxn" = [ "org.gnome.eog.desktop" ];
-        "image/x-r3d" = [ "org.gnome.eog.desktop" ];
-        "image/x-raf" = [ "org.gnome.eog.desktop" ];
-        "image/x-raw" = [ "org.gnome.eog.desktop" ];
-        "image/x-rw2" = [ "org.gnome.eog.desktop" ];
-        "image/x-rwl" = [ "org.gnome.eog.desktop" ];
-        "image/x-rwz" = [ "org.gnome.eog.desktop" ];
-        "image/x-sigma-x3f" = [ "org.gnome.eog.desktop" ];
-        "image/x-sony-arw" = [ "org.gnome.eog.desktop" ];
-        "image/x-sony-sr2" = [ "org.gnome.eog.desktop" ];
-        "image/x-sony-srf" = [ "org.gnome.eog.desktop" ];
-        "image/x-sr2" = [ "org.gnome.eog.desktop" ];
-        "image/x-srf" = [ "org.gnome.eog.desktop" ];
-        "image/x-x3f" = [ "org.gnome.eog.desktop" ];
-        "application/xml" = [ "org.gnome.TextEditor.desktop" ];
-        "text/markdown" = [ "org.gnome.TextEditor.desktop" ];
-        "application/x-shellscript" = [ "org.gnome.TextEditor.desktop" ];
-        "text/plain" = [ "org.gnome.TextEditor.desktop" ];
-      };
-    };
   };
 
   systemd.user.services = {
@@ -345,8 +264,6 @@ rec {
       };
     };
   home.file.".config/theme.zsh".source = ./theme.zsh;
-  home.file.".local/bin/update".source = ./update.sh;
-  home.file.".local/bin/backup".source = ./backup.sh;
   home.file.".local/bin/startup".source = ./startup.sh;
   home.file.".local/bin/flatpak-switch".source = ./flatpak-switch.py;
   home.file.".config/autostart/startup.desktop".text = ''
@@ -570,6 +487,7 @@ rec {
         "AlphabeticalAppGrid@stuarthayhurst"
         "espresso@coadmunkee.github.com"
         "focus-changer@heartmire"
+        "org.gnome.Totem"
       ];
       favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.visualstudio.code.desktop" ];
     };
