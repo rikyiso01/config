@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+cd "$(dirname "$0")"
 
 sudo setenforce Permissive
 sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
