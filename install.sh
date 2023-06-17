@@ -47,7 +47,7 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
 export PATH=~/.nix-profile/bin:$PATH
 
-nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-nix-channel --update
-nix-shell '<home-manager>' -A install
-home-manager switch -f home.nix -b backup
+nix-channel --remove nixpkgs
+nix --extra-experimental-features nix-command --extra-experimental-features flakes profile install nixpkgs#nix --priority 4
+nix --extra-experimental-features nix-command --extra-experimental-features flakes profile remove 0
+nix --extra-experimental-features nix-command --extra-experimental-features flakes shell nixpkgs#home-manager --command home-manager switch --flake home.nix -b backup

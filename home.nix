@@ -1,13 +1,4 @@
-{ config, pkgs, lib, ... }:
-
-let
-  vscode-extensions = (import (builtins.fetchGit {
-    url = "https://github.com/nix-community/nix-vscode-extensions";
-    ref = "refs/heads/master";
-    rev = "d5af9f1dd2af094e2fb5b7301a934380bcf1b55e";
-  })).extensions.x86_64-linux.vscode-marketplace;
-
-in
+{ config, pkgs, lib, nix-vscode-extensions, ... }:
 
 rec {
 
@@ -172,7 +163,7 @@ rec {
     enableExtensionUpdateCheck = false;
     enableUpdateCheck = false;
     package = pkgs.runCommandLocal "no-vscode" { pname = "vscode"; version = "1.79.1"; } "mkdir $out";
-    extensions = with vscode-extensions; [
+    extensions = with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
       ms-python.python
       deque-systems.vscode-axe-linter
       mads-hartmann.bash-ide-vscode
@@ -584,7 +575,8 @@ rec {
           "org.gnome.FileRoller"
           "org.gnome.Evince"
           "org.chromium.Chromium"
-          "com.vscodium.codium"
+          "org.gnome.eog"
+          "com.visualstudio.code-oss"
         ];
       };
       flathub-beta = {
