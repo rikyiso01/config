@@ -1,5 +1,14 @@
 { config, pkgs, lib, ... }:
 
+let
+  vscode-extensions = (import (builtins.fetchGit {
+    url = "https://github.com/nix-community/nix-vscode-extensions";
+    ref = "refs/heads/master";
+    rev = "d5af9f1dd2af094e2fb5b7301a934380bcf1b55e";
+  })).extensions.x86_64-linux.vscode-marketplace;
+
+in
+
 rec {
 
   # Home Manager needs a bit of information about you and the
@@ -12,7 +21,6 @@ rec {
     man-pages
     man-pages-posix
     perl
-    podman
     docker-compose
     du-dust
     fd
@@ -20,22 +28,22 @@ rec {
     p7zip
     curlie
     gnomeExtensions.espresso
-    gnomeExtensions.dash-to-dock
     gnomeExtensions.alphabetical-app-grid
-    gnomeExtensions.appindicator
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.compiz-alike-magic-lamp-effect
-    gnomeExtensions.focus-changer
     fira-code
     rust-analyzer
+    rustfmt
+    cargo
+    php
     powertop
+    maven
     micro
     nodePackages.pnpm
     nodejs-slim
     shellcheck
     android-tools
     nmap
-    wireguard-tools
     haskell-language-server
     exiftool
     imagemagick
@@ -47,17 +55,12 @@ rec {
     brightnessctl
     traceroute
     poetry
-    maven
     (callPackage ./downloadhelper.nix { })
     (callPackage ./tlauncher.nix { })
     (callPackage ./podmandocker.nix { })
     pypy38
-    linux-wifi-hotspot
     xdg-ninja
     python310Packages.ipython
-    (texlive.combine {
-      inherit (texlive) scheme-minimal xetex tcolorbox pgf environ etoolbox pdfcol tools ltxcmds infwarerr parskip kvoptions kvsetkeys caption float geometry amsmath upquote eurosym fontspec unicode-math fancyvrb grffile adjustbox hyperref titling booktabs enumitem ulem jknapltx rsfs;
-    })
     (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
   ];
 
@@ -79,11 +82,10 @@ rec {
 
   home.sessionVariables = {
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
-    #PYTHONBREAKPOINT = "pudb.set_trace";
     NIXPKGS_ALLOW_UNFREE = "1";
     VISUAL = "micro";
     EDITOR = "micro";
-    SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent.socket";
+    XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
     DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
     CPATH = "${pkgs.opencl-headers}/include";
     LIBRARY_PATH = "${pkgs.ocl-icd}/lib";
@@ -96,7 +98,6 @@ rec {
     LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
     NODE_REPL_HISTORY = "${config.xdg.dataHome}/node_repl_history";
     _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${config.xdg.configHome}/java";
-    RUSTUP_HOME = "${config.xdg.dataHome}/rustup";
   };
 
   fonts.fontconfig.enable = true;
@@ -137,14 +138,7 @@ rec {
     initExtra = ''source $HOME/.config/theme.zsh
     FPATH=$HOME/.nix-profile/share/zsh/site-functions:$FPATH
     compinit
-    PATH=$HOME/.local/bin:$HOME/.local/share/flatpak/exports/bin:$PATH
-    export ZPLUG_HOME=${config.xdg.dataHome}/zplug
-    source ${pkgs.zplug}/share/zplug/init.zsh
-    zplug "romkatv/powerlevel10k", as:theme, depth:1
-    if ! zplug check; then
-      zplug install
-    fi
-    zplug load'';
+    PATH=$HOME/.local/bin:$HOME/.local/share/flatpak/exports/bin:$PATH'';
     shellAliases = {
       cat = "bat";
       du = "dust";
@@ -159,19 +153,112 @@ rec {
     };
     history.path = "${config.xdg.dataHome}/zsh/zsh_history";
     dotDir = ".config/zsh";
-    # zplug = {
-    #   enable = true;
-    #   plugins = [
-    #     { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
-    #   ];
-    #   zplugHome = "${config.xdg.dataHome}/zplug";
-    # };
+    zplug = {
+      enable = true;
+      plugins = [
+        { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
+      ];
+      zplugHome = "${config.xdg.dataHome}/zplug";
+    };
 
     oh-my-zsh = {
       enable = true;
       plugins = [ "git" "sudo" ];
     };
   };
+
+  programs.vscode = {
+    enable = true;
+    enableExtensionUpdateCheck = false;
+    enableUpdateCheck = false;
+    package = pkgs.runCommandLocal "no-vscode" { pname = "vscode"; version = "1.79.1"; } "mkdir $out";
+    extensions = with vscode-extensions; [
+      ms-python.python
+      deque-systems.vscode-axe-linter
+      mads-hartmann.bash-ide-vscode
+      jeff-hykin.better-cpp-syntax
+      ms-python.black-formatter
+      ms-vscode.cpptools
+      ms-vscode.cpptools-themes
+      streetsidesoftware.code-spell-checker
+      vscjava.vscode-java-debug
+      ms-azuretools.vscode-docker
+      elmtooling.elm-ls-vscode
+      tamasfe.even-better-toml
+      vscjava.vscode-gradle
+      haskell.haskell
+      justusadam.language-haskell
+      htmlhint.vscode-htmlhint
+      visualstudioexptteam.vscodeintellicode
+      ms-python.isort
+      streetsidesoftware.code-spell-checker-italian
+      wholroyd.jinja
+      ms-toolsai.vscode-jupyter-cell-tags
+      ms-toolsai.jupyter-keymap
+      ms-toolsai.jupyter-renderers
+      ms-toolsai.vscode-jupyter-slideshow
+      fwcd.kotlin
+      mathiasfrohlich.kotlin
+      redhat.java
+      ms-vscode.live-server
+      marp-team.marp-vscode
+      pkief.material-icon-theme
+      vscjava.vscode-maven
+      bbenoist.nix
+      jnoortheen.nix-ide
+      zhuangtongfa.material-theme
+      xdebug.php-debug
+      bmewburn.vscode-intelephense-client
+      esbenp.prettier-vscode
+      vscjava.vscode-java-dependency
+      getpsalm.psalm-vscode-plugin
+      ms-python.vscode-pylance
+      ms-python.python
+      rust-lang.rust-analyzer
+      foxundermoon.shell-format
+      ms-vscode.test-adapter-converter
+      hbenl.vscode-test-explorer
+      vscjava.vscode-java-test
+      tomoki1207.pdf
+      joyceerhl.vscode-pyodide
+      umoxfo.vscode-w3cvalidation
+      redhat.vscode-xml
+      redhat.vscode-yaml
+    ];
+    keybindings = [
+      {
+        "key" = "ctrl+e";
+        "command" = "-workbench.action.quickOpen";
+      }
+      {
+        "key" = "ctrl+[Minus]";
+        "command" = "workbench.action.terminal.toggleTerminal";
+      }
+      {
+        "key" = "down";
+        "command" = "-editor.action.scrollDownHover";
+        "when" = "editorHoverFocused";
+      }
+      {
+        "key" = "left";
+        "command" = "-editor.action.scrollLeftHover";
+        "when" = "editorHoverFocused";
+      }
+      {
+        "key" = "right";
+        "command" = "-editor.action.scrollRightHover";
+        "when" = "editorHoverFocused";
+      }
+      {
+        "key" = "up";
+        "command" = "-editor.action.scrollUpHover";
+        "when" = "editorHoverFocused";
+      }
+    ];
+    mutableExtensionsDir = false;
+    userSettings = { };
+  };
+
 
   programs.nix-index.enable = true;
 
@@ -181,7 +268,6 @@ rec {
   home.enableNixpkgsReleaseCheck = true;
 
   news.display = "show";
-  #systemd.user.startServices = "legacy";
   nix.settings = {
     auto-optimise-store = true;
   };
@@ -230,7 +316,7 @@ rec {
         Description = "KeepassXC";
       };
       Service = {
-        ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; ${home.homeDirectory}/.nix-profile/bin/secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
+        ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
       };
       Install = { WantedBy = [ "graphical-session.target" ]; };
     };
@@ -264,11 +350,9 @@ rec {
       };
     };
   home.file.".config/theme.zsh".source = ./theme.zsh;
-  home.file.".local/bin/startup".source = ./startup.sh;
-  home.file.".local/bin/flatpak-switch".source = ./flatpak-switch.py;
   home.file.".config/autostart/startup.desktop".text = ''
     [Desktop Entry]
-    Exec=startup
+    Exec=${./startup.sh}
     Name=startup
     Comment=Startup
     Type=Application
@@ -308,6 +392,29 @@ rec {
         "type": "stdio"
     }
   '';
+  home.file.".var/app/org.chromium.Chromium/config/chromium/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
+    {
+      "name": "net.downloadhelper.coapp",
+      "description": "Video DownloadHelper companion app",
+      "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",
+      "type": "stdio",
+      "allowed_origins": [
+          "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
+      ]
+    }
+  '';
+  home.file.".var/app/org.chromium.Chromium/config/chromium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''
+        {
+        "allowed_origins": [
+            "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
+            "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
+        ],
+        "description": "KeePassXC integration with native messaging support",
+        "name": "org.keepassxc.keepassxc_browser",
+        "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",
+        "type": "stdio"
+    }
+  '';
 
   home.file.".local/flatpak/git".source = ./normal-spawn.sh;
   home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
@@ -318,6 +425,10 @@ rec {
   };
   home.file.".local/flatpak/brave" = {
     text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --enable-raw-draw=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-usermedia-screen-capturing \"$@\"";
+    executable = true;
+  };
+  home.file.".local/flatpak/cobalt" = {
+    text = "#!/usr/bin/env bash\nexec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
     executable = true;
   };
   home.file.".local/flatpak/host-spawn".source = ./host-spawn;
@@ -335,6 +446,19 @@ rec {
     {
       Context = {
         filesystems = "home;/nix/store:ro;";
+      };
+      Environment = {
+        PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
+      };
+      "Session Bus Policy" = {
+        "org.freedesktop.Flatpak" = "talk";
+      };
+    };
+  home.file.".local/share/flatpak/overrides/org.chromium.Chromium".text = lib.generators.toINI
+    { }
+    {
+      Context = {
+        filesystems = "/nix/store:ro;";
       };
       Environment = {
         PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
@@ -363,6 +487,65 @@ rec {
         filesystems = "home";
       };
     };
+
+  home.file.".var/app/org.keepassxc.KeePassXC/config/keepassxc/keepassxc.ini".text = ''
+    [General]
+    ConfigVersion=2
+    MinimizeAfterUnlock=true
+    UseAtomicSaves=false
+    AutoSaveAfterEveryChange=false
+
+    [Browser]
+    AlwaysAllowAccess=true
+    CustomProxyLocation=
+    Enabled=true
+    SearchInAllDatabases=false
+
+    [GUI]
+    MinimizeOnClose=true
+    MinimizeOnStartup=true
+    MinimizeToTray=true
+    ShowTrayIcon=true
+    TrayIconAppearance=monochrome-light
+
+    [KeeShare]
+    Active="<?xml version=\"1.0\"?><KeeShare><Active/></KeeShare>\n"
+    Own="<?xml version=\"1.0\"?><KeeShare><PrivateKey>MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCv+DiaOYsA5VeObx8y0Z0dUaAHBejPyLXaYpHFz5SCqUkiPGhVYlyN4hRrIaKWWS8+uNHE+TRasLoMeKLSl/QLz8bJnIUfbBmUa2yG3ES+l+vAFUQ9fdJMFSm+zbzhM8jg6rRj+T9QyDZlH7oD5TwibJ04M9krqlUxjaCNSjUpNZMPbBfxMRNllwERlAGY7EtqsIg/L8LyVagUGnZtKCy2rUftUb9lUUKPQ9Qkp7KsveTJ/OHEMHE3tEI/7EKBpvV2IYXgsuqjGXogx/DwBnC2HMAX0pr35V46X6dXfVYeLQVxCzI3zo2kIdeUEVNPT0WmbZoY6+kWcWYfLNgSwO0DAgMBAAECggEABdCZhajc/B08lfNFFwMry5a6kKxGiEanbXQ5ZfI0ljItK0mF4DvdN4foEmVaf7QYCu8y+1quOv+KLA/B5IE0PIdmGAnf+khXHzIVRqWU3fcuNzsTiCIWMAC5BuxxGHcn0tQDPLkQuVdMXW4Y5CY0krgRraaOGvc2VDNeZnhGpnD6YfymWb+LTvM8zv1FGa4DGb/rEiunPlbaLM0FFwpQ8/JdPI8FUK36Yrf8Xk/MzNwYQepBEj9osfVxvTzRa4Jvrh8P25nYEBMIJKzHM3+MqM2a3xC5K72GKvjFLOOQz7pUKaSc0kbPkf7JD24x1pHXkPqXGJPG5qPPUxVkDj/K2QKBgQDNvo08G91E3AzI6ssndNo1FQyfyBHLRzXdL6KEl6+bXowDKvYmQw3bQxy86eylnqscYQIqsSWI0cxNgsffQnSefq0f+q7qI6pZXiHiR137rodEHGUDXfIyGpPDR8WShMKBfdjptm3CkApCtgeGy82wBzToTIl1m9RcT8BNM6XZ2wKBgQDa89Gay9c/0Q0l8hq8Slt4hNq4LtshSZ+my4l6Wbu+1RUUa6mseKGo2vLFzGVRn4AnumhW4HWqlwxGDda9MxJiP7PuBeZjUFmhW0RFMDkvsRUQBzIWgPe7+jrfVMHwr9nUzOF9uKadPG1YM0M+DFaDxKRD06CU0MNtSbHl8ahF+QKBgQCB0NR+c7pmQ03Ry8vJJoKz8YcYnf0UPOcwm2i4rpi/uKUxLn9HXxG0IiFU1Whai8W9Tzw1wbZEINP+qCECroS0qIsF3X9V/pDyeGF6y7ryHYn9oMjfmfxCPuCy22s+6oNrfwNJW7DfjVDcDMys8ZTjl3h7hidJTLxuTmewjoD79wKBgAIihHWs7SFbKXSoQqh5VSD8sqE/G7XcYOkgbOu7ekAnFbiIQDRFTNY3pExXbNl546b/g0rtj1glduIr+l8H43L/ygJVHmTzgJw5JpZCHRyg7mKkn1Fm2oODshVBX064eDhB8yTlqwI3d513in1NY36PaUacBqHM00r6f/iM/aYJAoGATDR8rHxE5p5p2V4gtnn1iTSNbAJy++tWBmNPAXomph7r4kKkL0LVmCt+1eiTE0Xe4byn6b6YAEWo/GikvMHitukrcNJ6V8XwtNAdgA2ML8+p54y8w1R/Du7IJWbt3lnl0R47DQ6Om8Dpqy63DgD3uJGFyfz3D8X41t7WBwJzBYY=</PrivateKey><PublicKey><Signer>riky</Signer><Key>MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCv+DiaOYsA5VeObx8y0Z0dUaAHBejPyLXaYpHFz5SCqUkiPGhVYlyN4hRrIaKWWS8+uNHE+TRasLoMeKLSl/QLz8bJnIUfbBmUa2yG3ES+l+vAFUQ9fdJMFSm+zbzhM8jg6rRj+T9QyDZlH7oD5TwibJ04M9krqlUxjaCNSjUpNZMPbBfxMRNllwERlAGY7EtqsIg/L8LyVagUGnZtKCy2rUftUb9lUUKPQ9Qkp7KsveTJ/OHEMHE3tEI/7EKBpvV2IYXgsuqjGXogx/DwBnC2HMAX0pr35V46X6dXfVYeLQVxCzI3zo2kIdeUEVNPT0WmbZoY6+kWcWYfLNgSwO0DAgMBAAECggEABdCZhajc/B08lfNFFwMry5a6kKxGiEanbXQ5ZfI0ljItK0mF4DvdN4foEmVaf7QYCu8y+1quOv+KLA/B5IE0PIdmGAnf+khXHzIVRqWU3fcuNzsTiCIWMAC5BuxxGHcn0tQDPLkQuVdMXW4Y5CY0krgRraaOGvc2VDNeZnhGpnD6YfymWb+LTvM8zv1FGa4DGb/rEiunPlbaLM0FFwpQ8/JdPI8FUK36Yrf8Xk/MzNwYQepBEj9osfVxvTzRa4Jvrh8P25nYEBMIJKzHM3+MqM2a3xC5K72GKvjFLOOQz7pUKaSc0kbPkf7JD24x1pHXkPqXGJPG5qPPUxVkDj/K2QKBgQDNvo08G91E3AzI6ssndNo1FQyfyBHLRzXdL6KEl6+bXowDKvYmQw3bQxy86eylnqscYQIqsSWI0cxNgsffQnSefq0f+q7qI6pZXiHiR137rodEHGUDXfIyGpPDR8WShMKBfdjptm3CkApCtgeGy82wBzToTIl1m9RcT8BNM6XZ2wKBgQDa89Gay9c/0Q0l8hq8Slt4hNq4LtshSZ+my4l6Wbu+1RUUa6mseKGo2vLFzGVRn4AnumhW4HWqlwxGDda9MxJiP7PuBeZjUFmhW0RFMDkvsRUQBzIWgPe7+jrfVMHwr9nUzOF9uKadPG1YM0M+DFaDxKRD06CU0MNtSbHl8ahF+QKBgQCB0NR+c7pmQ03Ry8vJJoKz8YcYnf0UPOcwm2i4rpi/uKUxLn9HXxG0IiFU1Whai8W9Tzw1wbZEINP+qCECroS0qIsF3X9V/pDyeGF6y7ryHYn9oMjfmfxCPuCy22s+6oNrfwNJW7DfjVDcDMys8ZTjl3h7hidJTLxuTmewjoD79wKBgAIihHWs7SFbKXSoQqh5VSD8sqE/G7XcYOkgbOu7ekAnFbiIQDRFTNY3pExXbNl546b/g0rtj1glduIr+l8H43L/ygJVHmTzgJw5JpZCHRyg7mKkn1Fm2oODshVBX064eDhB8yTlqwI3d513in1NY36PaUacBqHM00r6f/iM/aYJAoGATDR8rHxE5p5p2V4gtnn1iTSNbAJy++tWBmNPAXomph7r4kKkL0LVmCt+1eiTE0Xe4byn6b6YAEWo/GikvMHitukrcNJ6V8XwtNAdgA2ML8+p54y8w1R/Du7IJWbt3lnl0R47DQ6Om8Dpqy63DgD3uJGFyfz3D8X41t7WBwJzBYY=</Key></PublicKey></KeeShare>\n"
+    QuietSuccess=true
+
+    [PasswordGenerator]
+    AdditionalChars=
+    ExcludedChars=
+
+    [Security]
+    ClearClipboard=false
+    IconDownloadFallback=true
+    LockDatabaseScreenLock=false
+  '';
+
+  home.file.".local/share/flatpak/app/org.chromium.Chromium/current/active/files/chromium/policies/policies/managed/policies.json".text = builtins.toJSON {
+    DefaultSearchProviderEnabled = true;
+    DefaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
+    DefaultSearchProviderIconURL = "https://duckduckgo.com/favicon.ico";
+    DefaultSearchProviderName = "DuckDuckGo";
+    DefaultSearchProviderKeyword = "duckduckgo.com";
+    DefaultSearchProviderSuggestURL = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
+    PasswordManagerEnabled = false;
+    AutofillAddressEnabled = false;
+    PaymentMethodQueryEnabled = false;
+    HighEfficiencyModeEnabled = true;
+    BookmarkBarEnabled = true;
+    BackgroundModeEnabled = false;
+    ExtensionInstallForcelist = [
+      "ddkjiahejlhfcafbddmgiahcphecmpfh" # Ublock lite
+      "oboonakemofpalcgghocfoadofidjkkk" # KeepassXC
+      "lmjnegcaeklhafolokijcfjliaokphfk" # Video Download Helper
+      "fnaicdffflnofjppbagibeoednhnbjhg" # Floccus
+      "mpbjkejclgfgadiemmefgebjfooflfhl" # Buster
+      "ceipnlhmjohemhfpbjdgeigkababhmjc" # I'm not a robot
+      "dpplndkoilcedkdjicmbeoahnckdcnle" # 123Apps
+    ];
+  };
 
   home.file.".config/flatpak.json".text = builtins.toJSON
     {
@@ -397,6 +580,11 @@ rec {
           "com.protonvpn.www"
           "org.keepassxc.KeePassXC"
           "com.google.AndroidStudio"
+          "org.gnome.Totem"
+          "org.gnome.FileRoller"
+          "org.gnome.Evince"
+          "org.chromium.Chromium"
+          "com.vscodium.codium"
         ];
       };
       flathub-beta = {
@@ -415,8 +603,8 @@ rec {
       clock-show-seconds = false;
       clock-show-weekday = true;
       color-scheme = "prefer-dark";
-      font-antialiasing = "grayscale";
-      font-hinting = "slight";
+      font-antialiasing = "rgba";
+      font-hinting = "full";
       show-battery-percentage = true;
       toolkit-accessibility = false;
     };
@@ -451,7 +639,7 @@ rec {
       switch-to-workspace-right = [ ];
     };
     "org/gnome/desktop/wm/preferences" = {
-      button-layout = ":minimize,maximize,close";
+      button-layout = ":close";
     };
     "org/gnome/mutter/keybindings" = {
       toggle-tiled-left = [ "<Control><Alt>Left" ];
@@ -479,41 +667,30 @@ rec {
     };
     "org/gnome/shell" = {
       enabled-extensions = [
-        "dash-to-dock@micxgx.gmail.com"
-        "appindicatorsupport@rgcjonas.gmail.com"
         "compiz-alike-magic-lamp-effect@hermes83.github.com"
         "compiz-windows-effect@hermes83.github.com"
-        "ddterm@amezin.github.com"
         "AlphabeticalAppGrid@stuarthayhurst"
         "espresso@coadmunkee.github.com"
-        "focus-changer@heartmire"
-        "org.gnome.Totem"
       ];
-      favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.visualstudio.code.desktop" ];
+      favorite-apps = [ "org.chromium.Chromium.desktop" "org.gnome.Nautilus.desktop" "com.visualstudio.code.desktop" "org.gnome.Terminal.desktop" ];
     };
-    "org/gnome/shell/extensions/dash-to-dock" = {
-      apply-custom-theme = true;
-      background-opacity = 0.8;
-      custom-theme-shrink = false;
-      dash-max-icon-size = 48;
-      dock-position = "BOTTOM";
-      extend-height = false;
-      height-fraction = 0.9;
-      intellihide-mode = "FOCUS_APPLICATION_WINDOWS";
-      preferred-monitor = -2;
-      running-indicator-style = "DEFAULT";
-      show-mounts = false;
-      show-trash = false;
-    };
+    # "org/gnome/shell/extensions/dash-to-dock" = {
+    #   apply-custom-theme = true;
+    #   background-opacity = 0.8;
+    #   custom-theme-shrink = false;
+    #   dash-max-icon-size = 48;
+    #   dock-position = "BOTTOM";
+    #   extend-height = false;
+    #   height-fraction = 0.9;
+    #   intellihide-mode = "FOCUS_APPLICATION_WINDOWS";
+    #   preferred-monitor = -2;
+    #   running-indicator-style = "DEFAULT";
+    #   show-mounts = false;
+    #   show-trash = false;
+    # };
     "org/gnome/shell/extensions/espresso" = {
       has-battery = true;
       show-notifications = false;
-    };
-    "org/gnome/shell/extensions/focus-changer" = {
-      focus-down = [ "<Shift><Alt>Down" ];
-      focus-left = [ "<Shift><Alt>Left" ];
-      focus-right = [ "<Shift><Alt>Right" ];
-      focus-up = [ "<Shift><Alt>Up" ];
     };
   };
 
@@ -524,6 +701,15 @@ rec {
 
   home.activation = {
     setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      if [ ! -L "$HOME/Documents" ]
+      then
+        rmdir "$HOME/Documents"
+        ln -sfT "$HOME/backup/Documents" "$HOME/Documents"
+      fi
+      ln -sfT "$HOME/backup/Games" "$HOME/Games"
+      ln -sfT "$HOME/backup/id_ed25519" "$HOME/.ssh/id_ed25519"
+      ln -sfT "$HOME/backup/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
+      chmod 600 "$HOME/.ssh/id_ed25519"
       mkdir -p "$HOME/Games/Minecraft/tlauncher"
       ln -sfT "$HOME/Games/Minecraft/tlauncher" "$HOME/.tlauncher"
       mkdir -p "$HOME/Games/5dchesswithmultiversetimetravel" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel"
@@ -531,10 +717,21 @@ rec {
       ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
       ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
       ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
+      ln -sfT "$HOME/.vscode/extensions" "$HOME/.var/app/com.vscodium.codium/data/codium/extensions"
+      ln -sfT "$HOME/.config/Code/User/settings.json" "$HOME/.var/app/com.vscodium.codium/config/VSCodium/User/settings.json"
+      ln -sfT "$HOME/.config/Code/User/keybindings.json" "$HOME/.var/app/com.vscodium.codium/config/VSCodium/User/keybindings.json"
       mkdir -p "$HOME/.local/lib"
       mkdir -p "$HOME/.local/share/systemd"
       ln -sfT "$HOME/.nix-profile/share/systemd/user" "$HOME/.local/share/systemd/user"
-      "$HOME/.local/bin/flatpak-switch"
+      systemctl enable --user podman.socket
+      systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
+      if [ ! -f "$HOME/.local/bin/autotune" ]
+      then
+        ${pkgs.ghc}/bin/ghc powertop.hs -odir /tmp/autotune -hidir /tmp/autotune -o "$HOME/.local/bin/autotune"
+        sudo chown root:root "$HOME/.local/bin/autotune"
+        sudo chmod u+s "$HOME/.local/bin/autotune"
+      fi
+      ${./flatpak-switch.py}
     '';
   };
 }

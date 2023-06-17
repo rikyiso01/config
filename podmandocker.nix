@@ -1,4 +1,4 @@
-{ stdenv, docker-compose, podman }:
+{ stdenv, docker-compose }:
 stdenv.mkDerivation rec {
   name = "podmandocker-${version}";
   version = "0.1.0";
@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
         shift
         exec ${docker-compose}/bin/docker-compose "$@"
     else
-        exec ${podman}/bin/podman "$@"
+        exec podman "$@"
     fi' > $out/bin/docker
     chmod +x $out/bin/docker
   '';

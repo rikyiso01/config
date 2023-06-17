@@ -51,10 +51,3 @@ nix-channel --add https://github.com/nix-community/home-manager/archive/master.t
 nix-channel --update
 nix-shell '<home-manager>' -A install
 home-manager switch -f home.nix -b backup
-
-ghc powertop.hs -odir /tmp/autotune -hidir /tmp/autotune -o "$HOME/.local/bin/autotune"
-sudo chown root:root "$HOME/.local/bin/autotune"
-sudo chmod u+s "$HOME/.local/bin/autotune"
-
-flatpak remote-delete --system --force flathub
-flatpak remote-delete --system --force fedora
