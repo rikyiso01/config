@@ -27,13 +27,21 @@ class flatpak:
         check_call(["flatpak", "remove", "--user", "-y", *packages])
 
     @staticmethod
-    def remote_add(name: str, url: str, /):
-        check_call(["flatpak", "remote-add", "--user", "--if-not-exists", name, url])
+    def remote_add(name: str, url: str, local: bool, /):
+        args = ["flatpak", "remote-add", "--user", "--if-not-exists", name, url]
+        if local:
+            args.extend(["--no-gpg-verify", "--no-enumerate"])
+        check_call(args)
 
     @staticmethod
     def remote_list(*, system: bool) -> list[str]:
         result = check_output(
-            ["flatpak", "remote-list", "--system" if system else "--user"],
+            [
+                "flatpak",
+                "remote-list",
+                "--system" if system else "--user",
+                "--columns=name",
+            ],
             text=True,
         ).splitlines()
         if len(result) == 1 and "" in result:
@@ -73,14 +81,14 @@ def validate(json: object) -> TypeGuard[dict[str, Repo]]:
 
 
 def main():
-    with open(expanduser("~/.config/flatpak.json")) as f:
+    with open(expanduser("~/.local/nix-sources/flatpak.json")) as f:
         json = load(f)
     assert validate(json)
     installed_packages = {*flatpak.list()}
     for repo, value in json.items():
         url = value["url"]
         packages = set(value["packages"])
-        flatpak.remote_add(repo, url)
+        flatpak.remote_add(repo, url, repo == "local")
         missing_packages = packages - installed_packages
         if missing_packages:
             flatpak.install(repo, missing_packages)

@@ -8,12 +8,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    nix-index-database.url = "github:Mic92/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, homeManager, nix-vscode-extensions }: {
+  outputs = { self, nixpkgs, homeManager, nix-vscode-extensions, nix-index-database }: {
     homeConfigurations = {
       "riky" = homeManager.lib.homeManagerConfiguration {
-        modules = [ ./home.nix ];
+        modules = [
+          ./home.nix
+          nix-index-database.hmModules.nix-index
+          { programs.nix-index-database.comma.enable = true; }
+        ];
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         extraSpecialArgs = { inherit nix-vscode-extensions; };
       };

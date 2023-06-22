@@ -1,0 +1,17 @@
+#the unshielded FTDI cables have difficulty running at full speed
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{product}=="TTL232R-3V3", ATTRS{idProduct}=="6001", TAG+="uaccess" , GROUP="dialout"
+
+#this is a cheap nano where the lazy people didn't program the serial
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{product}=="FT232R USB UART", ATTRS{idProduct}=="6001", TAG+="uaccess" , GROUP="dialout"
+
+#this is a decent nano
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{product}=="ARDUINO NANO", ATTRS{idProduct}=="6001", TAG+="uaccess" , GROUP="dialout"
+
+# Arduino Uno
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0043", TAG+="uaccess" , GROUP="dialout"
+
+# dog hunter AG Arduino Uno Rev3
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2a03", ATTRS{idProduct}=="0043", TAG+="uaccess" , GROUP="dialout"
+
+# Latest 2018 Arduino Nano's from arduino.cc
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC", TAG+="uaccess" , GROUP="dialout"

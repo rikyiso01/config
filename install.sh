@@ -50,4 +50,4 @@ export PATH=~/.nix-profile/bin:$PATH
 nix-channel --remove nixpkgs
 nix --extra-experimental-features nix-command --extra-experimental-features flakes profile install nixpkgs#nix --priority 4
 nix --extra-experimental-features nix-command --extra-experimental-features flakes profile remove 0
-nix --extra-experimental-features nix-command --extra-experimental-features flakes shell nixpkgs#home-manager --command home-manager switch --flake home.nix -b backup
+nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#home-manager -- switch --flake . -b backup
