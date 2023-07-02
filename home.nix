@@ -52,7 +52,6 @@ let
       brightnessctl
       traceroute
       poetry
-      (callPackage ./downloadhelper.nix { })
       (callPackage ./podmandocker.nix { })
       pypy38
       xdg-ninja
@@ -369,11 +368,6 @@ let
         "vsintellicode.modelDownloadPath" = "/home/riky/.var/app/com.vscodium.codium/data/codium/intellicode";
       };
     };
-    home.file.".vscode-oss/argv.json".text = builtins.toJSON {
-      disable-hardware-acceleration = false;
-      enable-crash-reporter = false;
-      crash-reporter-id = "bc1272d8-84bf-4887-a87a-c2e0824162f6";
-    };
 
 
     programs.nix-index.enable = true;
@@ -425,6 +419,7 @@ let
       userDirs = {
         createDirectories = true;
         enable = true;
+        documents = "${home.homeDirectory}/backup/Documents";
       };
     };
 
@@ -479,7 +474,7 @@ let
     home.file.".local/bin/charge".source = ./charge.py;
 
     home.file.".local/bin/chromium" = {
-      text = "#!/usr/bin/env bash\nexec com.brave.Browser \"$@\"";
+      text = "#!/usr/bin/env bash\nexec org.chromium.Chromium \"$@\"";
       executable = true;
     };
 
@@ -506,29 +501,6 @@ let
           "type": "stdio"
       }
     '';
-    home.file.".var/app/org.chromium.Chromium/config/chromium/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
-      {
-        "name": "net.downloadhelper.coapp",
-        "description": "Video DownloadHelper companion app",
-        "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",
-        "type": "stdio",
-        "allowed_origins": [
-            "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
-        ]
-      }
-    '';
-    home.file.".var/app/org.chromium.Chromium/config/chromium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''
-          {
-          "allowed_origins": [
-              "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
-              "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
-          ],
-          "description": "KeePassXC integration with native messaging support",
-          "name": "org.keepassxc.keepassxc_browser",
-          "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",
-          "type": "stdio"
-      }
-    '';
 
     home.file.".local/flatpak/git".source = ./normal-spawn.sh;
     home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
@@ -542,7 +514,7 @@ let
       executable = true;
     };
     home.file.".local/flatpak/cobalt" = {
-      text = "#!/usr/bin/env bash\nexec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
       executable = true;
     };
     home.file.".local/flatpak/codium" = {
@@ -550,33 +522,116 @@ let
       executable = true;
     };
     home.file.".local/flatpak/host-spawn".source = ./host-spawn;
-    home.file.".local/share/applications/net.chessin5d.desktop".text = ''[Desktop Entry]
-    Encoding=UTF-8
-    Version=1.0
-    Type=Application
-    Terminal=false
-    Exec=${home.homeDirectory}/Games/5dchesswithmultiversetimetravel/5dchesswithmultiversetimetravel
-    Name=5D Chess With Multiverse Time Travel
-    Icon=${home.homeDirectory}/Games/5dchesswithmultiversetimetravel/5dchesswithmultiversetimetravel.png'';
+
+    home.file.".local/share/flatpak/overrides/ca.desrt.dconf-editor".text = ''
+      [Session Bus Policy]
+      org.freedesktop.Flatpak=none
+    '';
+    home.file.".local/share/flatpak/overrides/com.github.tchx84.Flatseal".text = ''
+      [Context]
+      filesystems=/nix/store:ro
+    '';
+    home.file.".local/share/flatpak/overrides/com.google.AndroidStudio".text = ''
+      [Context]
+      filesystems=xdg-documents/Projects/Android;!host
+      persistent=.android;Android
+
+      [Session Bus Policy]
+      org.freedesktop.Flatpak=none
+    '';
+    home.file.".local/share/flatpak/overrides/com.obsproject.Studio".text = ''
+      [Context]
+      filesystems=!xdg-config/kdeglobals;xdg-videos;!host
+
+      [Session Bus Policy]
+      org.freedesktop.Flatpak=none
+    '';
+    home.file.".local/share/flatpak/overrides/com.protonvpn.www".text = ''
+      [Context]
+      filesystems=!xdg-run/gvfsd
+    '';
+    home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
+      [Context]
+      filesystems=!xdg-download
+    '';
+    home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = ''
+      [Context]
+      filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;xdg-documents;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host
+
+      [Environment]
+      PATH=/home/riky/.local/flatpak:/home/riky/.local/bin:/home/riky/.nix-profile/bin:/app/bin:/usr/bin
+    '';
+    home.file.".local/share/flatpak/overrides/io.dbeaver.DBeaverCommunity".text = ''
+      [Context]
+      sockets=!ssh-auth
+      filesystems=!home
+    '';
+    home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = ''
+      [Environment]
+      ANKI_WAYLAND=1
+    '';
+    home.file.".local/share/flatpak/overrides/org.chromium.Chromium".text = ''
+      [Context]
+      filesystems=~/.local/nix-sources/policy.json:ro;~/.local/flatpak/cobalt:ro;xdg-download;xdg-documents:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;!home
+
+      [Environment]
+      PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
+    '';
+    home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
+      [Context]
+      filesystems=xdg-download;!home
+      persistent=.ghidra
+    '';
+    home.file.".local/share/flatpak/overrides/org.gimp.GIMP".text = ''
+      [Context]
+      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/tmp;!xdg-config/gtk-3.0;!xdg-config/GIMP;xdg-download;xdg-pictures;!host
+    '';
+    home.file.".local/share/flatpak/overrides/org.gnome.Boxes".text = ''
+      [Context]
+      filesystems=!host
+    '';
+    home.file.".local/share/flatpak/overrides/org.gnome.eog".text = ''
+      [Context]
+      filesystems=!xdg-run/gvfsd;!host
+    '';
+    home.file.".local/share/flatpak/overrides/org.gnome.Evince".text = ''
+      [Context]
+      filesystems=!/run/media;!xdg-run/gvfsd;!/media;!home
+    '';
+    home.file.".local/share/flatpak/overrides/org.gnome.FileRoller".text = ''
+      [Context]
+      filesystems=!home
+    '';
+    home.file.".local/share/flatpak/overrides/org.gnome.GHex".text = ''
+      [Context]
+      filesystems=!xdg-run/gvfsd;!host
+    '';
+    home.file.".local/share/flatpak/overrides/org.gnome.TextEditor".text = ''
+      [Context]
+      filesystems=!xdg-run/gvfsd;!host
+    '';
+    home.file.".local/share/flatpak/overrides/org.gnome.Totem".text = ''
+      [Context]
+      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/run/media;!xdg-videos;!xdg-pictures;!xdg-download
+    '';
+    home.file.".local/share/flatpak/overrides/org.keepassxc.KeePassXC".text = ''
+      [Context]
+      filesystems=!xdg-config/kdeglobals;!/tmp;/nix/store:ro;!host
+    '';
+    home.file.".local/share/flatpak/overrides/org.pitivi.Pitivi".text = ''
+      [Context]
+      filesystems=xdg-videos;!host
+    '';
+    home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = ''
+      [Context]
+      filesystems=!xdg-config/kdeglobals;!xdg-public-share;xdg-download;!home
+    '';
 
     home.file.".local/share/flatpak/overrides/com.brave.Browser".text = lib.generators.toINI
       { }
       {
         Context = {
           filesystems = "home;/nix/store:ro;";
-        };
-        Environment = {
-          PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
-        };
-        "Session Bus Policy" = {
-          "org.freedesktop.Flatpak" = "talk";
-        };
-      };
-    home.file.".local/share/flatpak/overrides/org.chromium.Chromium".text = lib.generators.toINI
-      { }
-      {
-        Context = {
-          filesystems = "/nix/store:ro;";
         };
         Environment = {
           PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
@@ -593,30 +648,6 @@ let
         };
         Environment = {
           PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin";
-        };
-        # Context = {
-        #   filesystems = "host;xdg-config/kdeglobals:ro;xdg-config/gtk-3.0;/run/user/1000/podman/podman.sock";
-        # };
-      };
-    home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = lib.generators.toINI
-      { }
-      {
-        Environment = {
-          PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin";
-        };
-      };
-    home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = lib.generators.toINI
-      { }
-      {
-        Context = {
-          filesystems = "home";
-        };
-      };
-    home.file.".local/share/flatpak/overrides/org.tlauncher.TLauncher".text = lib.generators.toINI
-      { }
-      {
-        Context = {
-          filesystems = "~/Games/Minecraft";
         };
       };
 
@@ -655,7 +686,7 @@ let
       LockDatabaseScreenLock=false
     '';
 
-    home.file.".local/share/flatpak/app/org.chromium.Chromium/current/active/files/chromium/policies/policies/managed/policies.json".text = builtins.toJSON {
+    home.file.".local/nix-sources/policy.json".text = builtins.toJSON {
       DefaultSearchProviderEnabled = true;
       DefaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
       DefaultSearchProviderIconURL = "https://duckduckgo.com/favicon.ico";
@@ -719,6 +750,8 @@ let
             "org.chromium.Chromium"
             "org.gnome.eog"
             "com.vscodium.codium"
+            "org.freedesktop.Sdk//22.08"
+            "org.freedesktop.Platform//22.08"
           ];
         };
         flathub-beta = {
@@ -727,11 +760,19 @@ let
         };
         local = {
           url = "file://${home.homeDirectory}/.local/flatpak-repo";
-          packages = [ "org.tlauncher.TLauncher" ];
+          packages = [
+            "org.tlauncher.TLauncher"
+            "org.chromium.Chromium.Extension.KeepassXC"
+            "org.chromium.Chromium.Extension.VideoDownloadHelper"
+            "org.chromium.Chromium.Extension.Policy"
+          ];
         };
       };
 
     home.file.".local/nix-sources/tlauncher.yml" = create_flatpak ./tlauncher.yml;
+    home.file.".local/nix-sources/keepassxc.yml" = create_flatpak ./keepassxc.yml;
+    home.file.".local/nix-sources/downloadhelper.yml" = create_flatpak ./downloadhelper.yml;
+    home.file.".local/nix-sources/chrome-policy.yml" = create_flatpak ./chrome-policy.yml;
     home.file.".local/nix-sources/powertop.hs" = {
       source = ./powertop.hs;
       onChange = ''
@@ -860,21 +901,13 @@ let
 
     home.activation = {
       setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        if [ ! -L "$HOME/Documents" ]
-        then
-          rmdir "$HOME/Documents"
-          ln -sfT "$HOME/backup/Documents" "$HOME/Documents"
-        fi
-        ln -sfT "$HOME/backup/Games" "$HOME/Games"
         ln -sfT "$HOME/backup/id_ed25519" "$HOME/.ssh/id_ed25519"
         ln -sfT "$HOME/backup/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
         chmod 600 "$HOME/.ssh/id_ed25519"
-        mkdir -p "$HOME/Games/Minecraft/tlauncher"
-        ln -sfT "$HOME/Games/Minecraft/tlauncher" "$HOME/.var/app/org.tlauncher.TLauncher/.tlauncher"
-        mkdir -p "$HOME/Games/Minecraft/minecraft"
-        ln -sfT "$HOME/Games/Minecraft/minecraft" "$HOME/.var/app/org.tlauncher.TLauncher/.minecraft"
-        mkdir -p "$HOME/Games/5dchesswithmultiversetimetravel" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel"
-        ln -sfT "$HOME/Games/5dchesswithmultiversetimetravel/settings_and_progress.txt" "$HOME/.local/share/Thunkspace/5dchesswithmultiversetimetravel/settings_and_progress.txt"
+        mkdir -p "$HOME/.var/app/org.tlauncher.TLauncher/.tlauncher"
+        ln -sfT "$HOME/backup/Games/Minecraft/tlauncher" "$HOME/.var/app/org.tlauncher.TLauncher/.tlauncher"
+        mkdir -p "$HOME/.var/app/org.tlauncher.TLauncher/.minecraft"
+        ln -sfT "$HOME/backup/Games/Minecraft/minecraft" "$HOME/.var/app/org.tlauncher.TLauncher/.minecraft"
         ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
         ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
         ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
@@ -888,9 +921,6 @@ let
         for f in com.vscodium.codium com.vscodium.codium-url-handler; do
             sed -E 's:^(Exec=.*com\.vscodium\.codium)(.*)$:\1 --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto\2:' < "$HOME/.local/share/flatpak/exports/share/applications/$f.desktop" > "$HOME/.local/share/applications/$f.desktop"
         done
-        mkdir -p "$HOME/.local/lib"
-        mkdir -p "$HOME/.local/share/systemd"
-        ln -sfT "$HOME/.nix-profile/share/systemd/user" "$HOME/.local/share/systemd/user"
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         ${./flatpak-switch.py}

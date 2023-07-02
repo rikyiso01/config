@@ -20,7 +20,9 @@ class flatpak:
 
     @staticmethod
     def install(repo: str, packages: list[str] | set[str], /):
-        check_call(["flatpak", "install", "--user", "-y", repo, *packages])
+        check_call(
+            ["flatpak", "install", "--user", "-y", "--or-update", repo, *packages]
+        )
 
     @staticmethod
     def remove(packages: list[str] | set[str], /):
@@ -90,7 +92,7 @@ def main():
         packages = set(value["packages"])
         flatpak.remote_add(repo, url, repo == "local")
         missing_packages = packages - installed_packages
-        if missing_packages:
+        if missing_packages or repo == "local":
             flatpak.install(repo, missing_packages)
         installed_packages -= packages
     for repo in flatpak.remote_list(system=True):

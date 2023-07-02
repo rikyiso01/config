@@ -47,6 +47,8 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
 export PATH=~/.nix-profile/bin:$PATH
 
+flatpak install flathub -y org.freedesktop.Sdk//22.08 org.freedesktop.Platform//22.08
+
 nix-channel --remove nixpkgs
 nix --extra-experimental-features nix-command --extra-experimental-features flakes profile install nixpkgs#nix --priority 4
 nix --extra-experimental-features nix-command --extra-experimental-features flakes profile remove 0

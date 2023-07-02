@@ -1,0 +1,30 @@
+app-id: org.chromium.Chromium.Extension.VideoDownloadHelper
+# This should match the extension point version
+branch: "1"
+runtime: org.chromium.Chromium
+runtime-version: stable
+sdk: org.freedesktop.Sdk//22.08
+build-extension: true
+appstream-compose: false
+
+modules:
+  - name: native-messaging-hosts
+    buildsystem: simple
+    build-commands:
+      - cp -r . ${FLATPAK_DEST}/downloadhelper
+      - mkdir -p ${FLATPAK_DEST}/native-messaging-hosts
+      - |
+        echo '{
+          "name": "net.downloadhelper.coapp",
+          "description": "Video DownloadHelper companion app",
+          "path": "'${FLATPAK_DEST}/downloadhelper/bin/net.downloadhelper.coapp-linux-64'",
+          "type": "stdio",
+          "allowed_origins": [
+              "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
+          ]
+        }' > ${FLATPAK_DEST}/native-messaging-hosts/net.downloadhelper.coapp.json
+    sources:
+      - type: archive
+        url: https://github.com/mi-g/vdhcoapp/releases/download/v1.6.3/net.downloadhelper.coapp-1.6.3-1_amd64.tar.gz
+        sha256: ee7bfdd5c9476e42644ec4a780de75e272dd331442c72ee972df5faba09a90f1
+        size: 33422230
