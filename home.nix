@@ -572,7 +572,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.chromium.Chromium".text = ''
       [Context]
-      filesystems=~/.local/nix-sources/policy.json:ro;~/.local/flatpak/cobalt:ro;xdg-download;xdg-documents:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;!home
+      filesystems=xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro
 
       [Environment]
       PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
