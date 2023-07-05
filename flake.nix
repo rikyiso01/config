@@ -18,7 +18,10 @@
         modules = [
           ./home.nix
           nix-index-database.hmModules.nix-index
-          { programs.nix-index-database.comma.enable = true; }
+          {
+            programs.nix-index-database.comma.enable = true;
+            home.sessionVariables.NIX_PATH = nixpkgs.outPath;
+          }
         ];
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         extraSpecialArgs = { inherit nix-vscode-extensions; };

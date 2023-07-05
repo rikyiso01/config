@@ -29,9 +29,9 @@ let
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.compiz-alike-magic-lamp-effect
       fira-code
-      rust-analyzer
+      # rust-analyzer
       rustfmt
-      cargo
+      # cargo
       php
       powertop
       maven
@@ -156,6 +156,16 @@ let
       };
     };
 
+    home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
+      "nameShort": "VSCodium",
+      "nameLong": "Visual Studio Code",
+      "extensionsGallery": {
+        "serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
+        "cacheUrl": "https://vscode.blob.core.windows.net/gallery/index",
+        "itemUrl": "https://marketplace.visualstudio.com/items"
+      }
+    }'';
+
     programs.vscode = {
       enable = true;
       enableExtensionUpdateCheck = false;
@@ -203,18 +213,15 @@ let
         hbenl.vscode-test-explorer
         vscjava.vscode-java-test
         tomoki1207.pdf
-        umoxfo.vscode-w3cvalidation
         redhat.vscode-xml
         redhat.vscode-yaml
         hbenl.test-adapter-converter
+        llvm-vs-code-extensions.vscode-clangd
+        ms-pyright.pyright
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
-        # deque-systems.vscode-axe-linter
-        ms-vscode.cpptools
-        vscjava.vscode-gradle
-        htmlhint.vscode-htmlhint
-        visualstudioexptteam.vscodeintellicode
-        ms-python.vscode-pylance
-        joyceerhl.vscode-pyodide
+        #htmlhint.vscode-htmlhint
+        #visualstudioexptteam.vscodeintellicode
+        #ms-python.vscode-pylance
       ]);
       keybindings = [
         {
@@ -254,14 +261,14 @@ let
         "python.formatting.provider" = "none";
         "explorer.confirmDragAndDrop" = false;
         "git.confirmSync" = false;
-        "python.languageServer" = "Pylance";
+        "python.languageServer" = "Jedi";
         "git.autofetch" = true;
         "python.analysis.typeCheckingMode" = "strict";
         "editor.formatOnSave" = true;
         "git.enableCommitSigning" = true;
         #"python.analysis.stubPath"= "/home/riky/Documents/Projects/Python/common-stubs";
         "update.mode" = "none";
-        "rust-analyzer.server.path" = "rust-analyzer";
+        "rust-analyzer.server.path" = "${home.homeDirectory}/.local/flatpak/rust-analyzer";
         "github.gitProtocol" = "ssh";
         "editor.fontFamily" = "'Fira Code'";
         "editor.linkedEditing" = true;
@@ -366,6 +373,8 @@ let
         "haskell.manageHLS" = "PATH";
         "window.zoomLevel" = 1;
         "vsintellicode.modelDownloadPath" = "/home/riky/.var/app/com.vscodium.codium/data/codium/intellicode";
+        "shellformat.path" = "${pkgs.shfmt}/bin/shfmt";
+        "clangd.path" = "${home.homeDirectory}/.var/app/com.vscodium.codium/config/VSCodium/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/16.0.2/clangd_16.0.2/bin/clangd";
       };
     };
 
@@ -374,7 +383,8 @@ let
 
     programs.home-manager.enable = true;
     home.stateVersion = "22.05";
-    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowUnfreePredicate = (pkg: true);
+    xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; }";
     home.enableNixpkgsReleaseCheck = true;
 
     news.display = "show";
@@ -474,43 +484,25 @@ let
     home.file.".local/bin/charge".source = ./charge.py;
 
     home.file.".local/bin/chromium" = {
-      text = "#!/usr/bin/env bash\nexec org.chromium.Chromium \"$@\"";
+      text = "#!/usr/bin/env bash\nexec flatpak run --command=/app/bin/chromium org.chromium.Chromium \"$@\"";
       executable = true;
     };
-
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
-      {
-        "name": "net.downloadhelper.coapp",
-        "description": "Video DownloadHelper companion app",
-        "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",
-        "type": "stdio",
-        "allowed_origins": [
-            "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
-        ]
-      }
-    '';
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''
-          {
-          "allowed_origins": [
-              "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
-              "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
-          ],
-          "description": "KeePassXC integration with native messaging support",
-          "name": "org.keepassxc.keepassxc_browser",
-          "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",
-          "type": "stdio"
-      }
-    '';
 
     home.file.".local/flatpak/git".source = ./normal-spawn.sh;
     home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
     home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
-    home.file.".local/flatpak/code" = {
-      text = "#!/usr/bin/env bash\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
+    home.file.".local/flatpak/cargo" = {
+      text = "#!/usr/bin/env bash\nexec flatpak-spawn --host nix develop --command cargo \"$@\"";
       executable = true;
     };
-    home.file.".local/flatpak/brave" = {
-      text = "#!/usr/bin/env bash\nexec /app/bin/brave --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer=enabled --enable-raw-draw=enabled --use-vulkan --enable-features=VaapiVideoEncoder,CanvasOopRasterization --enable-zero-copy --ignore-gpu-blocklist --enable-usermedia-screen-capturing \"$@\"";
+    home.file.".local/flatpak/rust-analyzer" = {
+      text = "#!/usr/bin/env bash\nif [ -f flake.nix ]; then exec flatpak-spawn --host nix develop --command rust-analyzer \"$@\"; else exec ${pkgs.rust-analyzer}/bin/rust-analyzer \"$@\"; fi";
+      executable = true;
+    };
+    # home.file.".local/flatpak/rust-analyzer".source = ./normal-spawn.sh;
+    # home.file.".local/flatpak/rustfmt".source = ./normal-spawn.sh;
+    home.file.".local/flatpak/code" = {
+      text = "#!/usr/bin/env bash\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
       executable = true;
     };
     home.file.".local/flatpak/cobalt" = {
@@ -554,6 +546,10 @@ let
       [Context]
       filesystems=!xdg-download
     '';
+    home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = ''
+      [Context]
+      filesystems=!xdg-config/kdeglobals;!xdg-config/gtk-3.0;!host
+    '';
     home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = ''
       [Context]
       filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;xdg-documents;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host
@@ -572,7 +568,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.chromium.Chromium".text = ''
       [Context]
-      filesystems=xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro
+      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro
 
       [Environment]
       PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
@@ -622,34 +618,14 @@ let
       [Context]
       filesystems=xdg-videos;!host
     '';
+    home.file.".local/share/flatpak/overrides/org.remmina.Remmina".text = ''
+      [Context]
+      filesystems=!xdg-download;!xdg-run/gvfsd;~/.ssh;!home
+    '';
     home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = ''
       [Context]
       filesystems=!xdg-config/kdeglobals;!xdg-public-share;xdg-download;!home
     '';
-
-    home.file.".local/share/flatpak/overrides/com.brave.Browser".text = lib.generators.toINI
-      { }
-      {
-        Context = {
-          filesystems = "home;/nix/store:ro;";
-        };
-        Environment = {
-          PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin";
-        };
-        "Session Bus Policy" = {
-          "org.freedesktop.Flatpak" = "talk";
-        };
-      };
-    home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = lib.generators.toINI
-      { }
-      {
-        Context = {
-          sockets = "wayland";
-        };
-        Environment = {
-          PATH = "${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin:${home.homeDirectory}/.var/app/com.visualstudio.code/data/node_modules/bin";
-        };
-      };
 
     home.file.".var/app/org.keepassxc.KeePassXC/config/keepassxc/keepassxc.ini".text = ''
       [General]
@@ -721,9 +697,7 @@ let
             "org.gnome.Logs"
             "org.gnome.Boxes"
             "ca.desrt.dconf-editor"
-            "com.brave.Browser"
             "com.github.tchx84.Flatseal"
-            "com.visualstudio.code"
             "rest.insomnia.Insomnia"
             "org.ghidra_sre.Ghidra"
             "org.wireshark.Wireshark"
@@ -752,6 +726,8 @@ let
             "com.vscodium.codium"
             "org.freedesktop.Sdk//22.08"
             "org.freedesktop.Platform//22.08"
+            "org.remmina.Remmina"
+            "com.visualstudio.code"
           ];
         };
         flathub-beta = {
