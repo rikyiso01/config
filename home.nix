@@ -18,20 +18,26 @@ let
       man-pages
       man-pages-posix
       perl
+      docker
       docker-compose
       du-dust
       fd
       procs
       p7zip
       curlie
+      netcat-openbsd
+      iputils
+      binutils
+      unixtools.netstat
       gnomeExtensions.espresso
       gnomeExtensions.alphabetical-app-grid
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.compiz-alike-magic-lamp-effect
+      gnomeExtensions.burn-my-windows
       fira-code
-      # rust-analyzer
+      rust-analyzer
       rustfmt
-      # cargo
+      cargo
       php
       powertop
       maven
@@ -45,14 +51,11 @@ let
       exiftool
       imagemagick
       jdk
-      elmPackages.elm
-      elmPackages.elm-format
       inotify-tools
       nixpkgs-fmt
       brightnessctl
       traceroute
       poetry
-      (callPackage ./podmandocker.nix { })
       pypy38
       xdg-ninja
       python310Packages.ipython
@@ -83,6 +86,7 @@ let
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
       CPATH = "${pkgs.opencl-headers}/include";
       LIBRARY_PATH = "${pkgs.ocl-icd}/lib";
+      NIXPKGS_ACCEPT_ANDROID_SDK_LICENSE = "1";
       OCL_ICD_VENDORS = "${pkgs.intel-compute-runtime}/etc/OpenCL/vendors/intel-neo.icd";
       ANDROID_HOME = "${config.xdg.dataHome}/android";
       GNUPGHOME = "${config.xdg.dataHome}/gnupg";
@@ -110,6 +114,8 @@ let
       enable = true;
       generateCaches = true;
     };
+    programs.direnv.enable = true;
+    programs.direnv.nix-direnv.enable = true;
 
     programs.pandoc.enable = true;
 
@@ -384,7 +390,7 @@ let
     programs.home-manager.enable = true;
     home.stateVersion = "22.05";
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
-    xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; }";
+    xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; android_sdk.accept_license = true; }";
     home.enableNixpkgsReleaseCheck = true;
 
     news.display = "show";
@@ -491,15 +497,16 @@ let
     home.file.".local/flatpak/git".source = ./normal-spawn.sh;
     home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
     home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
+    home.file.".local/flatpak/docker".source = ./normal-spawn.sh;
     home.file.".local/flatpak/cargo" = {
-      text = "#!/usr/bin/env bash\nexec flatpak-spawn --host nix develop --command cargo \"$@\"";
+      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"cargo $@\"; else exec ${pkgs.cargo}/bin/cargo \"$@\"; fi";
       executable = true;
     };
     home.file.".local/flatpak/rust-analyzer" = {
-      text = "#!/usr/bin/env bash\nif [ -f flake.nix ]; then exec flatpak-spawn --host nix develop --command rust-analyzer \"$@\"; else exec ${pkgs.rust-analyzer}/bin/rust-analyzer \"$@\"; fi";
+      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"rust-analyzer $@\"; else exec ${pkgs.rust-analyzer}/bin/rust-analyzer \"$@\"; fi";
       executable = true;
     };
-    # home.file.".local/flatpak/rust-analyzer".source = ./normal-spawn.sh;
+    #home.file.".local/flatpak/rust-analyzer".source = ./normal-spawn.sh;
     # home.file.".local/flatpak/rustfmt".source = ./normal-spawn.sh;
     home.file.".local/flatpak/code" = {
       text = "#!/usr/bin/env bash\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
@@ -769,7 +776,7 @@ let
       '';
     };
 
-    home.file.".config/containers/registries.conf".text = ''unqualified-search-registries = ["docker.io"]'';
+    #home.file.".config/containers/registries.conf".text = ''unqualified-search-registries = ["docker.io"]'';
 
     home.file.".local/share/backgrounds/background.jpg".source = ./wallpaper.jpg;
 
@@ -847,23 +854,18 @@ let
           "compiz-windows-effect@hermes83.github.com"
           "AlphabeticalAppGrid@stuarthayhurst"
           "espresso@coadmunkee.github.com"
+          "burn-my-windows@schneegans.github.com"
         ];
         favorite-apps = [ "org.chromium.Chromium.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Terminal.desktop" ];
       };
-      # "org/gnome/shell/extensions/dash-to-dock" = {
-      #   apply-custom-theme = true;
-      #   background-opacity = 0.8;
-      #   custom-theme-shrink = false;
-      #   dash-max-icon-size = 48;
-      #   dock-position = "BOTTOM";
-      #   extend-height = false;
-      #   height-fraction = 0.9;
-      #   intellihide-mode = "FOCUS_APPLICATION_WINDOWS";
-      #   preferred-monitor = -2;
-      #   running-indicator-style = "DEFAULT";
-      #   show-mounts = false;
-      #   show-trash = false;
-      # };
+      "org/gnome/desktop/privacy" = {
+        remove-old-trash-files = true;
+        remove-old-temp-files = true;
+        old-files-age = 30;
+      };
+      "org/gnome/shell/extensions/burn-my-windows" = {
+        active-profile = toString ./window-animation.conf;
+      };
       "org/gnome/shell/extensions/espresso" = {
         has-battery = true;
         show-notifications = false;
