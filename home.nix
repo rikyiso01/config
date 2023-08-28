@@ -82,7 +82,6 @@ let
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       VISUAL = "micro";
       EDITOR = "micro";
-      #XDG_DATA_DIRS = "$HOME/.nix-profile/share:$XDG_DATA_DIRS";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
       CPATH = "${pkgs.opencl-headers}/include";
       LIBRARY_PATH = "${pkgs.ocl-icd}/lib";
@@ -272,7 +271,6 @@ let
         "python.analysis.typeCheckingMode" = "strict";
         "editor.formatOnSave" = true;
         "git.enableCommitSigning" = true;
-        #"python.analysis.stubPath"= "/home/riky/Documents/Projects/Python/common-stubs";
         "update.mode" = "none";
         "rust-analyzer.server.path" = "${home.homeDirectory}/.local/flatpak/rust-analyzer";
         "github.gitProtocol" = "ssh";
@@ -498,16 +496,18 @@ let
     home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
     home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
     home.file.".local/flatpak/docker".source = ./normal-spawn.sh;
+    home.file.".local/flatpak/ghc" = {
+      text = "#!/usr/bin/env bash\nif [ -f default.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"ghc $(printf \"'%s' \" \"$@\")\" default.nix; else exec flatpak-spawn --host ghc \"$@\"; fi";
+      executable = true;
+    };
     home.file.".local/flatpak/cargo" = {
-      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"cargo $@\"; else exec ${pkgs.cargo}/bin/cargo \"$@\"; fi";
+      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"cargo $*\"; else exec ${pkgs.cargo}/bin/cargo \"$@\"; fi";
       executable = true;
     };
     home.file.".local/flatpak/rust-analyzer" = {
-      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"rust-analyzer $@\"; else exec ${pkgs.rust-analyzer}/bin/rust-analyzer \"$@\"; fi";
+      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"rust-analyzer $*\"; else exec ${pkgs.rust-analyzer}/bin/rust-analyzer \"$@\"; fi";
       executable = true;
     };
-    #home.file.".local/flatpak/rust-analyzer".source = ./normal-spawn.sh;
-    # home.file.".local/flatpak/rustfmt".source = ./normal-spawn.sh;
     home.file.".local/flatpak/code" = {
       text = "#!/usr/bin/env bash\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
       executable = true;
@@ -775,8 +775,6 @@ let
         sudo udevadm trigger
       '';
     };
-
-    #home.file.".config/containers/registries.conf".text = ''unqualified-search-registries = ["docker.io"]'';
 
     home.file.".local/share/backgrounds/background.jpg".source = ./wallpaper.jpg;
 
