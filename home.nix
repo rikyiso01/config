@@ -60,6 +60,8 @@ let
       xdg-ninja
       python310Packages.ipython
       (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
+      glab
+      (callPackage ./downloadhelper.nix { })
     ];
 
     programs.git = {
@@ -99,7 +101,7 @@ let
 
     fonts.fontconfig.enable = true;
     programs.bat.enable = true;
-    programs.exa = {
+    programs.eza = {
       enable = true;
       enableAliases = true;
     };
@@ -151,6 +153,7 @@ let
         enable = true;
         plugins = [
           { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
+          { name = "zsh-users/zsh-syntax-highlighting"; }
         ];
         zplugHome = "${config.xdg.dataHome}/zplug";
       };
@@ -223,6 +226,11 @@ let
         hbenl.test-adapter-converter
         llvm-vs-code-extensions.vscode-clangd
         ms-pyright.pyright
+        surendrajat.apklab
+        loyieking.smalise
+        hashicorp.hcl
+        mechatroner.rainbow-csv
+        janisdd.vscode-edit-csv
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         #htmlhint.vscode-htmlhint
         #visualstudioexptteam.vscodeintellicode
@@ -379,6 +387,9 @@ let
         "vsintellicode.modelDownloadPath" = "/home/riky/.var/app/com.vscodium.codium/data/codium/intellicode";
         "shellformat.path" = "${pkgs.shfmt}/bin/shfmt";
         "clangd.path" = "${home.homeDirectory}/.var/app/com.vscodium.codium/config/VSCodium/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/16.0.2/clangd_16.0.2/bin/clangd";
+        "apklab.apkSignerPath" = "/var/home/riky/.apklab/uber-apk-signer-1.3.0.jar";
+        "apklab.apktoolPath" = "/var/home/riky/.apklab/apktool_2.8.1.jar";
+        "apklab.jadxDirPath" = "/var/home/riky/.apklab/jadx-1.4.7";
       };
     };
 
@@ -477,6 +488,32 @@ let
         };
       };
     home.file.".config/theme.zsh".source = ./theme.zsh;
+
+    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''	
+      {	
+        "name": "net.downloadhelper.coapp",	
+        "description": "Video DownloadHelper companion app",	
+        "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",	
+        "type": "stdio",	
+        "allowed_origins": [	
+            "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"	
+        ]	
+      }	
+    '';
+    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''	
+          {	
+          "allowed_origins": [	
+              "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",	
+              "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"	
+          ],	
+          "description": "KeePassXC integration with native messaging support",	
+          "name": "org.keepassxc.keepassxc_browser",	
+          "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",	
+          "type": "stdio"	
+      }	
+    '';
+
+
     home.file.".config/autostart/startup.desktop".text = ''
       [Desktop Entry]
       Exec=${./startup.sh}
@@ -516,6 +553,11 @@ let
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
       executable = true;
     };
+    home.file.".local/flatpak/brave" = {
+      #text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sf \"$HOME/.local/nix-sources/policy.json\" /etc/brave/policies/managed/policy.yml && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark --incognito \"$@\"";
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark --incognito \"$@\"";
+      executable = true;
+    };
     home.file.".local/flatpak/codium" = {
       text = "#!/usr/bin/env bash\nexec /app/bin/codium --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
       executable = true;
@@ -544,10 +586,6 @@ let
 
       [Session Bus Policy]
       org.freedesktop.Flatpak=none
-    '';
-    home.file.".local/share/flatpak/overrides/com.protonvpn.www".text = ''
-      [Context]
-      filesystems=!xdg-run/gvfsd
     '';
     home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
       [Context]
@@ -579,6 +617,16 @@ let
 
       [Environment]
       PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
+    '';
+    home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
+      [Context]
+      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/nix-sources/policy.json:ro;~/.local/flatpak:ro;~/.nix-profile:ro
+
+      [Environment]
+      PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
+
+      [Session Bus Policy]
+      org.freedesktop.Flatpak=talk
     '';
     home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
       [Context]
@@ -683,6 +731,10 @@ let
       BookmarkBarEnabled = true;
       BackgroundModeEnabled = false;
       AlwaysOpenPdfExternally = true;
+      BraveRewardsDisabled = true;
+      BraveWalletDisabled = true;
+      BraveShieldsDisabledForUrls = [ "https://duckduckgo.com" ];
+      IPFSEnabled = false;
       ExtensionInstallForcelist = [
         "ddkjiahejlhfcafbddmgiahcphecmpfh" # Ublock lite
         "oboonakemofpalcgghocfoadofidjkkk" # KeepassXC
@@ -722,7 +774,6 @@ let
             "org.gnome.Cheese"
             "org.gnome.SoundRecorder"
             "org.pitivi.Pitivi"
-            "com.protonvpn.www"
             "org.keepassxc.KeePassXC"
             "com.google.AndroidStudio"
             "org.gnome.Totem"
@@ -734,7 +785,8 @@ let
             "org.freedesktop.Sdk//22.08"
             "org.freedesktop.Platform//22.08"
             "org.remmina.Remmina"
-            "com.visualstudio.code"
+            "com.github.micahflee.torbrowser-launcher"
+            "com.brave.Browser"
           ];
         };
         flathub-beta = {
@@ -789,9 +841,12 @@ let
         show-battery-percentage = true;
         toolkit-accessibility = false;
       };
+      "org/gnome/desktop/peripherals/mouse" = {
+        speed = 1.0;
+      };
       "org/gnome/desktop/peripherals/touchpad" = {
         click-method = "areas";
-        speed = 0.00512820512820511;
+        speed = 0.6;
         tap-and-drag = true;
         tap-to-click = true;
         two-finger-scrolling-enabled = true;
@@ -854,7 +909,7 @@ let
           "espresso@coadmunkee.github.com"
           "burn-my-windows@schneegans.github.com"
         ];
-        favorite-apps = [ "org.chromium.Chromium.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Terminal.desktop" ];
+        favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Terminal.desktop" ];
       };
       "org/gnome/desktop/privacy" = {
         remove-old-trash-files = true;
