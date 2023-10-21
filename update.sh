@@ -8,3 +8,5 @@ nix flake update
 home-manager switch --flake .
 
 flatpak update -y
+
+sudo rpm-ostree upgrade

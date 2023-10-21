@@ -15,6 +15,7 @@ let
 
     # Packages that should be installed to the user profile.
     home.packages = with pkgs; [
+      tldr
       man-pages
       man-pages-posix
       perl
@@ -56,9 +57,9 @@ let
       brightnessctl
       traceroute
       poetry
-      pypy38
+      pypy3
       xdg-ninja
-      python310Packages.ipython
+      python311Packages.ipython
       (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
       glab
       (callPackage ./downloadhelper.nix { })
@@ -82,6 +83,7 @@ let
 
     home.sessionVariables = {
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+      MANROFFOPT = "-c";
       VISUAL = "micro";
       EDITOR = "micro";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
