@@ -10,7 +10,7 @@ let
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
     home.username = "riky";
-    home.homeDirectory = "/home/riky";
+    home.homeDirectory = "/var/home/riky";
     targets.genericLinux.enable = true;
 
     # Packages that should be installed to the user profile.
@@ -346,7 +346,7 @@ let
         };
         "terminal.integrated.profiles.linux" = {
           "zsh" = {
-            "path" = "/home/riky/.local/flatpak/host-spawn";
+            "path" = "${home.homeDirectory}/.local/flatpak/host-spawn";
             "icon" = "terminal-bash";
             "args" = [
               "/usr/bin/bash"
@@ -366,7 +366,7 @@ let
         "java.configuration.runtimes" = [
           {
             "name" = "JavaSE-19";
-            "path" = "/home/riky/.nix-profile/lib/openjdk";
+            "path" = "${home.homeDirectory}/.nix-profile/lib/openjdk";
             "default" = true;
           }
         ];
@@ -386,12 +386,12 @@ let
         ];
         "haskell.manageHLS" = "PATH";
         "window.zoomLevel" = 1;
-        "vsintellicode.modelDownloadPath" = "/home/riky/.var/app/com.vscodium.codium/data/codium/intellicode";
+        "vsintellicode.modelDownloadPath" = "${home.homeDirectory}/.var/app/com.vscodium.codium/data/codium/intellicode";
         "shellformat.path" = "${pkgs.shfmt}/bin/shfmt";
         "clangd.path" = "${home.homeDirectory}/.var/app/com.vscodium.codium/config/VSCodium/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/16.0.2/clangd_16.0.2/bin/clangd";
-        "apklab.apkSignerPath" = "/var/home/riky/.apklab/uber-apk-signer-1.3.0.jar";
-        "apklab.apktoolPath" = "/var/home/riky/.apklab/apktool_2.8.1.jar";
-        "apklab.jadxDirPath" = "/var/home/riky/.apklab/jadx-1.4.7";
+        "apklab.apkSignerPath" = "${home.homeDirectory}/.apklab/uber-apk-signer-1.3.0.jar";
+        "apklab.apktoolPath" = "${home.homeDirectory}/.apklab/apktool_2.8.1.jar";
+        "apklab.jadxDirPath" = "${home.homeDirectory}/.apklab/jadx-1.4.7";
       };
     };
 
@@ -456,7 +456,7 @@ let
           Description = "KeepassXC";
         };
         Service = {
-          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
+          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done;sleep 5; gio mount google-drive://riky.isola@gmail.com; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
         };
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
@@ -539,6 +539,10 @@ let
       text = "#!/usr/bin/env bash\nif [ -f default.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"ghc $(printf \"'%s' \" \"$@\")\" default.nix; else exec flatpak-spawn --host ghc \"$@\"; fi";
       executable = true;
     };
+    home.file.".local/flatpak/cabal-fmt" = {
+      text = "#!/usr/bin/env bash\nexec flatpak-spawn --host ${pkgs.haskellPackages.cabal-fmt.bin}/bin/cabal-fmt \"$@\"";
+      executable = true;
+    };
     home.file.".local/flatpak/cargo" = {
       text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"cargo $*\"; else exec ${pkgs.cargo}/bin/cargo \"$@\"; fi";
       executable = true;
@@ -557,7 +561,7 @@ let
     };
     home.file.".local/flatpak/brave" = {
       #text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sf \"$HOME/.local/nix-sources/policy.json\" /etc/brave/policies/managed/policy.yml && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark --incognito \"$@\"";
-      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark --incognito \"$@\"";
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat --incognito \"$@\"";
       executable = true;
     };
     home.file.".local/flatpak/codium" = {
@@ -599,10 +603,10 @@ let
     '';
     home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = ''
       [Context]
-      filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;xdg-documents;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host
+      filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host;xdg-documents
 
       [Environment]
-      PATH=/home/riky/.local/flatpak:/home/riky/.local/bin:/home/riky/.nix-profile/bin:/app/bin:/usr/bin
+      PATH=${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin
     '';
     home.file.".local/share/flatpak/overrides/io.dbeaver.DBeaverCommunity".text = ''
       [Context]
@@ -618,14 +622,14 @@ let
       filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro
 
       [Environment]
-      PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
+      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
     '';
     home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
       [Context]
-      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/nix-sources/policy.json:ro;~/.local/flatpak:ro;~/.nix-profile:ro
+      filesystems=!xdg-download;/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/nix-sources/policy.json:ro;~/.local/flatpak:ro;~/.nix-profile:ro
 
       [Environment]
-      PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
+      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
 
       [Session Bus Policy]
       org.freedesktop.Flatpak=talk
@@ -643,9 +647,9 @@ let
       [Context]
       filesystems=!host
     '';
-    home.file.".local/share/flatpak/overrides/org.gnome.eog".text = ''
+    home.file.".local/share/flatpak/overrides/org.gnome.Loupe".text = ''
       [Context]
-      filesystems=!xdg-run/gvfsd;!host
+      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!host
     '';
     home.file.".local/share/flatpak/overrides/org.gnome.Evince".text = ''
       [Context]
@@ -773,7 +777,7 @@ let
             "org.gnome.Extensions"
             "org.localsend.localsend_app"
             "org.gnome.dspy"
-            "org.gnome.Cheese"
+            "org.gnome.Snapshot"
             "org.gnome.SoundRecorder"
             "org.pitivi.Pitivi"
             "org.keepassxc.KeePassXC"
@@ -782,13 +786,14 @@ let
             "org.gnome.FileRoller"
             "org.gnome.Evince"
             "org.chromium.Chromium"
-            "org.gnome.eog"
+            "org.gnome.Loupe"
             "com.vscodium.codium"
             "org.freedesktop.Sdk//22.08"
             "org.freedesktop.Platform//22.08"
             "org.remmina.Remmina"
             "com.github.micahflee.torbrowser-launcher"
             "com.brave.Browser"
+            "org.gnome.SimpleScan"
           ];
         };
         flathub-beta = {
