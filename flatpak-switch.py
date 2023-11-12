@@ -104,5 +104,6 @@ def main():
         flatpak.remove(installed_packages)
 
 
+
 if __name__ == "__main__":
     main()

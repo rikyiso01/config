@@ -35,6 +35,7 @@ let
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.burn-my-windows
+      ddgr
       fira-code
       rust-analyzer
       rustfmt
@@ -164,6 +165,50 @@ let
         enable = true;
         plugins = [ "git" "sudo" ];
       };
+    };
+
+    programs.tmux = {
+      enable = true;
+    };
+
+    programs.neovim = {
+      enable = true;
+      extraLuaConfig = ''
+                vim.opt.termguicolors = true
+                require'lspconfig'.pyright.setup{}
+                require'lspconfig'.rnix.setup{}
+                require("bufferline").setup{}
+                require("toggleterm").setup{}
+                require('feline').setup()
+                require("nvim-tree").setup()
+
+                vim.o.expandtab = true
+                vim.o.smartindent = true
+                vim.o.tabstop = 4
+                vim.o.shiftwidth = 4
+                vim.wo.number = true
+                vim.g.loaded_netrw = 1
+                vim.g.loaded_netrwPlugin = 1
+                vim.api.nvim_create_autocmd('BufWritePre', {
+                  buffer = vim.fn.bufnr(),
+                  callback = function()
+        	        vim.lsp.buf.format({ timeout_ms = 3000 })
+        	      end,
+                })
+        	    vim.keymap.set('n', '<C-b>', '<cmd>NvimTreeToggle<cr>')
+        	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
+        	    vim.keymap.set('n', "<C-t>", '<cmd>ToggleTerm<cr>')
+      '';
+      plugins = with pkgs.vimPlugins; [
+        nvim-lspconfig
+        trouble-nvim
+        bufferline-nvim
+        toggleterm-nvim
+        feline-nvim
+        nvim-tree-lua
+        auto-save-nvim
+      ];
+      extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ];
     };
 
     home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
@@ -571,6 +616,8 @@ let
     home.file.".local/flatpak/host-spawn".source = ./host-spawn;
 
     home.file.".local/share/flatpak/overrides/ca.desrt.dconf-editor".text = ''
+      [Context]
+      filesystems=~/.config/dconf/user:ro
       [Session Bus Policy]
       org.freedesktop.Flatpak=none
     '';
@@ -593,10 +640,10 @@ let
       [Session Bus Policy]
       org.freedesktop.Flatpak=none
     '';
-    home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
-      [Context]
-      filesystems=!xdg-download
-    '';
+    # home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
+    #   [Context]
+    #   filesystems=!xdg-download
+    # '';
     home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = ''
       [Context]
       filesystems=!xdg-config/kdeglobals;!xdg-config/gtk-3.0;!host
@@ -636,12 +683,12 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
       [Context]
-      filesystems=xdg-download;!home
+      filesystems=xdg-documents/CTF:ro;!home
       persistent=.ghidra
     '';
     home.file.".local/share/flatpak/overrides/org.gimp.GIMP".text = ''
       [Context]
-      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/tmp;!xdg-config/gtk-3.0;!xdg-config/GIMP;xdg-download;xdg-pictures;!host
+      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/tmp;!xdg-config/gtk-3.0;!xdg-config/GIMP;xdg-pictures;!host
     '';
     home.file.".local/share/flatpak/overrides/org.gnome.Boxes".text = ''
       [Context]
@@ -878,8 +925,11 @@ let
         move-to-monitor-right = [ ];
         switch-input-source = [ ];
         switch-input-source-backward = [ ];
-        switch-to-workspace-left = [ ];
-        switch-to-workspace-right = [ ];
+        switch-to-workspace-left = [ "<Super>j" "<Super>h" ];
+        switch-to-workspace-right = [ "<Super>k" "<Super>l" ];
+        close = [ "<Super>x" ];
+        move-to-workspace-left = [ "<Shift><Super>j" "<Shift><Super>h" ];
+        move-to-workspace-right = [ "<Shift><Super>k" "<Shift><Super>l" ];
       };
       "org/gnome/desktop/wm/preferences" = {
         button-layout = ":close";
@@ -916,7 +966,7 @@ let
           "espresso@coadmunkee.github.com"
           "burn-my-windows@schneegans.github.com"
         ];
-        favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Terminal.desktop" ];
+        favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Console.desktop" ];
       };
       "org/gnome/desktop/privacy" = {
         remove-old-trash-files = true;
@@ -929,6 +979,9 @@ let
       "org/gnome/shell/extensions/espresso" = {
         has-battery = true;
         show-notifications = false;
+      };
+      "org/gnome/Console" = {
+        last-window-size = lib.hm.gvariant.mkTuple [ 1900 1048 ];
       };
     };
 
