@@ -182,13 +182,15 @@ let
                 require('feline').setup()
                 require("nvim-tree").setup()
 
-                vim.o.expandtab = true
-                vim.o.smartindent = true
-                vim.o.tabstop = 4
-                vim.o.shiftwidth = 4
-                vim.wo.number = true
+                vim.opt.expandtab = true
+                vim.opt.smartindent = true
+                vim.opt.tabstop = 4
+                vim.opt.shiftwidth = 4
+                vim.opt.number = true
                 vim.g.loaded_netrw = 1
                 vim.g.loaded_netrwPlugin = 1
+                vim.opt.incsearch = true
+                vim.opt.shortmess:remove({ 'S' })
                 vim.api.nvim_create_autocmd('BufWritePre', {
                   buffer = vim.fn.bufnr(),
                   callback = function()
@@ -198,6 +200,8 @@ let
         	    vim.keymap.set('n', '<C-b>', '<cmd>NvimTreeToggle<cr>')
         	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
         	    vim.keymap.set('n', "<C-t>", '<cmd>ToggleTerm<cr>')
+        	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
+        	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
       '';
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -207,8 +211,11 @@ let
         feline-nvim
         nvim-tree-lua
         auto-save-nvim
+        telescope-nvim
+        nvim-treesitter.withAllGrammars
+        lazygit-nvim
       ];
-      extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ];
+      extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ripgrep lazygit ];
     };
 
     home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
