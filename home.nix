@@ -35,7 +35,7 @@ let
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.burn-my-windows
-      ddgr
+      gnomeExtensions.resource-monitor
       fira-code
       rust-analyzer
       rustfmt
@@ -63,7 +63,6 @@ let
       python311Packages.ipython
       (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
       glab
-      (callPackage ./downloadhelper.nix { })
     ];
 
     programs.git = {
@@ -167,66 +166,126 @@ let
       };
     };
 
-    programs.tmux = {
-      enable = true;
-    };
+    # programs.tmux = {
+    #   enable = true;
+    # };
 
-    programs.neovim = {
-      enable = true;
-      extraLuaConfig = ''
-                vim.opt.termguicolors = true
-                require'lspconfig'.pyright.setup{}
-                require'lspconfig'.rnix.setup{}
-                require("bufferline").setup{}
-                require("toggleterm").setup{}
-                require('feline').setup()
-                require("nvim-tree").setup()
+    # programs.neovim = {
+    #   enable = true;
+    #   extraLuaConfig = ''
+    #             vim.opt.termguicolors = true
+    #             local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
+    #             require'lspconfig'.pyright.setup{capabilities=lsp_capabilities}
+    #             require'lspconfig'.rnix.setup{capabilities=lsp_capabilities}
+    #             require("bufferline").setup{}
+    #             require("toggleterm").setup{open_mapping=[[<C-t>]]}
+    #             require('feline').setup()
+    #             require("nvim-tree").setup()
+    #             require("auto-session").setup{}
+    #             require("autoclose").setup()
+    #             require("auto-save").setup{enabled=true,trigger_events={"BufLeave"}}
+    #             vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
+    #             local cmp=require("cmp")
+    #             cmp.setup{
+    #                 sources={{name="nvim_lsp",keyword_length=1},},
+    #                 window={
+    #                     completion={
+    #                         border="rounded",
+    #                         winhighlight="Normal:CmpNormal",
+    #                     },
+    #                     documentation={
+    #                         border="rounded",
+    #                         winhighlight="Normal:CmpNormal",
+    #                     },
+    #                 },
+    #                 formatting={fields={"menu","abbr","kind"},},
+    #                 mapping={
+    #                     ['<CR>']=cmp.mapping.confirm({select=false}),
+    #                     ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
+    #                     ['<Down>'] = cmp.mapping.select_next_item(select_opts),
+    #                     ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+    #                     ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    #                     ['<esc>'] = cmp.mapping.abort(),
+    #                 },
+    #             }
 
-                vim.opt.expandtab = true
-                vim.opt.smartindent = true
-                vim.opt.tabstop = 4
-                vim.opt.shiftwidth = 4
-                vim.opt.number = true
-                vim.g.loaded_netrw = 1
-                vim.g.loaded_netrwPlugin = 1
-                vim.opt.incsearch = true
-                vim.opt.shortmess:remove({ 'S' })
-                vim.api.nvim_create_autocmd('BufWritePre', {
-                  buffer = vim.fn.bufnr(),
-                  callback = function()
-        	        vim.lsp.buf.format({ timeout_ms = 3000 })
-        	      end,
-                })
-        	    vim.keymap.set('n', '<C-b>', '<cmd>NvimTreeToggle<cr>')
-        	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
-        	    vim.keymap.set('n', "<C-t>", '<cmd>ToggleTerm<cr>')
-        	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
-        	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
-      '';
-      plugins = with pkgs.vimPlugins; [
-        nvim-lspconfig
-        trouble-nvim
-        bufferline-nvim
-        toggleterm-nvim
-        feline-nvim
-        nvim-tree-lua
-        auto-save-nvim
-        telescope-nvim
-        nvim-treesitter.withAllGrammars
-        lazygit-nvim
-      ];
-      extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ripgrep lazygit ];
-    };
+    #             vim.opt.expandtab = true
+    #             vim.opt.smartindent = true
+    #             vim.opt.tabstop = 4
+    #             vim.opt.shiftwidth = 4
+    #             vim.opt.number = true
+    #             vim.g.loaded_netrw = 1
+    #             vim.g.loaded_netrwPlugin = 1
+    #             vim.opt.incsearch = true
+    #             vim.opt.shortmess:remove({ 'S' })
+    #             vim.opt.clipboard = "unnamedplus"
+    #             vim.api.nvim_create_autocmd('BufWritePre', {
+    #               buffer = vim.fn.bufnr(),
+    #               callback = function()
+    #     	        vim.lsp.buf.format({ timeout_ms = 3000 })
+    #     	      end,
+    #             })
+    #             vim.api.nvim_create_autocmd(
+    #                 "BufWritePost",
+    #                 {
+    #                     pattern = "*.py",
+    #                     callback = function()
+    #                         vim.cmd("silent !black --quiet %")            
+    #                         vim.cmd("edit")
+    #                     end,
+    #                 }
+    #             )
+    #     	    vim.keymap.set('n', '<C-b>', '<cmd>NvimTreeToggle<cr>')
+    #     	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
+    #     	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
+    #     	    vim.keymap.set('n', "<C-g>", '<cmd>LazyGit<cr>')
+    #     	    vim.keymap.set('n', "<C-x>", '<cmd>bd<cr>')
+    #     	    vim.keymap.set('n', "<C-k>", '<cmd>bnext<cr>')
+    #     	    vim.keymap.set('n', "<C-j>", '<cmd>bprev<cr>')
+    #     	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
+    #     	    vim.keymap.set('v', "<tab>", '>gv')
+    #     	    vim.keymap.set('v', "<s-tab>", '<gv')
+    #     	    vim.keymap.set('n', "U", '<C-r>')
+    #     	    vim.keymap.set('n', "K", '<cmd>lua vim.lsp.buf.hover()<cr>')
+    #             function _G.set_terminal_keymaps()
+    #                 local opts = {buffer = 0}
+    #                 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
+    #             end
+    #             vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()') 
+    #             vim.env.NVIM_SERVER=vim.v.servername
+    #   '';
+    #   plugins = with pkgs.vimPlugins; [
+    #     nvim-lspconfig
+    #     trouble-nvim
+    #     bufferline-nvim
+    #     toggleterm-nvim
+    #     feline-nvim
+    #     nvim-tree-lua
+    #     auto-save-nvim
+    #     telescope-nvim
+    #     nvim-treesitter.withAllGrammars
+    #     lazygit-nvim
+    #     auto-session
+    #     vim-move
+    #     nvim-cmp
+    #     cmp-nvim-lsp
+    #     markdown-preview-nvim
+    #     autoclose-nvim
+    #     pkgs.vimExtraPlugins.jupynium-nvim
+    #     vim-illuminate
+    #   ];
+    #   extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ripgrep lazygit nodePackages.diagnostic-languageserver black wl-clipboard gcc tree-sitter ];
+    # };
 
-    home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
-      "nameShort": "VSCodium",
-      "nameLong": "Visual Studio Code",
-      "extensionsGallery": {
-        "serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
-        "cacheUrl": "https://vscode.blob.core.windows.net/gallery/index",
-        "itemUrl": "https://marketplace.visualstudio.com/items"
-      }
-    }'';
+    # home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
+    #   "nameShort": "VSCodium",
+    #   "nameLong": "Visual Studio Code",
+    #   "extensionsGallery": {
+    #   "serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
+    #   "cacheUrl": "https://vscode.blob.core.windows.net/gallery/index",
+    #   "itemUrl": "https://marketplace.visualstudio.com/items"
+    #   }
+    #   }'';
 
     programs.vscode = {
       enable = true;
@@ -444,6 +503,7 @@ let
         "apklab.apkSignerPath" = "${home.homeDirectory}/.apklab/uber-apk-signer-1.3.0.jar";
         "apklab.apktoolPath" = "${home.homeDirectory}/.apklab/apktool_2.8.1.jar";
         "apklab.jadxDirPath" = "${home.homeDirectory}/.apklab/jadx-1.4.7";
+        "terminal.integrated.enablePersistentSessions" = false;
       };
     };
 
@@ -521,13 +581,13 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
-      cat = {
-        Unit = { Description = "X11 Cat"; };
-        Service = {
-          ExecStart = "${pkgs.oneko}/bin/oneko -tora -bg 'dark gray'";
-        };
-        Install = { WantedBy = [ "gnome-session-x11-services.target" ]; };
-      };
+      #cat = {
+      #  Unit = { Description = "X11 Cat"; };
+      #  Service = {
+      #    ExecStart = "${pkgs.oneko}/bin/oneko -tora -bg 'dark gray'";
+      #  };
+      #  Install = { WantedBy = [ "gnome-session-x11-services.target" ]; };
+      #};
     };
 
     home.file.".gdbinit".text = "source ${pkgs.gef}/share/gef/gef.py";
@@ -543,28 +603,28 @@ let
       };
     home.file.".config/theme.zsh".source = ./theme.zsh;
 
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''	
-      {	
-        "name": "net.downloadhelper.coapp",	
-        "description": "Video DownloadHelper companion app",	
-        "path": "${home.homeDirectory}/.nix-profile/bin/net.downloadhelper.coapp-linux-64",	
-        "type": "stdio",	
-        "allowed_origins": [	
-            "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"	
-        ]	
-      }	
+    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
+      {
+      "name": "net.downloadhelper.coapp",
+      "description": "Video DownloadHelper companion app",
+      "path": "${pkgs.callPackage ./downloadhelper.nix { }}/bin/net.downloadhelper.coapp-linux-64",
+      "type": "stdio",
+      "allowed_origins": [
+      "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
+      ]
+      }
     '';
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''	
-          {	
-          "allowed_origins": [	
-              "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",	
-              "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"	
-          ],	
-          "description": "KeePassXC integration with native messaging support",	
-          "name": "org.keepassxc.keepassxc_browser",	
-          "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",	
-          "type": "stdio"	
-      }	
+    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''
+      {
+      "allowed_origins": [
+      "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
+      "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
+      ],
+      "description": "KeePassXC integration with native messaging support",
+      "name": "org.keepassxc.keepassxc_browser",
+      "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",
+      "type": "stdio"
+      }
     '';
 
 
@@ -577,9 +637,10 @@ let
       Icon=nautilus'';
     home.file.".local/bin/conservative".source = ./conservative.sh;
     home.file.".local/bin/charge".source = ./charge.py;
+    home.file.".local/bin/jupynvim".source = ./jupynvim.py;
 
     home.file.".local/bin/chromium" = {
-      text = "#!/usr/bin/env bash\nexec flatpak run --command=/app/bin/chromium org.chromium.Chromium \"$@\"";
+      text = "#!/usr/bin/env bash\nexec flatpak run com.brave.Browser \"$@\"";
       executable = true;
     };
 
@@ -603,21 +664,9 @@ let
       text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"rust-analyzer $*\"; else exec ${pkgs.rust-analyzer}/bin/rust-analyzer \"$@\"; fi";
       executable = true;
     };
-    home.file.".local/flatpak/code" = {
-      text = "#!/usr/bin/env bash\nexec /app/bin/code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
-      executable = true;
-    };
-    home.file.".local/flatpak/cobalt" = {
-      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
-      executable = true;
-    };
     home.file.".local/flatpak/brave" = {
       #text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sf \"$HOME/.local/nix-sources/policy.json\" /etc/brave/policies/managed/policy.yml && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark --incognito \"$@\"";
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat --incognito \"$@\"";
-      executable = true;
-    };
-    home.file.".local/flatpak/codium" = {
-      text = "#!/usr/bin/env bash\nexec /app/bin/codium --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto \"$@\"";
       executable = true;
     };
     home.file.".local/flatpak/host-spawn".source = ./host-spawn;
@@ -647,10 +696,10 @@ let
       [Session Bus Policy]
       org.freedesktop.Flatpak=none
     '';
-    # home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
-    #   [Context]
-    #   filesystems=!xdg-download
-    # '';
+    home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
+      [Context]
+      filesystems=!xdg-download
+    '';
     home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = ''
       [Context]
       filesystems=!xdg-config/kdeglobals;!xdg-config/gtk-3.0;!host
@@ -671,16 +720,9 @@ let
       [Environment]
       ANKI_WAYLAND=1
     '';
-    home.file.".local/share/flatpak/overrides/org.chromium.Chromium".text = ''
-      [Context]
-      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro
-
-      [Environment]
-      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-    '';
     home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
       [Context]
-      filesystems=!xdg-download;/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/nix-sources/policy.json:ro;~/.local/flatpak:ro;~/.nix-profile:ro
+      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/nix-sources/policy.json:ro;~/.local/flatpak:ro;~/.nix-profile:ro
 
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
@@ -777,34 +819,34 @@ let
       LockDatabaseScreenLock=false
     '';
 
-    home.file.".local/nix-sources/policy.json".text = builtins.toJSON {
-      DefaultSearchProviderEnabled = true;
-      DefaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
-      DefaultSearchProviderIconURL = "https://duckduckgo.com/favicon.ico";
-      DefaultSearchProviderName = "DuckDuckGo";
-      DefaultSearchProviderKeyword = "duckduckgo.com";
-      DefaultSearchProviderSuggestURL = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
-      PasswordManagerEnabled = false;
-      AutofillAddressEnabled = false;
-      PaymentMethodQueryEnabled = false;
-      HighEfficiencyModeEnabled = true;
-      BookmarkBarEnabled = true;
-      BackgroundModeEnabled = false;
-      AlwaysOpenPdfExternally = true;
-      BraveRewardsDisabled = true;
-      BraveWalletDisabled = true;
-      BraveShieldsDisabledForUrls = [ "https://duckduckgo.com" ];
-      IPFSEnabled = false;
-      ExtensionInstallForcelist = [
-        "ddkjiahejlhfcafbddmgiahcphecmpfh" # Ublock lite
-        "oboonakemofpalcgghocfoadofidjkkk" # KeepassXC
-        "lmjnegcaeklhafolokijcfjliaokphfk" # Video Download Helper
-        "fnaicdffflnofjppbagibeoednhnbjhg" # Floccus
-        "mpbjkejclgfgadiemmefgebjfooflfhl" # Buster
-        "ceipnlhmjohemhfpbjdgeigkababhmjc" # I'm not a robot
-        "dpplndkoilcedkdjicmbeoahnckdcnle" # 123Apps
-      ];
-    };
+    # home.file.".local/nix-sources/policy.json".text = builtins.toJSON {
+    #   DefaultSearchProviderEnabled = true;
+    #   DefaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
+    #   DefaultSearchProviderIconURL = "https://duckduckgo.com/favicon.ico";
+    #   DefaultSearchProviderName = "DuckDuckGo";
+    #   DefaultSearchProviderKeyword = "duckduckgo.com";
+    #   DefaultSearchProviderSuggestURL = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
+    #   PasswordManagerEnabled = false;
+    #   AutofillAddressEnabled = false;
+    #   PaymentMethodQueryEnabled = false;
+    #   HighEfficiencyModeEnabled = true;
+    #   BookmarkBarEnabled = true;
+    #   BackgroundModeEnabled = false;
+    #   AlwaysOpenPdfExternally = true;
+    #   BraveRewardsDisabled = true;
+    #   BraveWalletDisabled = true;
+    #   BraveShieldsDisabledForUrls = [ "https://duckduckgo.com" ];
+    #   IPFSEnabled = false;
+    #   ExtensionInstallForcelist = [
+    #     "ddkjiahejlhfcafbddmgiahcphecmpfh" # Ublock lite
+    #     "oboonakemofpalcgghocfoadofidjkkk" # KeepassXC
+    #     "lmjnegcaeklhafolokijcfjliaokphfk" # Video Download Helper
+    #     "fnaicdffflnofjppbagibeoednhnbjhg" # Floccus
+    #     "mpbjkejclgfgadiemmefgebjfooflfhl" # Buster
+    #     "ceipnlhmjohemhfpbjdgeigkababhmjc" # I'm not a robot
+    #     "dpplndkoilcedkdjicmbeoahnckdcnle" # 123Apps
+    #   ];
+    # };
 
     home.file.".local/nix-sources/flatpak.json".text = builtins.toJSON
       {
@@ -839,7 +881,6 @@ let
             "org.gnome.Totem"
             "org.gnome.FileRoller"
             "org.gnome.Evince"
-            "org.chromium.Chromium"
             "org.gnome.Loupe"
             "com.vscodium.codium"
             "org.freedesktop.Sdk//22.08"
@@ -848,6 +889,7 @@ let
             "com.github.micahflee.torbrowser-launcher"
             "com.brave.Browser"
             "org.gnome.SimpleScan"
+            "io.github.flattool.Warehouse"
           ];
         };
         flathub-beta = {
@@ -858,17 +900,14 @@ let
           url = "file://${home.homeDirectory}/.local/flatpak-repo";
           packages = [
             "org.tlauncher.TLauncher"
-            "org.chromium.Chromium.Extension.KeepassXC"
-            "org.chromium.Chromium.Extension.VideoDownloadHelper"
-            "org.chromium.Chromium.Extension.Policy"
+            #"org.chromium.Chromium.Extension.KeepassXC"
+            #"org.chromium.Chromium.Extension.VideoDownloadHelper"
+            #"org.chromium.Chromium.Extension.Policy"
           ];
         };
       };
 
     home.file.".local/nix-sources/tlauncher.yml" = create_flatpak ./tlauncher.yml;
-    home.file.".local/nix-sources/keepassxc.yml" = create_flatpak ./keepassxc.yml;
-    home.file.".local/nix-sources/downloadhelper.yml" = create_flatpak ./downloadhelper.yml;
-    home.file.".local/nix-sources/chrome-policy.yml" = create_flatpak ./chrome-policy.yml;
     home.file.".local/nix-sources/powertop.hs" = {
       source = ./powertop.hs;
       onChange = ''
@@ -928,37 +967,49 @@ let
         theme-name = "__custom";
       };
       "org/gnome/desktop/wm/keybindings" = {
-        move-to-monitor-left = [ ];
-        move-to-monitor-right = [ ];
+        # move-to-monitor-left = [ ];
+        # move-to-monitor-right = [ ];
         switch-input-source = [ ];
         switch-input-source-backward = [ ];
-        switch-to-workspace-left = [ "<Super>j" "<Super>h" ];
-        switch-to-workspace-right = [ "<Super>k" "<Super>l" ];
-        close = [ "<Super>x" ];
-        move-to-workspace-left = [ "<Shift><Super>j" "<Shift><Super>h" ];
-        move-to-workspace-right = [ "<Shift><Super>k" "<Shift><Super>l" ];
+        # switch-to-workspace-left = [ "<Alt>j" ];
+        # switch-to-workspace-right = [ "<Alt>k" ];
+        close = [ "<Super>q" ];
+        # move-to-workspace-left = [ "<Alt>Left" ];
+        # move-to-workspace-right = [ "<Alt>Right" ];
       };
       "org/gnome/desktop/wm/preferences" = {
         button-layout = ":close";
       };
       "org/gnome/mutter/keybindings" = {
-        toggle-tiled-left = [ "<Control><Alt>Left" ];
-        toggle-tiled-right = [ "<Control><Alt>Right" ];
+        # toggle-tiled-left = [ "<Control><Alt>Left" ];
+        # toggle-tiled-right = [ "<Control><Alt>Right" ];
+        toggle-tiled-left = [ ];
+        toggle-tiled-right = [ ];
       };
       "org/gnome/settings-daemon/plugins/color" = {
         night-light-enabled = true;
       };
       "org/gnome/settings-daemon/plugins/media-keys" = {
-        custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" ];
+        # custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/" "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/" ];
         next = [ "<Super>Right" ];
         play = [ "<Super>space" ];
         previous = [ "<Super>Left" ];
       };
-      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-        binding = "<Control><Alt>t";
-        command = "gnome-terminal";
-        name = "Terminal";
-      };
+      # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+      #   binding = "<Control><Alt>t";
+      #   command = "gnome-terminal";
+      #   name = "Terminal";
+      # };
+      # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
+      #   binding = "<Control><Alt>b";
+      #   command = "flatpak run com.brave.Browser";
+      #   name = "Browser";
+      # };
+      # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2" = {
+      #   binding = "<Control><Alt>v";
+      #   command = "flatpak run com.vscodium.codium";
+      #   name = "VSCode";
+      # };
       "org/gnome/settings-daemon/plugins/power" = {
         idle-brightness = 20;
         power-button-action = "interactive";
@@ -972,6 +1023,7 @@ let
           "AlphabeticalAppGrid@stuarthayhurst"
           "espresso@coadmunkee.github.com"
           "burn-my-windows@schneegans.github.com"
+          "Resource_Monitor@Ory0n"
         ];
         favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Console.desktop" ];
       };
@@ -986,9 +1038,6 @@ let
       "org/gnome/shell/extensions/espresso" = {
         has-battery = true;
         show-notifications = false;
-      };
-      "org/gnome/Console" = {
-        last-window-size = lib.hm.gvariant.mkTuple [ 1900 1048 ];
       };
     };
 
@@ -1017,7 +1066,8 @@ let
         ln -sfT "$HOME/.config/Code/User/keybindings.json" "$HOME/.var/app/com.vscodium.codium/config/VSCodium/User/keybindings.json"
         mkdir -p "$HOME/.local/share/applications"
         for f in com.vscodium.codium com.vscodium.codium-url-handler; do
-            sed -E 's:^(Exec=.*com\.vscodium\.codium)(.*)$:\1 --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto\2:' < "$HOME/.local/share/flatpak/exports/share/applications/$f.desktop" > "$HOME/.local/share/applications/$f.desktop"
+            # sed -E 's:^(Exec=.*com\.vscodium\.codium)(.*)$:\1 --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto\2:' < "$HOME/.local/share/flatpak/exports/share/applications/$f.desktop" > "$HOME/.local/share/applications/$f.desktop"
+            sed -E 's:^(Exec=.*com\.vscodium\.codium)(.*)$:\1 --ozone-platform-hint=auto\2:' < "$HOME/.local/share/flatpak/exports/share/applications/$f.desktop" > "$HOME/.local/share/applications/$f.desktop"
         done
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
