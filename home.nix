@@ -36,6 +36,7 @@ let
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.burn-my-windows
       gnomeExtensions.resource-monitor
+      gnomeExtensions.cronomix
       fira-code
       rust-analyzer
       rustfmt
@@ -63,6 +64,8 @@ let
       python311Packages.ipython
       (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
       glab
+      ansible
+      ansible-lint
     ];
 
     programs.git = {
@@ -170,112 +173,122 @@ let
     #   enable = true;
     # };
 
-    # programs.neovim = {
-    #   enable = true;
-    #   extraLuaConfig = ''
-    #             vim.opt.termguicolors = true
-    #             local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-    #             require'lspconfig'.pyright.setup{capabilities=lsp_capabilities}
-    #             require'lspconfig'.rnix.setup{capabilities=lsp_capabilities}
-    #             require("bufferline").setup{}
-    #             require("toggleterm").setup{open_mapping=[[<C-t>]]}
-    #             require('feline').setup()
-    #             require("nvim-tree").setup()
-    #             require("auto-session").setup{}
-    #             require("autoclose").setup()
-    #             require("auto-save").setup{enabled=true,trigger_events={"BufLeave"}}
-    #             vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
-    #             local cmp=require("cmp")
-    #             cmp.setup{
-    #                 sources={{name="nvim_lsp",keyword_length=1},},
-    #                 window={
-    #                     completion={
-    #                         border="rounded",
-    #                         winhighlight="Normal:CmpNormal",
-    #                     },
-    #                     documentation={
-    #                         border="rounded",
-    #                         winhighlight="Normal:CmpNormal",
-    #                     },
-    #                 },
-    #                 formatting={fields={"menu","abbr","kind"},},
-    #                 mapping={
-    #                     ['<CR>']=cmp.mapping.confirm({select=false}),
-    #                     ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
-    #                     ['<Down>'] = cmp.mapping.select_next_item(select_opts),
-    #                     ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-    #                     ['<C-d>'] = cmp.mapping.scroll_docs(4),
-    #                     ['<esc>'] = cmp.mapping.abort(),
-    #                 },
-    #             }
+    programs.neovim = {
+      enable = true;
+      extraLuaConfig = ''
+                vim.opt.termguicolors = true
+                local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
+                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities}
+                require'lspconfig'.rnix.setup{capabilities=lsp_capabilities}
+                require("bufferline").setup{}
+                require("toggleterm").setup{open_mapping=[[<C-t>]]}
+                require('feline').setup()
+                require("nvim-tree").setup()
+                require("auto-session").setup{}
+                require("autoclose").setup()
+                require("stickybuf").setup()
+                require("auto-save").setup{enabled=true,trigger_events={"BufLeave"}}
+                vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
+                local cmp=require("cmp")
+                cmp.setup{
+                    sources={{name="nvim_lsp",keyword_length=1},},
+                    window={
+                        completion={
+                            border="rounded",
+                            winhighlight="Normal:CmpNormal",
+                        },
+                        documentation={
+                            border="rounded",
+                            winhighlight="Normal:CmpNormal",
+                        },
+                    },
+                    formatting={fields={"menu","abbr","kind"},},
+                    mapping={
+                        ['<CR>']=cmp.mapping.confirm({select=false}),
+                        ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
+                        ['<Down>'] = cmp.mapping.select_next_item(select_opts),
+                        ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+                        ['<C-d>'] = cmp.mapping.scroll_docs(4),
+                        ['<esc>'] = cmp.mapping.abort(),
+                    },
+                }
 
-    #             vim.opt.expandtab = true
-    #             vim.opt.smartindent = true
-    #             vim.opt.tabstop = 4
-    #             vim.opt.shiftwidth = 4
-    #             vim.opt.number = true
-    #             vim.g.loaded_netrw = 1
-    #             vim.g.loaded_netrwPlugin = 1
-    #             vim.opt.incsearch = true
-    #             vim.opt.shortmess:remove({ 'S' })
-    #             vim.opt.clipboard = "unnamedplus"
-    #             vim.api.nvim_create_autocmd('BufWritePre', {
-    #               buffer = vim.fn.bufnr(),
-    #               callback = function()
-    #     	        vim.lsp.buf.format({ timeout_ms = 3000 })
-    #     	      end,
-    #             })
-    #             vim.api.nvim_create_autocmd(
-    #                 "BufWritePost",
-    #                 {
-    #                     pattern = "*.py",
-    #                     callback = function()
-    #                         vim.cmd("silent !black --quiet %")            
-    #                         vim.cmd("edit")
-    #                     end,
-    #                 }
-    #             )
-    #     	    vim.keymap.set('n', '<C-b>', '<cmd>NvimTreeToggle<cr>')
-    #     	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
-    #     	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
-    #     	    vim.keymap.set('n', "<C-g>", '<cmd>LazyGit<cr>')
-    #     	    vim.keymap.set('n', "<C-x>", '<cmd>bd<cr>')
-    #     	    vim.keymap.set('n', "<C-k>", '<cmd>bnext<cr>')
-    #     	    vim.keymap.set('n', "<C-j>", '<cmd>bprev<cr>')
-    #     	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
-    #     	    vim.keymap.set('v', "<tab>", '>gv')
-    #     	    vim.keymap.set('v', "<s-tab>", '<gv')
-    #     	    vim.keymap.set('n', "U", '<C-r>')
-    #     	    vim.keymap.set('n', "K", '<cmd>lua vim.lsp.buf.hover()<cr>')
-    #             function _G.set_terminal_keymaps()
-    #                 local opts = {buffer = 0}
-    #                 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
-    #             end
-    #             vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()') 
-    #             vim.env.NVIM_SERVER=vim.v.servername
-    #   '';
-    #   plugins = with pkgs.vimPlugins; [
-    #     nvim-lspconfig
-    #     trouble-nvim
-    #     bufferline-nvim
-    #     toggleterm-nvim
-    #     feline-nvim
-    #     nvim-tree-lua
-    #     auto-save-nvim
-    #     telescope-nvim
-    #     nvim-treesitter.withAllGrammars
-    #     lazygit-nvim
-    #     auto-session
-    #     vim-move
-    #     nvim-cmp
-    #     cmp-nvim-lsp
-    #     markdown-preview-nvim
-    #     autoclose-nvim
-    #     pkgs.vimExtraPlugins.jupynium-nvim
-    #     vim-illuminate
-    #   ];
-    #   extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ripgrep lazygit nodePackages.diagnostic-languageserver black wl-clipboard gcc tree-sitter ];
-    # };
+                vim.opt.expandtab = true
+                vim.opt.smartindent = true
+                vim.opt.tabstop = 4
+                vim.opt.shiftwidth = 4
+                vim.opt.number = true
+                vim.g.loaded_netrw = 1
+                vim.g.loaded_netrwPlugin = 1
+                vim.opt.incsearch = true
+                vim.opt.shortmess:remove({ 'S' })
+                vim.opt.clipboard = "unnamedplus"
+                vim.api.nvim_create_autocmd('BufWritePre', {
+                  buffer = vim.fn.bufnr(),
+                  callback = function()
+        	        vim.lsp.buf.format({ timeout_ms = 3000 })
+        	      end,
+                })
+                vim.api.nvim_create_autocmd(
+                    "BufWritePost",
+                    {
+                        pattern = "*.py",
+                        callback = function()
+                            vim.cmd("silent !black --quiet %")            
+                            vim.cmd("edit")
+                        end,
+                    }
+                )
+        	    vim.keymap.set('n', '<C-b>', '<cmd>NvimTreeToggle<cr>')
+        	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
+        	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
+        	    vim.keymap.set('n', "<C-g>", '<cmd>LazyGit<cr>')
+        	    vim.keymap.set('n', "<C-x>", '<cmd>bd<cr>')
+        	    vim.keymap.set('n', "<C-k>", '<cmd>bnext<cr>')
+        	    vim.keymap.set('n', "<C-j>", '<cmd>bprev<cr>')
+        	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
+        	    vim.keymap.set('v', "<tab>", '>gv')
+        	    vim.keymap.set('v', "<s-tab>", '<gv')
+        	    vim.keymap.set('n', "U", '<C-r>')
+        	    vim.keymap.set('n', "K", '<cmd>lua vim.lsp.buf.hover()<cr>')
+                function _G.set_terminal_keymaps()
+                    local opts = {buffer = 0}
+                    vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
+                end
+                vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()') 
+                vim.env.NVIM_SERVER=vim.v.servername
+      '';
+      plugins = with pkgs.vimPlugins; [
+        nvim-lspconfig
+        trouble-nvim
+        bufferline-nvim
+        toggleterm-nvim
+        feline-nvim
+        nvim-tree-lua
+        auto-save-nvim
+        telescope-nvim
+        nvim-treesitter.withAllGrammars
+        lazygit-nvim
+        auto-session
+        vim-move
+        nvim-cmp
+        cmp-nvim-lsp
+        markdown-preview-nvim
+        autoclose-nvim
+        pkgs.vimExtraPlugins.jupynium-nvim
+        vim-illuminate
+        (pkgs.vimUtils.buildVimPlugin {
+          name = "stickybuf-nvim";
+          src = pkgs.fetchFromGitHub {
+            owner = "stevearc";
+            repo = "stickybuf.nvim";
+            rev = "f3398f8639e903991acdf66e2d63de7a78fe708e";
+            sha256 = "sha256-+ZcfItAtidLMQKSGJcU6EBlHbgHQGs/InQYxMknjnzw=";
+          };
+        })
+      ];
+      extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ripgrep lazygit nodePackages.diagnostic-languageserver black wl-clipboard gcc tree-sitter ];
+    };
 
     # home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
     #   "nameShort": "VSCodium",
@@ -344,6 +357,9 @@ let
         hashicorp.hcl
         mechatroner.rainbow-csv
         janisdd.vscode-edit-csv
+        redhat.ansible
+        rebornix.ruby
+        wingrunr21.vscode-ruby
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         #htmlhint.vscode-htmlhint
         #visualstudioexptteam.vscodeintellicode
@@ -504,6 +520,7 @@ let
         "apklab.apktoolPath" = "${home.homeDirectory}/.apklab/apktool_2.8.1.jar";
         "apklab.jadxDirPath" = "${home.homeDirectory}/.apklab/jadx-1.4.7";
         "terminal.integrated.enablePersistentSessions" = false;
+        "ruby.useLanguageServer" = true;
       };
     };
 
@@ -648,6 +665,8 @@ let
     home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
     home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
     home.file.".local/flatpak/docker".source = ./normal-spawn.sh;
+    home.file.".local/flatpak/ansible-lint".source = ./normal-spawn.sh;
+    home.file.".local/flatpak/ansible-config".source = ./normal-spawn.sh;
     home.file.".local/flatpak/ghc" = {
       text = "#!/usr/bin/env bash\nif [ -f default.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"ghc $(printf \"'%s' \" \"$@\")\" default.nix; else exec flatpak-spawn --host ghc \"$@\"; fi";
       executable = true;
@@ -769,7 +788,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.keepassxc.KeePassXC".text = ''
       [Context]
-      filesystems=!xdg-config/kdeglobals;!/tmp;/nix/store:ro;!host
+      filesystems=!xdg-config/kdeglobals;!/tmp;/nix/store:ro;!host;xdg-download
     '';
     home.file.".local/share/flatpak/overrides/org.pitivi.Pitivi".text = ''
       [Context]
@@ -976,15 +995,17 @@ let
         close = [ "<Super>q" ];
         # move-to-workspace-left = [ "<Alt>Left" ];
         # move-to-workspace-right = [ "<Alt>Right" ];
+        move-to-workspace-left = [ ];
+        move-to-workspace-right = [ ];
       };
       "org/gnome/desktop/wm/preferences" = {
         button-layout = ":close";
       };
       "org/gnome/mutter/keybindings" = {
-        # toggle-tiled-left = [ "<Control><Alt>Left" ];
-        # toggle-tiled-right = [ "<Control><Alt>Right" ];
-        toggle-tiled-left = [ ];
-        toggle-tiled-right = [ ];
+        toggle-tiled-left = [ "<Control><Alt>Left" ];
+        toggle-tiled-right = [ "<Control><Alt>Right" ];
+        # toggle-tiled-left = [ ];
+        # toggle-tiled-right = [ ];
       };
       "org/gnome/settings-daemon/plugins/color" = {
         night-light-enabled = true;
@@ -1024,6 +1045,7 @@ let
           "espresso@coadmunkee.github.com"
           "burn-my-windows@schneegans.github.com"
           "Resource_Monitor@Ory0n"
+          "cronomix@zagortenay333"
         ];
         favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Console.desktop" ];
       };
