@@ -55,3 +55,5 @@ nix --extra-experimental-features nix-command --extra-experimental-features flak
 nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#home-manager -- switch --flake . -b backup
 
 sudo rpm-ostree install gnome-console libvirt libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm
+
+nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs

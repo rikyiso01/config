@@ -36,7 +36,6 @@ let
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.burn-my-windows
       gnomeExtensions.resource-monitor
-      gnomeExtensions.cronomix
       fira-code
       rust-analyzer
       rustfmt
@@ -59,7 +58,6 @@ let
       brightnessctl
       traceroute
       poetry
-      pypy3
       xdg-ninja
       python311Packages.ipython
       (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
@@ -150,7 +148,6 @@ let
         wget = "wget --hsts-file=$XDG_DATA_HOME/wget-hsts";
         zip = "7z a";
         unzip = "7z x";
-        python = "pypy3";
       };
       history.path = "${config.xdg.dataHome}/zsh/zsh_history";
       dotDir = ".config/zsh";
@@ -168,10 +165,6 @@ let
         plugins = [ "git" "sudo" ];
       };
     };
-
-    # programs.tmux = {
-    #   enable = true;
-    # };
 
     programs.neovim = {
       enable = true;
@@ -537,7 +530,9 @@ let
     nix.settings = {
       auto-optimise-store = true;
       auto-allocate-uids = true;
-      extra-nix-path = "nixpkgs=flake:nixpkgs";
+      #extra-nix-path = "nixpkgs=flake:nixpkgs";
+      extra-nix-path = "${home.homeDirectory}/.nix-defexpr/channels";
+      max-jobs = "auto";
     };
 
     qt = {
@@ -585,7 +580,7 @@ let
           Description = "KeepassXC";
         };
         Service = {
-          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done;sleep 5; gio mount google-drive://riky.isola@gmail.com; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
+          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
         };
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
@@ -639,7 +634,7 @@ let
       ],
       "description": "KeePassXC integration with native messaging support",
       "name": "org.keepassxc.keepassxc_browser",
-      "path": "${home.homeDirectory}/.local/flatpak/org.keepassxc.KeePassXC",
+      "path": "${./keepassxc-proxy}",
       "type": "stdio"
       }
     '';
@@ -662,11 +657,8 @@ let
     };
 
     home.file.".local/flatpak/git".source = ./normal-spawn.sh;
-    home.file.".local/flatpak/org.keepassxc.KeePassXC".source = ./normal-spawn.sh;
     home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
     home.file.".local/flatpak/docker".source = ./normal-spawn.sh;
-    home.file.".local/flatpak/ansible-lint".source = ./normal-spawn.sh;
-    home.file.".local/flatpak/ansible-config".source = ./normal-spawn.sh;
     home.file.".local/flatpak/ghc" = {
       text = "#!/usr/bin/env bash\nif [ -f default.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"ghc $(printf \"'%s' \" \"$@\")\" default.nix; else exec flatpak-spawn --host ghc \"$@\"; fi";
       executable = true;
@@ -684,7 +676,6 @@ let
       executable = true;
     };
     home.file.".local/flatpak/brave" = {
-      #text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sf \"$HOME/.local/nix-sources/policy.json\" /etc/brave/policies/managed/policy.yml && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark --incognito \"$@\"";
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat --incognito \"$@\"";
       executable = true;
     };
@@ -719,10 +710,6 @@ let
       [Context]
       filesystems=!xdg-download
     '';
-    home.file.".local/share/flatpak/overrides/com.visualstudio.code".text = ''
-      [Context]
-      filesystems=!xdg-config/kdeglobals;!xdg-config/gtk-3.0;!host
-    '';
     home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = ''
       [Context]
       filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host;xdg-documents
@@ -741,13 +728,10 @@ let
     '';
     home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
       [Context]
-      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/nix-sources/policy.json:ro;~/.local/flatpak:ro;~/.nix-profile:ro
+      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro;!xdg-desktop;!~/.local/share/icons;!xdg-run/dconf;!~/.config/dconf;!~/.config/kioslaverc;!~/.local/share/applications
 
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-
-      [Session Bus Policy]
-      org.freedesktop.Flatpak=talk
     '';
     home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
       [Context]
@@ -784,10 +768,12 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.gnome.Totem".text = ''
       [Context]
+      devices=!all
       filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/run/media;!xdg-videos;!xdg-pictures;!xdg-download
     '';
     home.file.".local/share/flatpak/overrides/org.keepassxc.KeePassXC".text = ''
       [Context]
+      devices=!all;dri
       filesystems=!xdg-config/kdeglobals;!/tmp;/nix/store:ro;!host;xdg-download
     '';
     home.file.".local/share/flatpak/overrides/org.pitivi.Pitivi".text = ''
@@ -797,6 +783,7 @@ let
     home.file.".local/share/flatpak/overrides/org.remmina.Remmina".text = ''
       [Context]
       filesystems=!xdg-download;!xdg-run/gvfsd;~/.ssh;!home
+      devices=!all;dri
     '';
     home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = ''
       [Context]
@@ -838,35 +825,6 @@ let
       LockDatabaseScreenLock=false
     '';
 
-    # home.file.".local/nix-sources/policy.json".text = builtins.toJSON {
-    #   DefaultSearchProviderEnabled = true;
-    #   DefaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
-    #   DefaultSearchProviderIconURL = "https://duckduckgo.com/favicon.ico";
-    #   DefaultSearchProviderName = "DuckDuckGo";
-    #   DefaultSearchProviderKeyword = "duckduckgo.com";
-    #   DefaultSearchProviderSuggestURL = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
-    #   PasswordManagerEnabled = false;
-    #   AutofillAddressEnabled = false;
-    #   PaymentMethodQueryEnabled = false;
-    #   HighEfficiencyModeEnabled = true;
-    #   BookmarkBarEnabled = true;
-    #   BackgroundModeEnabled = false;
-    #   AlwaysOpenPdfExternally = true;
-    #   BraveRewardsDisabled = true;
-    #   BraveWalletDisabled = true;
-    #   BraveShieldsDisabledForUrls = [ "https://duckduckgo.com" ];
-    #   IPFSEnabled = false;
-    #   ExtensionInstallForcelist = [
-    #     "ddkjiahejlhfcafbddmgiahcphecmpfh" # Ublock lite
-    #     "oboonakemofpalcgghocfoadofidjkkk" # KeepassXC
-    #     "lmjnegcaeklhafolokijcfjliaokphfk" # Video Download Helper
-    #     "fnaicdffflnofjppbagibeoednhnbjhg" # Floccus
-    #     "mpbjkejclgfgadiemmefgebjfooflfhl" # Buster
-    #     "ceipnlhmjohemhfpbjdgeigkababhmjc" # I'm not a robot
-    #     "dpplndkoilcedkdjicmbeoahnckdcnle" # 123Apps
-    #   ];
-    # };
-
     home.file.".local/nix-sources/flatpak.json".text = builtins.toJSON
       {
         flathub = {
@@ -905,7 +863,6 @@ let
             "org.freedesktop.Sdk//22.08"
             "org.freedesktop.Platform//22.08"
             "org.remmina.Remmina"
-            "com.github.micahflee.torbrowser-launcher"
             "com.brave.Browser"
             "org.gnome.SimpleScan"
             "io.github.flattool.Warehouse"
@@ -919,9 +876,6 @@ let
           url = "file://${home.homeDirectory}/.local/flatpak-repo";
           packages = [
             "org.tlauncher.TLauncher"
-            #"org.chromium.Chromium.Extension.KeepassXC"
-            #"org.chromium.Chromium.Extension.VideoDownloadHelper"
-            #"org.chromium.Chromium.Extension.Policy"
           ];
         };
       };
@@ -1045,7 +999,6 @@ let
           "espresso@coadmunkee.github.com"
           "burn-my-windows@schneegans.github.com"
           "Resource_Monitor@Ory0n"
-          "cronomix@zagortenay333"
         ];
         favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Console.desktop" ];
       };
