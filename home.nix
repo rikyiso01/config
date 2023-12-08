@@ -64,6 +64,9 @@ let
       glab
       ansible
       ansible-lint
+      dhall-lsp-server
+      ruby
+      rubyPackages.ruby-lsp
     ];
 
     programs.git = {
@@ -351,8 +354,12 @@ let
         mechatroner.rainbow-csv
         janisdd.vscode-edit-csv
         redhat.ansible
-        rebornix.ruby
-        wingrunr21.vscode-ruby
+        shopify.ruby-lsp
+        dhall.vscode-dhall-lsp-server
+        dhall.dhall-lang
+        bpruitt-goddard.mermaid-markdown-syntax-highlighting
+        tomoyukim.vscode-mermaid-editor
+        codeium.codeium
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         #htmlhint.vscode-htmlhint
         #visualstudioexptteam.vscodeintellicode
@@ -513,7 +520,7 @@ let
         "apklab.apktoolPath" = "${home.homeDirectory}/.apklab/apktool_2.8.1.jar";
         "apklab.jadxDirPath" = "${home.homeDirectory}/.apklab/jadx-1.4.7";
         "terminal.integrated.enablePersistentSessions" = false;
-        "ruby.useLanguageServer" = true;
+        "ansible.python.interpreterPath" = "${pkgs.python3}/bin/python3";
       };
     };
 
@@ -659,6 +666,10 @@ let
     home.file.".local/flatpak/git".source = ./normal-spawn.sh;
     home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
     home.file.".local/flatpak/docker".source = ./normal-spawn.sh;
+    home.file.".local/flatpak/ruby" = {
+      text = "#!/usr/bin/env bash\nexec flatpak-spawn --host nix-shell -p gnumake libyaml --run \"ruby $(printf \"'%s' \" \"$@\")\"";
+      executable = true;
+    };
     home.file.".local/flatpak/ghc" = {
       text = "#!/usr/bin/env bash\nif [ -f default.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"ghc $(printf \"'%s' \" \"$@\")\" default.nix; else exec flatpak-spawn --host ghc \"$@\"; fi";
       executable = true;
@@ -712,7 +723,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = ''
       [Context]
-      filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host;xdg-documents
+      filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host;xdg-documents;${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.codeium.codeium}/share/vscode/extensions/codeium.codeium/dist:rw
 
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin
@@ -1047,6 +1058,7 @@ let
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         ${./flatpak-switch.py}
+        chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.codeium.codeium}/share/vscode/extensions/codeium.codeium/dist
       '';
     };
   };
