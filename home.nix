@@ -521,6 +521,7 @@ let
         "apklab.jadxDirPath" = "${home.homeDirectory}/.apklab/jadx-1.4.7";
         "terminal.integrated.enablePersistentSessions" = false;
         "ansible.python.interpreterPath" = "${pkgs.python3}/bin/python3";
+        "codeium.useSecretStorage" = false;
       };
     };
 
@@ -687,7 +688,7 @@ let
       executable = true;
     };
     home.file.".local/flatpak/brave" = {
-      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat --incognito \"$@\"";
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat \"$@\"";
       executable = true;
     };
     home.file.".local/flatpak/host-spawn".source = ./host-spawn;
@@ -724,6 +725,7 @@ let
     home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = ''
       [Context]
       filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host;xdg-documents;${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.codeium.codeium}/share/vscode/extensions/codeium.codeium/dist:rw
+      persistent=.codeium
 
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin
