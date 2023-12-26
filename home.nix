@@ -67,6 +67,10 @@ let
       dhall-lsp-server
       ruby
       rubyPackages.ruby-lsp
+      devbox
+      ddgr
+      pre-commit
+      tmux
     ];
 
     programs.git = {
@@ -103,6 +107,7 @@ let
       LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
       NODE_REPL_HISTORY = "${config.xdg.dataHome}/node_repl_history";
       _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${config.xdg.configHome}/java";
+      NIXOS_OZONE_WL = "1";
     };
 
     fonts.fontconfig.enable = true;
@@ -174,8 +179,12 @@ let
       extraLuaConfig = ''
                 vim.opt.termguicolors = true
                 local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities}
+                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,settings={python={analysis={typeCheckingMode="strict",stubPath="/var/home/riky/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
                 require'lspconfig'.rnix.setup{capabilities=lsp_capabilities}
+                require'lspconfig'.ansiblels.setup{}
+                require'lspconfig'.bashls.setup{}
+                require'lspconfig'.dockerls.setup{}
+                require'lspconfig'.yamlls.setup{}
                 require("bufferline").setup{}
                 require("toggleterm").setup{open_mapping=[[<C-t>]]}
                 require('feline').setup()
@@ -183,10 +192,24 @@ let
                 require("auto-session").setup{}
                 require("autoclose").setup()
                 require("stickybuf").setup()
+                require("conform").setup{
+                    formatters_by_ft={
+                            python={"black"},
+                        },
+                }
                 require("auto-save").setup{enabled=true,trigger_events={"BufLeave"}}
                 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
                 local cmp=require("cmp")
                 cmp.setup{
+                snippet = {
+                      -- REQUIRED - you must specify a snippet engine
+                      expand = function(args)
+                        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+                        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+                        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+                        -- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
+                      end,
+                    },
                     sources={{name="nvim_lsp",keyword_length=1},},
                     window={
                         completion={
@@ -218,24 +241,9 @@ let
                 vim.g.loaded_netrwPlugin = 1
                 vim.opt.incsearch = true
                 vim.opt.shortmess:remove({ 'S' })
-                vim.opt.clipboard = "unnamedplus"
-                vim.api.nvim_create_autocmd('BufWritePre', {
-                  buffer = vim.fn.bufnr(),
-                  callback = function()
-        	        vim.lsp.buf.format({ timeout_ms = 3000 })
-        	      end,
-                })
-                vim.api.nvim_create_autocmd(
-                    "BufWritePost",
-                    {
-                        pattern = "*.py",
-                        callback = function()
-                            vim.cmd("silent !black --quiet %")            
-                            vim.cmd("edit")
-                        end,
-                    }
-                )
-        	    vim.keymap.set('n', '<C-b>', '<cmd>NvimTreeToggle<cr>')
+                vim.opt.clipboard = "unnamedplus" 
+        	    vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<cr>')
+        	    vim.keymap.set('n', '<C-i>', '<cmd>lua require"conform".format()<cr>')
         	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
         	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
         	    vim.keymap.set('n', "<C-g>", '<cmd>LazyGit<cr>')
@@ -253,6 +261,10 @@ let
                 end
                 vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()') 
                 vim.env.NVIM_SERVER=vim.v.servername
+                vim.api.nvim_set_hl(0, 'FloatBorder', {bg='#3B4252', fg='#5E81AC'})
+                vim.api.nvim_set_hl(0, 'NormalFloat', {bg='#3B4252'})
+                vim.api.nvim_set_hl(0, 'TelescopeNormal', {bg='#3B4252'})
+                vim.api.nvim_set_hl(0, 'TelescopeBorder', {bg='#3B4252'})
       '';
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -273,6 +285,9 @@ let
         autoclose-nvim
         pkgs.vimExtraPlugins.jupynium-nvim
         vim-illuminate
+        conform-nvim
+        ansible-vim
+        vim-vsnip
         (pkgs.vimUtils.buildVimPlugin {
           name = "stickybuf-nvim";
           src = pkgs.fetchFromGitHub {
@@ -283,7 +298,21 @@ let
           };
         })
       ];
-      extraPackages = with pkgs; [ nodePackages.pyright rnix-lsp ripgrep lazygit nodePackages.diagnostic-languageserver black wl-clipboard gcc tree-sitter ];
+      extraPackages = with pkgs; [
+        nodePackages.pyright
+        rnix-lsp
+        ripgrep
+        lazygit
+        nodePackages.diagnostic-languageserver
+        black
+        wl-clipboard
+        gcc
+        tree-sitter
+        ansible-language-server
+        nodePackages.bash-language-server
+        dockerfile-language-server-nodejs
+        yaml-language-server
+      ];
     };
 
     # home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
@@ -300,7 +329,7 @@ let
       enable = true;
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
-      package = pkgs.runCommandLocal "no-vscode" { pname = "vscode"; version = "1.79.1"; } "mkdir $out";
+      # package = pkgs.runCommandLocal "no-vscode" { pname = "vscode"; version = "1.79.1"; } "mkdir $out";
       extensions = (with nix-vscode-extensions.extensions.x86_64-linux.open-vsx; [
         mads-hartmann.bash-ide-vscode
         jeff-hykin.better-cpp-syntax
@@ -347,7 +376,7 @@ let
         redhat.vscode-yaml
         hbenl.test-adapter-converter
         llvm-vs-code-extensions.vscode-clangd
-        ms-pyright.pyright
+        # ms-pyright.pyright
         surendrajat.apklab
         loyieking.smalise
         hashicorp.hcl
@@ -360,10 +389,13 @@ let
         bpruitt-goddard.mermaid-markdown-syntax-highlighting
         tomoyukim.vscode-mermaid-editor
         codeium.codeium
+        mkhl.direnv
+        charliermarsh.ruff
+        aaron-bond.better-comments
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         #htmlhint.vscode-htmlhint
-        #visualstudioexptteam.vscodeintellicode
-        #ms-python.vscode-pylance
+        visualstudioexptteam.vscodeintellicode
+        ms-python.vscode-pylance
       ]);
       keybindings = [
         {
@@ -403,7 +435,7 @@ let
         "python.formatting.provider" = "none";
         "explorer.confirmDragAndDrop" = false;
         "git.confirmSync" = false;
-        "python.languageServer" = "Jedi";
+        # "python.languageServer" = "Jedi";
         "git.autofetch" = true;
         "python.analysis.typeCheckingMode" = "strict";
         "editor.formatOnSave" = true;
@@ -522,6 +554,11 @@ let
         "terminal.integrated.enablePersistentSessions" = false;
         "ansible.python.interpreterPath" = "${pkgs.python3}/bin/python3";
         "codeium.useSecretStorage" = false;
+        "python.analysis.stubPath" = "/var/home/riky/backup/Documents/Projects/Python/common-stubs";
+        "python.analysis.extraPaths" = [
+          "typings"
+        ];
+        "python.analysis.autoImportCompletions" = true;
       };
     };
 
@@ -1013,7 +1050,7 @@ let
           "burn-my-windows@schneegans.github.com"
           "Resource_Monitor@Ory0n"
         ];
-        favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "com.vscodium.codium.desktop" "org.gnome.Console.desktop" ];
+        favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "code.desktop" "org.gnome.Console.desktop" ];
       };
       "org/gnome/desktop/privacy" = {
         remove-old-trash-files = true;
@@ -1061,6 +1098,9 @@ let
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         ${./flatpak-switch.py}
         chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.codeium.codeium}/share/vscode/extensions/codeium.codeium/dist
+        chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
+        mkdir -p ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
+        chmod -w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
       '';
     };
   };

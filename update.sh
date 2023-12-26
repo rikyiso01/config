@@ -10,4 +10,4 @@ home-manager switch --flake .
 
 flatpak update -y
 
-sudo rpm-ostree upgrade
+rpm-ostree upgrade

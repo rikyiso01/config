@@ -2,6 +2,6 @@
 
 set -euo pipefail
 
-#docker system prune -a --volumes -f
+podman system prune -a --volumes -f
 nix-store --gc
 nix-store --optimise
