@@ -54,6 +54,9 @@ nix --extra-experimental-features nix-command --extra-experimental-features flak
 nix --extra-experimental-features nix-command --extra-experimental-features flakes profile remove 0
 nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#home-manager -- switch --flake . -b backup
 
-sudo rpm-ostree install gnome-console libvirt libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm
+sudo rpm-ostree install libvirt libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm
+
+grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
+sudo usermod -aG libvirt $USER
 
 nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs

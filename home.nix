@@ -15,12 +15,10 @@ let
 
     # Packages that should be installed to the user profile.
     home.packages = with pkgs; [
+      perl
       tldr
       man-pages
       man-pages-posix
-      perl
-      docker
-      docker-compose
       du-dust
       fd
       procs
@@ -35,42 +33,26 @@ let
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.burn-my-windows
-      gnomeExtensions.resource-monitor
+      gnomeExtensions.system-monitor-tray-indicator
       fira-code
-      rust-analyzer
-      rustfmt
-      cargo
       php
       powertop
-      maven
       micro
-      nodePackages.pnpm
-      nodejs-slim
-      shellcheck
       android-tools
       nmap
-      haskell-language-server
       exiftool
       imagemagick
-      jdk
-      inotify-tools
-      nixpkgs-fmt
+      jre
       brightnessctl
       traceroute
-      poetry
       xdg-ninja
       python311Packages.ipython
-      (haskellPackages.ghcWithPackages (pkgs: [ pkgs.turtle ]))
-      glab
-      ansible
-      ansible-lint
-      dhall-lsp-server
-      ruby
-      rubyPackages.ruby-lsp
       devbox
       ddgr
       pre-commit
       tmux
+      gnome-console
+      git-ignore
     ];
 
     programs.git = {
@@ -315,21 +297,10 @@ let
       ];
     };
 
-    # home.file.".var/app/com.vscodium.codium/config/VSCodium/product.json".text = ''{
-    #   "nameShort": "VSCodium",
-    #   "nameLong": "Visual Studio Code",
-    #   "extensionsGallery": {
-    #   "serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
-    #   "cacheUrl": "https://vscode.blob.core.windows.net/gallery/index",
-    #   "itemUrl": "https://marketplace.visualstudio.com/items"
-    #   }
-    #   }'';
-
     programs.vscode = {
       enable = true;
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
-      # package = pkgs.runCommandLocal "no-vscode" { pname = "vscode"; version = "1.79.1"; } "mkdir $out";
       extensions = (with nix-vscode-extensions.extensions.x86_64-linux.open-vsx; [
         mads-hartmann.bash-ide-vscode
         jeff-hykin.better-cpp-syntax
@@ -375,8 +346,6 @@ let
         redhat.vscode-xml
         redhat.vscode-yaml
         hbenl.test-adapter-converter
-        llvm-vs-code-extensions.vscode-clangd
-        # ms-pyright.pyright
         surendrajat.apklab
         loyieking.smalise
         hashicorp.hcl
@@ -388,14 +357,14 @@ let
         dhall.dhall-lang
         bpruitt-goddard.mermaid-markdown-syntax-highlighting
         tomoyukim.vscode-mermaid-editor
-        codeium.codeium
         mkhl.direnv
-        charliermarsh.ruff
         aaron-bond.better-comments
+        ms-vscode.makefile-tools
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
-        #htmlhint.vscode-htmlhint
+        htmlhint.vscode-htmlhint
         visualstudioexptteam.vscodeintellicode
         ms-python.vscode-pylance
+        ms-vscode.cpptools
       ]);
       keybindings = [
         {
@@ -435,13 +404,12 @@ let
         "python.formatting.provider" = "none";
         "explorer.confirmDragAndDrop" = false;
         "git.confirmSync" = false;
-        # "python.languageServer" = "Jedi";
         "git.autofetch" = true;
         "python.analysis.typeCheckingMode" = "strict";
         "editor.formatOnSave" = true;
         "git.enableCommitSigning" = true;
         "update.mode" = "none";
-        "rust-analyzer.server.path" = "${home.homeDirectory}/.local/flatpak/rust-analyzer";
+        "rust-analyzer.server.path" = "${pkgs.rust-analyzer}/bin/rust-analyzer";
         "github.gitProtocol" = "ssh";
         "editor.fontFamily" = "'Fira Code'";
         "editor.linkedEditing" = true;
@@ -470,7 +438,7 @@ let
         "[jsonc]" = {
           "editor.defaultFormatter" = "vscode.json-language-features";
         };
-        "python.defaultInterpreterPath" = "/bin/python3";
+        "python.defaultInterpreterPath" = "${pkgs.python3}/bin/python3";
         "explorer.confirmDelete" = false;
         "terminal.integrated.enableMultiLinePasteWarning" = false;
         "git.autoStash" = true;
@@ -503,29 +471,13 @@ let
         "[yaml]" = {
           "editor.defaultFormatter" = "redhat.vscode-yaml";
         };
-        "terminal.integrated.profiles.linux" = {
-          "zsh" = {
-            "path" = "${home.homeDirectory}/.local/flatpak/host-spawn";
-            "icon" = "terminal-bash";
-            "args" = [
-              "/usr/bin/bash"
-            ];
-            "overrideName" = true;
-          };
-          "sh" = {
-            "path" = "/bin/sh";
-            "icon" = "terminal-linux";
-          };
-        };
-        "terminal.integrated.defaultProfile.linux" = "zsh";
-        "terminal.integrated.shellIntegration.enabled" = false;
         "[dockerfile]" = {
           "editor.defaultFormatter" = "ms-azuretools.vscode-docker";
         };
         "java.configuration.runtimes" = [
           {
             "name" = "JavaSE-19";
-            "path" = "${home.homeDirectory}/.nix-profile/lib/openjdk";
+            "path" = "${pkgs.jdk19}/lib/openjdk";
             "default" = true;
           }
         ];
@@ -545,20 +497,22 @@ let
         ];
         "haskell.manageHLS" = "PATH";
         "window.zoomLevel" = 1;
-        "vsintellicode.modelDownloadPath" = "${home.homeDirectory}/.var/app/com.vscodium.codium/data/codium/intellicode";
+        "vsintellicode.modelDownloadPath" = "${home.homeDirectory}/.config/Code/User/intellicode";
         "shellformat.path" = "${pkgs.shfmt}/bin/shfmt";
-        "clangd.path" = "${home.homeDirectory}/.var/app/com.vscodium.codium/config/VSCodium/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/16.0.2/clangd_16.0.2/bin/clangd";
-        "apklab.apkSignerPath" = "${home.homeDirectory}/.apklab/uber-apk-signer-1.3.0.jar";
-        "apklab.apktoolPath" = "${home.homeDirectory}/.apklab/apktool_2.8.1.jar";
-        "apklab.jadxDirPath" = "${home.homeDirectory}/.apklab/jadx-1.4.7";
+        "apklab.apkSignerPath" = "${home.homeDirectory}/.config/Code/User/apklab/uber-apk-signer-1.3.0.jar";
+        "apklab.apktoolPath" = "${home.homeDirectory}/.config/Code/User/apklab/apktool_2.8.1.jar";
+        "apklab.jadxDirPath" = "${home.homeDirectory}/.config/Code/User/apklab/jadx-1.4.7";
         "terminal.integrated.enablePersistentSessions" = false;
         "ansible.python.interpreterPath" = "${pkgs.python3}/bin/python3";
-        "codeium.useSecretStorage" = false;
         "python.analysis.stubPath" = "/var/home/riky/backup/Documents/Projects/Python/common-stubs";
-        "python.analysis.extraPaths" = [
-          "typings"
-        ];
+        "python.analysis.extraPaths" = [ "typings" ];
         "python.analysis.autoImportCompletions" = true;
+        "ansible.ansible.path" = "${pkgs.ansible}/bin/ansible";
+        "ansible.validation.lint.path" = "${pkgs.ansible-lint}/bin/ansible-lint";
+        "vscode-dhall-lsp-server.executable" = "${pkgs.dhall-lsp-server}/bin/dhall-lsp-server";
+        "rubyLsp.rubyVersionManager" = "custom";
+        "rubyLsp.customRubyCommand" = "${pkgs.ruby.withPackages (ps: with ps; [ ruby-lsp ])}/bin/ruby";
+        "nix.formatterPath" = "${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt";
       };
     };
 
@@ -576,7 +530,7 @@ let
       auto-optimise-store = true;
       auto-allocate-uids = true;
       #extra-nix-path = "nixpkgs=flake:nixpkgs";
-      extra-nix-path = "${home.homeDirectory}/.nix-defexpr/channels";
+      #extra-nix-path = "${home.homeDirectory}/.nix-defexpr/channels";
       max-jobs = "auto";
     };
 
@@ -649,7 +603,6 @@ let
 
     home.file.".gdbinit".text = "source ${pkgs.gef}/share/gef/gef.py";
     home.file."Templates/emptyfile.txt".text = "";
-    home.file."Templates/pwntools.py".source = ./pwntoolstemplate.py;
 
     home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
       { }
@@ -701,34 +654,10 @@ let
       executable = true;
     };
 
-    home.file.".local/flatpak/git".source = ./normal-spawn.sh;
-    home.file.".local/flatpak/chromium".source = ./normal-spawn.sh;
-    home.file.".local/flatpak/docker".source = ./normal-spawn.sh;
-    home.file.".local/flatpak/ruby" = {
-      text = "#!/usr/bin/env bash\nexec flatpak-spawn --host nix-shell -p gnumake libyaml --run \"ruby $(printf \"'%s' \" \"$@\")\"";
-      executable = true;
-    };
-    home.file.".local/flatpak/ghc" = {
-      text = "#!/usr/bin/env bash\nif [ -f default.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"ghc $(printf \"'%s' \" \"$@\")\" default.nix; else exec flatpak-spawn --host ghc \"$@\"; fi";
-      executable = true;
-    };
-    home.file.".local/flatpak/cabal-fmt" = {
-      text = "#!/usr/bin/env bash\nexec flatpak-spawn --host ${pkgs.haskellPackages.cabal-fmt.bin}/bin/cabal-fmt \"$@\"";
-      executable = true;
-    };
-    home.file.".local/flatpak/cargo" = {
-      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"cargo $*\"; else exec ${pkgs.cargo}/bin/cargo \"$@\"; fi";
-      executable = true;
-    };
-    home.file.".local/flatpak/rust-analyzer" = {
-      text = "#!/usr/bin/env bash\nif [ -f shell.nix ]; then exec flatpak-spawn --host nix-shell --pure --run \"rust-analyzer $*\"; else exec ${pkgs.rust-analyzer}/bin/rust-analyzer \"$@\"; fi";
-      executable = true;
-    };
     home.file.".local/flatpak/brave" = {
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat \"$@\"";
       executable = true;
     };
-    home.file.".local/flatpak/host-spawn".source = ./host-spawn;
 
     home.file.".local/share/flatpak/overrides/ca.desrt.dconf-editor".text = ''
       [Context]
@@ -758,14 +687,6 @@ let
     home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
       [Context]
       filesystems=!xdg-download
-    '';
-    home.file.".local/share/flatpak/overrides/com.vscodium.codium".text = ''
-      [Context]
-      filesystems=!xdg-config/kdeglobals;/nix/store:ro;~/.nix-profile/bin:ro;~/.local/bin:ro;~/.local/flatpak:ro;~/.vscode/extensions:ro;xdg-config/Code/User:ro;!host;xdg-documents;${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.codeium.codeium}/share/vscode/extensions/codeium.codeium/dist:rw
-      persistent=.codeium
-
-      [Environment]
-      PATH=${home.homeDirectory}/.local/flatpak:${home.homeDirectory}/.local/bin:${home.homeDirectory}/.nix-profile/bin:/app/bin:/usr/bin
     '';
     home.file.".local/share/flatpak/overrides/io.dbeaver.DBeaverCommunity".text = ''
       [Context]
@@ -909,7 +830,6 @@ let
             "org.gnome.FileRoller"
             "org.gnome.Evince"
             "org.gnome.Loupe"
-            "com.vscodium.codium"
             "org.freedesktop.Sdk//22.08"
             "org.freedesktop.Platform//22.08"
             "org.remmina.Remmina"
@@ -974,7 +894,7 @@ let
         tap-to-click = true;
         two-finger-scrolling-enabled = true;
       };
-      "org/gnome/desktop/screensaver" = {
+      "org/gnome/desktop/background" = {
         color-shading-type = "solid";
         picture-options = "zoom";
         picture-uri = "file:///usr/share/backgrounds/gnome/adwaita-l.webp";
@@ -1048,7 +968,7 @@ let
           "AlphabeticalAppGrid@stuarthayhurst"
           "espresso@coadmunkee.github.com"
           "burn-my-windows@schneegans.github.com"
-          "Resource_Monitor@Ory0n"
+          "system-monitor-indicator@mknap.com"
         ];
         favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "code.desktop" "org.gnome.Console.desktop" ];
       };
@@ -1083,21 +1003,10 @@ let
         ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
         ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
         ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
-        rm -rf "$HOME/.var/app/com.vscodium.codium/data/codium/extensions"
-        mkdir -p "$HOME/.var/app/com.vscodium.codium/data/codium"
-        mkdir -p "$HOME/.var/app/com.vscodium.codium/config/VSCodium/User"
-        ln -sfT "$HOME/.vscode/extensions" "$HOME/.var/app/com.vscodium.codium/data/codium/extensions"
-        ln -sfT "$HOME/.config/Code/User/settings.json" "$HOME/.var/app/com.vscodium.codium/config/VSCodium/User/settings.json"
-        ln -sfT "$HOME/.config/Code/User/keybindings.json" "$HOME/.var/app/com.vscodium.codium/config/VSCodium/User/keybindings.json"
-        mkdir -p "$HOME/.local/share/applications"
-        for f in com.vscodium.codium com.vscodium.codium-url-handler; do
-            # sed -E 's:^(Exec=.*com\.vscodium\.codium)(.*)$:\1 --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto\2:' < "$HOME/.local/share/flatpak/exports/share/applications/$f.desktop" > "$HOME/.local/share/applications/$f.desktop"
-            sed -E 's:^(Exec=.*com\.vscodium\.codium)(.*)$:\1 --ozone-platform-hint=auto\2:' < "$HOME/.local/share/flatpak/exports/share/applications/$f.desktop" > "$HOME/.local/share/applications/$f.desktop"
-        done
+        
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         ${./flatpak-switch.py}
-        chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.codeium.codeium}/share/vscode/extensions/codeium.codeium/dist
         chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
         mkdir -p ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
         chmod -w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
