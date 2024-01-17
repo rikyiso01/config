@@ -3,9 +3,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-nix profile upgrade 0
+sudo -i nix upgrade-nix
 nix flake update
-nix-channel --update
 home-manager switch --flake .
 
 flatpak update -y

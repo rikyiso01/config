@@ -1,0 +1,3 @@
+- burning windows on first boot
+- background on first boot
+- backup system

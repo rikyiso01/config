@@ -7,6 +7,10 @@ let
   };
   homeManager = rec {
 
+    manual.html.enable = false;
+    manual.manpages.enable = false;
+    manual.json.enable = false;
+
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
     home.username = "riky";
@@ -53,6 +57,7 @@ let
       tmux
       gnome-console
       git-ignore
+      evtest
     ];
 
     programs.git = {
@@ -74,8 +79,9 @@ let
     home.sessionVariables = {
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      VISUAL = "micro";
-      EDITOR = "micro";
+      VISUAL = "${pkgs.micro}/bin/micro";
+      EDITOR = "${pkgs.micro}/bin/micro";
+      SUDO_EDITOR = "${pkgs.micro}/bin/micro";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
       CPATH = "${pkgs.opencl-headers}/include";
       LIBRARY_PATH = "${pkgs.ocl-icd}/lib";
@@ -109,7 +115,6 @@ let
       generateCaches = true;
     };
     programs.direnv.enable = true;
-    programs.direnv.nix-direnv.enable = true;
 
     programs.pandoc.enable = true;
 
@@ -120,21 +125,26 @@ let
 
     programs.bash = {
       enable = true;
-      initExtra = "[[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
+      initExtra = "PATH=$HOME/.local/bin:$PATH\n[[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
       historyFile = "${config.xdg.dataHome}/bash/bash_history";
     };
 
     programs.zsh = {
       enable = true;
       enableAutosuggestions = true;
-      initExtra = "source $HOME/.config/theme.zsh";
+      initExtra = ''
+        source $HOME/.config/theme.zsh
+        if [[ -n "$VSCODE_INJECTION" && -z "$VSCODE_TERMINAL_DIRENV_LOADED" && -f .envrc ]]; then
+          direnv reload
+          export VSCODE_TERMINAL_DIRENV_LOADED=1
+        fi
+        PATH=$HOME/.local/bin:$PATH'';
       shellAliases = {
         cat = "bat";
         du = "dust";
         find = "fd";
         ps = "procs";
         curl = "curlie";
-        sudo = "sudo env \"PATH=$PATH\"";
         wget = "wget --hsts-file=$XDG_DATA_HOME/wget-hsts";
         zip = "7z a";
         unzip = "7z x";
@@ -645,12 +655,9 @@ let
       Comment=Startup
       Type=Application
       Icon=nautilus'';
-    home.file.".local/bin/conservative".source = ./conservative.sh;
-    home.file.".local/bin/charge".source = ./charge.py;
     home.file.".local/bin/jupynvim".source = ./jupynvim.py;
-
-    home.file.".local/bin/chromium" = {
-      text = "#!/usr/bin/env bash\nexec flatpak run com.brave.Browser \"$@\"";
+    home.file.".local/bin/nix" = {
+      text = "#!/usr/bin/env bash\nLD_LIBRARY_PATH='' ${pkgs.nix}/bin/nix \"$@\"";
       executable = true;
     };
 
@@ -996,9 +1003,8 @@ let
         ln -sfT "$HOME/backup/id_ed25519" "$HOME/.ssh/id_ed25519"
         ln -sfT "$HOME/backup/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
         chmod 600 "$HOME/.ssh/id_ed25519"
-        mkdir -p "$HOME/.var/app/org.tlauncher.TLauncher/.tlauncher"
+        mkdir -p "$HOME/.var/app/org.tlauncher.TLauncher"
         ln -sfT "$HOME/backup/Games/Minecraft/tlauncher" "$HOME/.var/app/org.tlauncher.TLauncher/.tlauncher"
-        mkdir -p "$HOME/.var/app/org.tlauncher.TLauncher/.minecraft"
         ln -sfT "$HOME/backup/Games/Minecraft/minecraft" "$HOME/.var/app/org.tlauncher.TLauncher/.minecraft"
         ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
         ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
@@ -1007,9 +1013,11 @@ let
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         ${./flatpak-switch.py}
-        chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
-        mkdir -p ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
-        chmod -w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
+        if [ ! -d ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp ]; then
+          sudo chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
+          sudo mkdir ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
+          sudo chmod -w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
+        fi
       '';
     };
   };

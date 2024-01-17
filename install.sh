@@ -3,60 +3,20 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-sudo setenforce Permissive
-sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
-sudo mkdir /var/lib/nix
-sudo chown "$USER:$USER" /var/lib/nix
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 
-echo "[Unit]
-Description=Enable mount points in / for ostree
-ConditionPathExists=!%f
-DefaultDependencies=no
-Requires=local-fs-pre.target
-After=local-fs-pre.target
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
-[Service]
-Type=oneshot
-ExecStartPre=chattr -i /
-ExecStart=mkdir -p '%f'
-ExecStopPost=chattr +i /" | sudo tee /etc/systemd/system/mkdir-rootfs@.service
+flatpak remote-delete --system fedora flathub
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub -y org.freedesktop.Sdk//22.08 org.freedesktop.Platform//22.08 org.freedesktop.Sdk.Extension.openjdk11/x86_64/22.08
 
-echo "[Unit]
-Description=Nix Package Manager
-DefaultDependencies=no
-After=mkdir-rootfs@nix.service
-Wants=mkdir-rootfs@nix.service
-Before=sockets.target
-After=ostree-remount.service
-BindsTo=var.mount
+nix run nixpkgs#home-manager -- switch --flake . -b backup
 
-[Mount]
-What=/var/lib/nix
-Where=/nix
-Options=bind
-Type=none
-
-[Install]
-WantedBy=local-fs.target" | sudo tee /etc/systemd/system/nix.mount
-
-sudo systemctl daemon-reload
-sudo systemctl enable nix.mount
-sudo systemctl start nix.mount
-
-sh <(curl -L https://nixos.org/nix/install) --no-daemon
-
-export PATH=~/.nix-profile/bin:$PATH
-
-flatpak install flathub -y org.freedesktop.Sdk//22.08 org.freedesktop.Platform//22.08
-
-nix-channel --remove nixpkgs
-nix --extra-experimental-features nix-command --extra-experimental-features flakes profile install nixpkgs#nix --priority 4
-nix --extra-experimental-features nix-command --extra-experimental-features flakes profile remove 0
-nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#home-manager -- switch --flake . -b backup
-
-sudo rpm-ostree install libvirt libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm
+sudo rpm-ostree --apply-live install libvirt libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm
+sudo systemctl enable libvirtd.socket virtqemud.socket virtstoraged.socket virtnetworkd.socket
 
 grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
 sudo usermod -aG libvirt $USER
 
-nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+secret-tool store --label='Keepass password' keepass password
