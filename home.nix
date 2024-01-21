@@ -125,7 +125,7 @@ let
 
     programs.bash = {
       enable = true;
-      initExtra = "PATH=$HOME/.local/bin:$PATH\n[[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
+      initExtra = "[[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
       historyFile = "${config.xdg.dataHome}/bash/bash_history";
     };
 
@@ -135,10 +135,9 @@ let
       initExtra = ''
         source $HOME/.config/theme.zsh
         if [[ -n "$VSCODE_INJECTION" && -z "$VSCODE_TERMINAL_DIRENV_LOADED" && -f .envrc ]]; then
-          direnv reload
+          # direnv reload
           export VSCODE_TERMINAL_DIRENV_LOADED=1
-        fi
-        PATH=$HOME/.local/bin:$PATH'';
+        fi'';
       shellAliases = {
         cat = "bat";
         du = "dust";
@@ -148,6 +147,8 @@ let
         wget = "wget --hsts-file=$XDG_DATA_HOME/wget-hsts";
         zip = "7z a";
         unzip = "7z x";
+        nix = "LD_LIBRARY_PATH='' nix";
+        devbox = "LD_LIBRARY_PATH='' devbox";
       };
       history.path = "${config.xdg.dataHome}/zsh/zsh_history";
       dotDir = ".config/zsh";
@@ -523,6 +524,9 @@ let
         "rubyLsp.rubyVersionManager" = "custom";
         "rubyLsp.customRubyCommand" = "${pkgs.ruby.withPackages (ps: with ps; [ ruby-lsp ])}/bin/ruby";
         "nix.formatterPath" = "${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt";
+        "haskell.serverEnvironment" = {
+          "PATH" = "${pkgs.busybox}/bin:${pkgs.ghc}/bin:${pkgs.haskellPackages.haskell-language-server}/bin";
+        };
       };
     };
 
@@ -536,13 +540,6 @@ let
     home.enableNixpkgsReleaseCheck = true;
 
     news.display = "show";
-    nix.settings = {
-      auto-optimise-store = true;
-      auto-allocate-uids = true;
-      #extra-nix-path = "nixpkgs=flake:nixpkgs";
-      #extra-nix-path = "${home.homeDirectory}/.nix-defexpr/channels";
-      max-jobs = "auto";
-    };
 
     qt = {
       enable = true;
@@ -589,7 +586,7 @@ let
           Description = "KeepassXC";
         };
         Service = {
-          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
+          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; cp \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\" ${home.homeDirectory}/backup/keepass.kdbx; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
         };
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
@@ -656,10 +653,6 @@ let
       Type=Application
       Icon=nautilus'';
     home.file.".local/bin/jupynvim".source = ./jupynvim.py;
-    home.file.".local/bin/nix" = {
-      text = "#!/usr/bin/env bash\nLD_LIBRARY_PATH='' ${pkgs.nix}/bin/nix \"$@\"";
-      executable = true;
-    };
 
     home.file.".local/flatpak/brave" = {
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat \"$@\"";
@@ -994,12 +987,10 @@ let
     };
 
     nix.package = pkgs.nix;
-    nix.settings = {
-      experimental-features = [ "nix-command" "flakes" "auto-allocate-uids" ];
-    };
 
     home.activation = {
       setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        rmdir "$HOME/Documents" > /dev/null 2> /dev/null || true
         ln -sfT "$HOME/backup/id_ed25519" "$HOME/.ssh/id_ed25519"
         ln -sfT "$HOME/backup/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
         chmod 600 "$HOME/.ssh/id_ed25519"
@@ -1012,11 +1003,10 @@ let
         
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
-        ${./flatpak-switch.py}
+        ${pkgs.python3}/bin/python3 ${./flatpak-switch.py}
         if [ ! -d ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp ]; then
-          sudo chmod +w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
           sudo mkdir ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
-          sudo chmod -w ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter
+          sudo chown $USER:$USER ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
         fi
       '';
     };
