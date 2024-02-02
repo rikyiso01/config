@@ -371,6 +371,7 @@ let
         mkhl.direnv
         aaron-bond.better-comments
         ms-vscode.makefile-tools
+        vscodevim.vim
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         htmlhint.vscode-htmlhint
         visualstudioexptteam.vscodeintellicode
@@ -405,6 +406,10 @@ let
           "key" = "up";
           "command" = "-editor.action.scrollUpHover";
           "when" = "editorHoverFocused";
+        }
+        {
+          "command" = "explorer.newFile";
+          "key" = "ctrl+n";
         }
       ];
       mutableExtensionsDir = false;
@@ -830,27 +835,21 @@ let
             "org.gnome.FileRoller"
             "org.gnome.Evince"
             "org.gnome.Loupe"
-            "org.freedesktop.Sdk//22.08"
-            "org.freedesktop.Platform//22.08"
             "org.remmina.Remmina"
             "com.brave.Browser"
             "org.gnome.SimpleScan"
             "io.github.flattool.Warehouse"
+            "app.moosync.moosync"
+            "org.polymc.PolyMC"
+            "org.gimp.GIMP"
           ];
         };
-        flathub-beta = {
-          url = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
-          packages = [ "org.gimp.GIMP" ];
-        };
-        local = {
-          url = "file://${home.homeDirectory}/.local/flatpak-repo";
-          packages = [
-            "org.tlauncher.TLauncher"
-          ];
-        };
+        # flathub-beta = {
+        #   url = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
+        #   packages = [ "org.gimp.GIMP" ];
+        # };
       };
 
-    home.file.".local/nix-sources/tlauncher.yml" = create_flatpak ./tlauncher.yml;
     home.file.".local/nix-sources/powertop.hs" = {
       source = ./powertop.hs;
       onChange = ''
@@ -994,9 +993,6 @@ let
         ln -sfT "$HOME/backup/id_ed25519" "$HOME/.ssh/id_ed25519"
         ln -sfT "$HOME/backup/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
         chmod 600 "$HOME/.ssh/id_ed25519"
-        mkdir -p "$HOME/.var/app/org.tlauncher.TLauncher"
-        ln -sfT "$HOME/backup/Games/Minecraft/tlauncher" "$HOME/.var/app/org.tlauncher.TLauncher/.tlauncher"
-        ln -sfT "$HOME/backup/Games/Minecraft/minecraft" "$HOME/.var/app/org.tlauncher.TLauncher/.minecraft"
         ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
         ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
         ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
@@ -1007,6 +1003,9 @@ let
         if [ ! -d ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp ]; then
           sudo mkdir ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
           sudo chown $USER:$USER ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
+        fi
+        if [[ ! -x ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/bin/cpptools ]]; then
+          sudo chmod +x ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/bin/* ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/LLVM/bin/* ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/*
         fi
       '';
     };
