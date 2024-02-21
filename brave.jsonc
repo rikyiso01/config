@@ -1,0 +1,28 @@
+{
+    "BraveShieldsDisabledForUrls": [
+        "https://duckduckgo.com"
+    ],
+    "BraveWalletDisabled": true,
+    "BraveRewardsDisabled": true,
+    "BraveVPNDisabled": true,
+    "DefaultSearchProviderEnabled": true,
+    "DefaultSearchProviderName": "DuckDuckGo",
+    "DefaultSearchProviderSearchURL": "https://duckduckgo.com/?q={searchTerms}",
+    "DefaultSearchProviderSuggestURL": "https://duckduckgo.com/?q={searchTerms}",
+    "ExtensionInstallForcelist": [
+        "ceipnlhmjohemhfpbjdgeigkababhmjc", //notarobot
+        "dbepggeogbaibhgnhhndojpepiihcmeb", //vimium
+        "fnaicdffflnofjppbagibeoednhnbjhg", //floccus
+        "lmjnegcaeklhafolokijcfjliaokphfk", //downloadhelper
+        "mpbjkejclgfgadiemmefgebjfooflfhl", //Buster
+        "oboonakemofpalcgghocfoadofidjkkk" //keepassxc
+    ],
+    "RestoreOnStartup": 5,
+    "BatterySaverModeAvailability": 1,
+    "PasswordManagerEnabled": false,
+    "DnsOverHttpsTemplates": "https://dns.nextdns.io",
+    "DnsOverHttpsMode": "automatic",
+    "HttpsOnlyMode": "force_enabled",
+    "AutofillCreditCardEnabled": false,
+    "AutofillAddressEnabled": false,
+}

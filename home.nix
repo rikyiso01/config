@@ -38,6 +38,7 @@ let
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.burn-my-windows
       gnomeExtensions.system-monitor-tray-indicator
+      gnomeExtensions.stopwatch
       fira-code
       php
       powertop
@@ -73,6 +74,8 @@ let
         gpg.format = "ssh";
       };
     };
+
+    programs.lazygit.enable = true;
 
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
 
@@ -372,6 +375,7 @@ let
         aaron-bond.better-comments
         ms-vscode.makefile-tools
         vscodevim.vim
+        vscjava.vscode-gradle
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         htmlhint.vscode-htmlhint
         visualstudioexptteam.vscodeintellicode
@@ -410,6 +414,10 @@ let
         {
           "command" = "explorer.newFile";
           "key" = "ctrl+n";
+        }
+        {
+          "command" = "workbench.action.toggleMaximizedPanel";
+          "key" = "ctrl+shift+b";
         }
       ];
       mutableExtensionsDir = false;
@@ -532,6 +540,13 @@ let
         "haskell.serverEnvironment" = {
           "PATH" = "${pkgs.busybox}/bin:${pkgs.ghc}/bin:${pkgs.haskellPackages.haskell-language-server}/bin";
         };
+        "vim.handleKeys" = {
+          "<C-w>" = false;
+          "<C-k>" = false;
+          "<C-d>" = true;
+          "<C-s>" = false;
+          "<C-z>" = false;
+        };
       };
     };
 
@@ -585,13 +600,15 @@ let
       };
     };
 
+    services.syncthing.enable = true;
+
     systemd.user.services = {
       keepass = {
         Unit = {
           Description = "KeepassXC";
         };
         Service = {
-          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; gio mount google-drive://riky.isola@gmail.com; cp \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\" ${home.homeDirectory}/backup/keepass.kdbx; secret-tool lookup 'keepass' 'password' | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/google-drive:host=gmail.com,user=riky.isola/My Drive/keepass.kdbx\"'";
+          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; printf \"riky.isola@gmail.com\\n$(secret-tool lookup keepass davpassword)\\n\" | gio mount davs://use08.thegood.cloud/remote.php/webdav; cp \"/run/user/1000/gvfs/dav:host=use08.thegood.cloud,ssl=true,prefix=%%2Fremote.php%%2Fwebdav/keepass.kdbx\" ${home.homeDirectory}/backup/keepass.kdbx; secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/dav:host=use08.thegood.cloud,ssl=true,prefix=%%2Fremote.php%%2Fwebdav/keepass.kdbx\"'";
         };
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
@@ -660,7 +677,7 @@ let
     home.file.".local/bin/jupynvim".source = ./jupynvim.py;
 
     home.file.".local/flatpak/brave" = {
-      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark,AIChat \"$@\"";
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sfT ${./brave.jsonc} /etc/brave/policies/managed/brave.json && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
       executable = true;
     };
 
@@ -704,7 +721,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
       [Context]
-      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro;!xdg-desktop;!~/.local/share/icons;!xdg-run/dconf;!~/.config/dconf;!~/.config/kioslaverc;!~/.local/share/applications
+      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro;!xdg-desktop;!~/.local/share/icons;!xdg-run/dconf;!~/.config/dconf;!~/.config/kioslaverc;!~/.local/share/applications;!host-etc
 
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
@@ -842,6 +859,9 @@ let
             "app.moosync.moosync"
             "org.polymc.PolyMC"
             "org.gimp.GIMP"
+            "org.gnome.Calendar"
+            "org.onlyoffice.desktopeditors"
+            "org.gnome.Geary"
           ];
         };
         # flathub-beta = {
@@ -968,6 +988,7 @@ let
           "espresso@coadmunkee.github.com"
           "burn-my-windows@schneegans.github.com"
           "system-monitor-indicator@mknap.com"
+          "stopwatch@aliakseiz.github.com"
         ];
         favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "code.desktop" "org.gnome.Console.desktop" ];
       };
