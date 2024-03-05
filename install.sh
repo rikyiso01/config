@@ -16,3 +16,6 @@ grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
 sudo usermod -aG libvirt $USER
 
 secret-tool store --label='Keepass password' keepass password
+
+# nix run nixpkgs#rclone config
+# xdg-open http://127.0.0.1:8384

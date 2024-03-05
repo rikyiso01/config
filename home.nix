@@ -166,7 +166,7 @@ let
 
       oh-my-zsh = {
         enable = true;
-        plugins = [ "git" "sudo" ];
+        plugins = [ "git" ];
       };
     };
 
@@ -376,6 +376,7 @@ let
         ms-vscode.makefile-tools
         vscodevim.vim
         vscjava.vscode-gradle
+        ryanluker.vscode-coverage-gutters
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         htmlhint.vscode-htmlhint
         visualstudioexptteam.vscodeintellicode
@@ -603,12 +604,21 @@ let
     services.syncthing.enable = true;
 
     systemd.user.services = {
+      rclone = {
+        Unit = {
+          Description = "rclone";
+        };
+        Service = {
+          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; ${pkgs.rclone}/bin/rclone copy --update ${home.homeDirectory}/backup/Syncthing drive:Syncthing'";
+        };
+        Install = { WantedBy = [ "graphical-session.target" ]; };
+      };
       keepass = {
         Unit = {
           Description = "KeepassXC";
         };
         Service = {
-          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; printf \"riky.isola@gmail.com\\n$(secret-tool lookup keepass davpassword)\\n\" | gio mount davs://use08.thegood.cloud/remote.php/webdav; cp \"/run/user/1000/gvfs/dav:host=use08.thegood.cloud,ssl=true,prefix=%%2Fremote.php%%2Fwebdav/keepass.kdbx\" ${home.homeDirectory}/backup/keepass.kdbx; secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin \"/run/user/1000/gvfs/dav:host=use08.thegood.cloud,ssl=true,prefix=%%2Fremote.php%%2Fwebdav/keepass.kdbx\"'";
+          ExecStart = "bash -c 'sleep 1; secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx'";
         };
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
@@ -677,7 +687,7 @@ let
     home.file.".local/bin/jupynvim".source = ./jupynvim.py;
 
     home.file.".local/flatpak/brave" = {
-      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sfT ${./brave.jsonc} /etc/brave/policies/managed/brave.json && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sfT ${./brave.jsonc} /etc/brave/policies/managed/brave.json && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark -incognito \"$@\"";
       executable = true;
     };
 
@@ -693,8 +703,8 @@ let
     '';
     home.file.".local/share/flatpak/overrides/com.google.AndroidStudio".text = ''
       [Context]
-      filesystems=xdg-documents/Projects/Android;!host
-      persistent=.android;Android
+      filesystems=xdg-documents;!host
+      persistent=.android;Android;.local/share/gradle
 
       [Session Bus Policy]
       org.freedesktop.Flatpak=none
@@ -767,7 +777,7 @@ let
     home.file.".local/share/flatpak/overrides/org.keepassxc.KeePassXC".text = ''
       [Context]
       devices=!all;dri
-      filesystems=!xdg-config/kdeglobals;!/tmp;/nix/store:ro;!host;xdg-download
+      filesystems=!xdg-config/kdeglobals;!/tmp;/nix/store:ro;!host;xdg-download;~/backup/Syncthing
     '';
     home.file.".local/share/flatpak/overrides/org.pitivi.Pitivi".text = ''
       [Context]
@@ -859,9 +869,7 @@ let
             "app.moosync.moosync"
             "org.polymc.PolyMC"
             "org.gimp.GIMP"
-            "org.gnome.Calendar"
             "org.onlyoffice.desktopeditors"
-            "org.gnome.Geary"
           ];
         };
         # flathub-beta = {
@@ -945,19 +953,17 @@ let
         button-layout = ":close";
       };
       "org/gnome/mutter/keybindings" = {
-        toggle-tiled-left = [ "<Control><Alt>Left" ];
-        toggle-tiled-right = [ "<Control><Alt>Right" ];
-        # toggle-tiled-left = [ ];
-        # toggle-tiled-right = [ ];
+        # toggle-tiled-left = [ "<Control><Alt>Left" ];
+        # toggle-tiled-right = [ "<Control><Alt>Right" ];
       };
       "org/gnome/settings-daemon/plugins/color" = {
         night-light-enabled = true;
       };
       "org/gnome/settings-daemon/plugins/media-keys" = {
         # custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/" "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/" ];
-        next = [ "<Super>Right" ];
+        # next = [ "<Super>Right" ];
         play = [ "<Super>space" ];
-        previous = [ "<Super>Left" ];
+        # previous = [ "<Super>Left" ];
       };
       # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
       #   binding = "<Control><Alt>t";
