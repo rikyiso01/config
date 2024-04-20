@@ -8,7 +8,7 @@ let
   homeManager = rec {
 
     manual.html.enable = false;
-    manual.manpages.enable = false;
+    manual.manpages.enable = true;
     manual.json.enable = false;
 
     # Home Manager needs a bit of information about you and the
@@ -39,7 +39,9 @@ let
       gnomeExtensions.burn-my-windows
       gnomeExtensions.system-monitor-tray-indicator
       gnomeExtensions.stopwatch
+      gnomeExtensions.one-window-wonderland
       fira-code
+      fira-code-nerdfont
       php
       powertop
       micro
@@ -53,12 +55,23 @@ let
       xdg-ninja
       python311Packages.ipython
       devbox
-      ddgr
       pre-commit
-      tmux
       gnome-console
       git-ignore
       evtest
+      ascii
+      virt-manager
+      w3m
+      bluetuith
+      networkmanager
+      neofetch
+      pulseaudio
+      brightnessctl
+      playerctl
+      vbindiff
+      trash-cli
+      pipx
+      distrobox
     ];
 
     programs.git = {
@@ -75,7 +88,124 @@ let
       };
     };
 
+    programs.tmux = {
+      enable = true;
+      keyMode = "vi";
+      terminal = "tmux-256color";
+      mouse = true;
+      extraConfig = ''
+        bind-key -T copy-mode-vi 'v' send -X begin-selection
+        bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
+        bind '"' split-window -c "#{pane_current_path}"
+        bind % split-window -h -c "#{pane_current_path}"
+        bind c new-window -c "#{pane_current_path}"
+        set-window-option -g mode-keys vi
+        set-option -sa terminal-features ',foot:RGB'
+        set-option -sg escape-time 10
+      '';
+    };
+    programs.htop.enable = true;
+    programs.ranger = {
+      enable = true;
+      extraConfig = ''
+        map dT shell ${pkgs.trash-cli}/bin/trash-put %s
+        map dD shell ${pkgs.trash-cli}/bin/trash-put %s
+      '';
+    };
+    home.file.".config/ranger/rifle.conf".text = ''
+      !mime ^application/json|^text|^inode, flag f = xdg-open "$1"
+      label editor = "$EDITOR" -- "$@"
+      label pager  = "$PAGER" -- "$@"
+    '';
+    programs.foot = { enable = true; settings = { main = { shell = "${pkgs.tmux}/bin/tmux new-session 'exec ranger'"; font = "FiraCode Nerd Font Mono:size=16"; }; }; };
     programs.lazygit.enable = true;
+    wayland.windowManager.sway = {
+      enable = true;
+      config = {
+        bars = [{ statusCommand = "${pkgs.i3blocks}/bin/i3blocks"; }];
+        workspaceLayout = "tabbed";
+        terminal = "foot";
+        modifier = "Mod4";
+        menu = "${pkgs.j4-dmenu-desktop}/bin/j4-dmenu-desktop --dmenu '${pkgs.bemenu}/bin/bemenu -i'";
+      };
+      extraConfig = ''
+        input type:touchpad {
+            tap enabled
+            natural_scroll enabled
+        }
+        input type:keyboard {
+            repeat_delay 250
+            repeat_rate 25
+        }
+        bindsym Mod4+Tab focus next
+        focus_wrapping workspace
+        for_window [shell="xwayland"] title_format "[XWayland] %title"
+        bindsym Mod4+Shift+p exec systemctl poweroff
+        bindsym Mod4+Shift+r exec systemctl reboot
+        bindsym Mod4+Shift+o exec swaylock
+        bindsym XF86AudioRaiseVolume exec ${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ +5%
+        bindsym XF86AudioLowerVolume exec ${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ -5%
+        bindsym XF86AudioMute exec ${pkgs.pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle
+        bindsym XF86MonBrightnessDown exec ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
+        bindsym XF86MonBrightnessUp exec ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
+        bindsym XF86AudioPlay exec ${pkgs.playerctl}/bin/playerctl play-pause
+        bindsym XF86AudioNext exec ${pkgs.playerctl}/bin/playerctl next
+        bindsym XF86AudioPrev exec ${pkgs.playerctl}/bin/playerctl previous
+        exec bash -c 'nohup ${pkgs.gammastep}/bin/gammastep -O 3600 > /dev/null 2> /dev/null &'
+        include /etc/sway/config.d/*
+      '';
+    };
+    programs.swaylock = {
+      enable = true;
+      settings = {
+        color = "333333";
+        ignore-empty-password = true;
+        show-failed-attempts = true;
+      };
+    };
+    home.file.".config/i3blocks/config".text = ''
+      [volume]
+      command=${pkgs.pulseaudio}/bin/pactl get-sink-volume $(${pkgs.pulseaudio}/bin/pactl get-default-sink) | awk '{print "vol: " $5}'
+      interval=3
+
+      [audio-device]
+      command=${pkgs.pulseaudio}/bin/pactl get-default-sink | cut -d. -f1
+      interval=5
+
+      [light]
+      command=echo "bri: $(($(${pkgs.brightnessctl}/bin/brightnessctl g)*100/$(${pkgs.brightnessctl}/bin/brightnessctl m)))%"
+      interval=3
+
+      [wifi]
+      command=echo "wifi: $(nmcli -t connection show --active | awk -F: '/wlp0s20f3/ {print $1}')"
+      interval=5
+
+      [date]
+      command=/usr/bin/date '+%a %d %b %Y'
+      interval=once
+
+      [date]
+      command=/usr/bin/date '+%H:%M'
+      interval=10
+
+      [bat]
+      command=echo "bat: $(cat /sys/class/power_supply/BAT0/capacity)%"
+      interval=10
+
+      [power]
+      command=powerprofilesctl get
+      interval=5
+            
+      [ram]
+      command=echo 'ram:' $((100-$(awk '/MemAvailable/ {print $2}' /proc/meminfo)*100/$(awk '/MemTotal/ {print $2}' /proc/meminfo)))%
+      interval=5
+            
+
+      [swap]
+      command=echo 'swap:' $((100-$(awk '/SwapFree/ {print $2}' /proc/meminfo)*100/$(awk '/SwapTotal/ {print $2}' /proc/meminfo)))%
+      interval=5
+            
+    '';
 
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
 
@@ -83,8 +213,8 @@ let
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
       VISUAL = "${pkgs.micro}/bin/micro";
-      EDITOR = "${pkgs.micro}/bin/micro";
-      SUDO_EDITOR = "${pkgs.micro}/bin/micro";
+      EDITOR = "${pkgs.vim}/bin/vim";
+      SUDO_EDITOR = "${pkgs.vim}/bin/vim";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
       CPATH = "${pkgs.opencl-headers}/include";
       LIBRARY_PATH = "${pkgs.ocl-icd}/lib";
@@ -99,14 +229,13 @@ let
       NODE_REPL_HISTORY = "${config.xdg.dataHome}/node_repl_history";
       _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${config.xdg.configHome}/java";
       NIXOS_OZONE_WL = "1";
+      LIBVIRT_DEFAULT_URI = "qemu:///system";
+      SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent.socket";
     };
 
     fonts.fontconfig.enable = true;
     programs.bat.enable = true;
-    programs.eza = {
-      enable = true;
-      enableAliases = true;
-    };
+    programs.eza.enable = true;
     programs.gh = {
       enable = true;
       settings = {
@@ -123,19 +252,20 @@ let
 
     programs.ssh = {
       enable = true;
-      extraConfig = "AddKeysToAgent yes";
+      addKeysToAgent = "yes";
     };
 
-    programs.bash = {
-      enable = true;
-      initExtra = "[[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
-      historyFile = "${config.xdg.dataHome}/bash/bash_history";
-    };
+    # programs.bash = {
+    #   enable = true;
+    #   initExtra = "[[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
+    #   historyFile = "${config.xdg.dataHome}/bash/bash_history";
+    # };
 
     programs.zsh = {
       enable = true;
-      enableAutosuggestions = true;
+      autosuggestion.enable = true;
       initExtra = ''
+        function arch-wiki(){w3m "https://wiki.archlinux.org/index.php?search=$1"}
         source $HOME/.config/theme.zsh
         if [[ -n "$VSCODE_INJECTION" && -z "$VSCODE_TERMINAL_DIRENV_LOADED" && -f .envrc ]]; then
           # direnv reload
@@ -152,13 +282,14 @@ let
         unzip = "7z x";
         nix = "LD_LIBRARY_PATH='' nix";
         devbox = "LD_LIBRARY_PATH='' devbox";
+        top = "htop";
       };
       history.path = "${config.xdg.dataHome}/zsh/zsh_history";
       dotDir = ".config/zsh";
       zplug = {
         enable = true;
         plugins = [
-          { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
+          { name = "romkatv/powerlevel10k"; tags = [ "as:theme" "depth:1" ]; }
           { name = "zsh-users/zsh-syntax-highlighting"; }
         ];
         zplugHome = "${config.xdg.dataHome}/zplug";
@@ -170,30 +301,52 @@ let
       };
     };
 
+    programs.vim.enable = true;
+
     programs.neovim = {
       enable = true;
       extraLuaConfig = ''
                 vim.opt.termguicolors = true
                 local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
                 require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,settings={python={analysis={typeCheckingMode="strict",stubPath="/var/home/riky/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
-                require'lspconfig'.rnix.setup{capabilities=lsp_capabilities}
+                require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities}
                 require'lspconfig'.ansiblels.setup{}
                 require'lspconfig'.bashls.setup{}
+                require'lspconfig'.hls.setup{cmd={"haskell-language-server-wrapper","--lsp"}}
                 require'lspconfig'.dockerls.setup{}
                 require'lspconfig'.yamlls.setup{}
+                require'lspconfig'.jdtls.setup{cmd={"${pkgs.jdt-language-server}/bin/jdtls"}}
+                require'lspconfig'.tsserver.setup{cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
+                local capabilities = vim.lsp.protocol.make_client_capabilities()
+                capabilities.textDocument.completion.completionItem.snippetSupport = true
+                require'lspconfig'.jsonls.setup{cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities}
+                require'lspconfig'.taplo.setup{cmd={"${pkgs.taplo}/bin/taplo","lsp","stdio"}}
+                require'lspconfig'.lemminx.setup{cmd={"${pkgs.lemminx}/bin/lemminx"}}
                 require("bufferline").setup{}
-                require("toggleterm").setup{open_mapping=[[<C-t>]]}
-                require('feline').setup()
-                require("nvim-tree").setup()
+                require("toggleterm").setup{open_mapping=[[<C-t>]],direction="float"}
+                -- require("nvim-tree").setup()
+                require("feline").setup()
                 require("auto-session").setup{}
                 require("autoclose").setup()
                 require("stickybuf").setup()
-                require("conform").setup{
-                    formatters_by_ft={
-                            python={"black"},
-                        },
+                require("formatter").setup{
+                    filetype={
+                        python={function()return {exe="${pkgs.python312Packages.black}/bin/black",args={"-"},stdin=true} end},
+                        haskell={function()return {exe="${pkgs.haskellPackages.floskell}/bin/floskell",stdin=true} end},
+                        java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
+                        javascript={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
+                        typescript={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
+                        json={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
+                        jsonc={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
+                        yaml={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
+                        markdown={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
+                        xml={function()return {exe="${pkgs.libxml2}/bin/xmllint",args={"--format","-"},stdin=true} end},
+                        nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
+                    }
                 }
                 require("auto-save").setup{enabled=true,trigger_events={"BufLeave"}}
+                require("Comment").setup{}
+                require("trouble").setup{icons=false,action_keys={jump={}}}
                 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
                 local cmp=require("cmp")
                 cmp.setup{
@@ -233,24 +386,22 @@ let
                 vim.opt.tabstop = 4
                 vim.opt.shiftwidth = 4
                 vim.opt.number = true
-                vim.g.loaded_netrw = 1
-                vim.g.loaded_netrwPlugin = 1
+                -- vim.g.loaded_netrw = 1
+                -- vim.g.loaded_netrwPlugin = 1
+                -- vim.g.rnvimr_enable_ex=1
                 vim.opt.incsearch = true
                 vim.opt.shortmess:remove({ 'S' })
-                vim.opt.clipboard = "unnamedplus" 
-        	    vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<cr>')
-        	    vim.keymap.set('n', '<C-i>', '<cmd>lua require"conform".format()<cr>')
-        	    vim.keymap.set('n', '<C-m>', '<cmd>TroubleToggle<cr>')
+                -- vim.opt.clipboard = "unnamedplus" 
+        	    vim.keymap.set('n', '<C-e>', '<cmd>RnvimrToggle<cr>')
+        	    vim.keymap.set('n', '<C-k><C-f>', '<cmd>Format<cr>')
+        	    vim.keymap.set('n', '<C-k><C-m>', '<cmd>TroubleToggle<cr>')
         	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
         	    vim.keymap.set('n', "<C-g>", '<cmd>LazyGit<cr>')
-        	    vim.keymap.set('n', "<C-x>", '<cmd>bd<cr>')
-        	    vim.keymap.set('n', "<C-k>", '<cmd>bnext<cr>')
-        	    vim.keymap.set('n', "<C-j>", '<cmd>bprev<cr>')
+        	    vim.keymap.set('n', "<C-w>", '<cmd>bd<cr>')
+        	    vim.keymap.set('n', "<C-Tab>", '<cmd>bnext<cr>')
         	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
-        	    vim.keymap.set('v', "<tab>", '>gv')
-        	    vim.keymap.set('v', "<s-tab>", '<gv')
-        	    vim.keymap.set('n', "U", '<C-r>')
-        	    vim.keymap.set('n', "K", '<cmd>lua vim.lsp.buf.hover()<cr>')
+        	    vim.keymap.set('n', "<C-k><C-i>", vim.lsp.buf.hover)
+        	    vim.keymap.set({'n','v'}, "<C-.>", vim.lsp.buf.code_action)
                 function _G.set_terminal_keymaps()
                     local opts = {buffer = 0}
                     vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
@@ -261,6 +412,7 @@ let
                 vim.api.nvim_set_hl(0, 'NormalFloat', {bg='#3B4252'})
                 vim.api.nvim_set_hl(0, 'TelescopeNormal', {bg='#3B4252'})
                 vim.api.nvim_set_hl(0, 'TelescopeBorder', {bg='#3B4252'})
+                vim.g.rnvimr_enable_picker = 1
       '';
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -281,9 +433,11 @@ let
         autoclose-nvim
         pkgs.vimExtraPlugins.jupynium-nvim
         vim-illuminate
-        conform-nvim
         ansible-vim
         vim-vsnip
+        formatter-nvim
+        rnvimr
+        pkgs.vimExtraPlugins.Comment-nvim
         (pkgs.vimUtils.buildVimPlugin {
           name = "stickybuf-nvim";
           src = pkgs.fetchFromGitHub {
@@ -296,11 +450,10 @@ let
       ];
       extraPackages = with pkgs; [
         nodePackages.pyright
-        rnix-lsp
+        nil
         ripgrep
         lazygit
         nodePackages.diagnostic-languageserver
-        black
         wl-clipboard
         gcc
         tree-sitter
@@ -308,6 +461,8 @@ let
         nodePackages.bash-language-server
         dockerfile-language-server-nodejs
         yaml-language-server
+        haskell-language-server
+        ghc
       ];
     };
 
@@ -323,7 +478,7 @@ let
         streetsidesoftware.code-spell-checker
         vscjava.vscode-java-debug
         ms-azuretools.vscode-docker
-        elmtooling.elm-ls-vscode
+        # elmtooling.elm-ls-vscode
         tamasfe.even-better-toml
         haskell.haskell
         justusadam.language-haskell
@@ -360,23 +515,25 @@ let
         redhat.vscode-xml
         redhat.vscode-yaml
         hbenl.test-adapter-converter
-        surendrajat.apklab
+        # surendrajat.apklab
         loyieking.smalise
         hashicorp.hcl
         mechatroner.rainbow-csv
         janisdd.vscode-edit-csv
         redhat.ansible
-        shopify.ruby-lsp
+        # shopify.ruby-lsp
         dhall.vscode-dhall-lsp-server
         dhall.dhall-lang
         bpruitt-goddard.mermaid-markdown-syntax-highlighting
         tomoyukim.vscode-mermaid-editor
         mkhl.direnv
         aaron-bond.better-comments
-        ms-vscode.makefile-tools
+        # ms-vscode.makefile-tools
         vscodevim.vim
         vscjava.vscode-gradle
         ryanluker.vscode-coverage-gutters
+        # codeium.codeium
+        alexkrechik.cucumberautocomplete
       ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
         htmlhint.vscode-htmlhint
         visualstudioexptteam.vscodeintellicode
@@ -548,6 +705,9 @@ let
           "<C-s>" = false;
           "<C-z>" = false;
         };
+        "codeium.enableConfig" = {
+          "*" = false;
+        };
       };
     };
 
@@ -564,7 +724,7 @@ let
 
     qt = {
       enable = true;
-      platformTheme = "gnome";
+      platformTheme.name = "adwaita";
       style = {
         name = "adwaita-dark";
         package = pkgs.adwaita-qt;
@@ -604,6 +764,11 @@ let
     services.syncthing.enable = true;
 
     systemd.user.services = {
+      startup = {
+        Unit = { Description = "Startup"; };
+        Service = { ExecStart = "bash ${./startup.sh}"; };
+        Install = { WantedBy = [ "graphical-session.target" ]; };
+      };
       rclone = {
         Unit = {
           Description = "rclone";
@@ -618,7 +783,7 @@ let
           Description = "KeepassXC";
         };
         Service = {
-          ExecStart = "bash -c 'sleep 1; secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx'";
+          ExecStart = "bash -c 'sleep 5; secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx'";
         };
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
@@ -676,18 +841,39 @@ let
       }
     '';
 
+    home.file.".var/app/io.gitlab.librewolf-community/.librewolf/native-messaging-hosts/net.downloadhelper.coapp.json".text = ''
+      {
+      "name": "net.downloadhelper.coapp",
+      "description": "Video DownloadHelper companion app",
+      "path": "${pkgs.callPackage ./downloadhelper.nix { }}/bin/net.downloadhelper.coapp-linux-64",
+      "type": "stdio",
+      "allowed_extensions": [
+      "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}"
+      ]
+      }
+    '';
+    home.file.".var/app/io.gitlab.librewolf-community/.librewolf/native-messaging-hosts/org.keepassxc.keepassxc_browser.json".text = ''
+      {
+      "allowed_extensions": [
+      "keepassxc-browser@keepassxc.org"
+      ],
+      "description": "KeePassXC integration with native messaging support",
+      "name": "org.keepassxc.keepassxc_browser",
+      "path": "${./keepassxc-proxy}",
+      "type": "stdio"
+      }
+    '';
 
-    home.file.".config/autostart/startup.desktop".text = ''
-      [Desktop Entry]
-      Exec=${./startup.sh}
-      Name=startup
-      Comment=Startup
-      Type=Application
-      Icon=nautilus'';
+
     home.file.".local/bin/jupynvim".source = ./jupynvim.py;
 
     home.file.".local/flatpak/brave" = {
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sfT ${./brave.jsonc} /etc/brave/policies/managed/brave.json && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark -incognito \"$@\"";
+      executable = true;
+    };
+
+    home.file.".local/flatpak/librewolf" = {
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/librewolf \"$@\"";
       executable = true;
     };
 
@@ -736,6 +922,14 @@ let
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
     '';
+    home.file.".local/share/flatpak/overrides/io.gitlab.librewolf-community".text = ''
+      [Context]
+      devices=all
+      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro
+
+      [Environment]
+      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
+    '';
     home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
       [Context]
       filesystems=xdg-documents/CTF:ro;!home
@@ -744,10 +938,6 @@ let
     home.file.".local/share/flatpak/overrides/org.gimp.GIMP".text = ''
       [Context]
       filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/tmp;!xdg-config/gtk-3.0;!xdg-config/GIMP;xdg-pictures;!host
-    '';
-    home.file.".local/share/flatpak/overrides/org.gnome.Boxes".text = ''
-      [Context]
-      filesystems=!host
     '';
     home.file.".local/share/flatpak/overrides/org.gnome.Loupe".text = ''
       [Context]
@@ -761,9 +951,9 @@ let
       [Context]
       filesystems=!home
     '';
-    home.file.".local/share/flatpak/overrides/org.gnome.GHex".text = ''
+    home.file.".local/share/flatpak/overrides/net.werwolv.ImHex".text = ''
       [Context]
-      filesystems=!xdg-run/gvfsd;!host
+      filesystems=!host
     '';
     home.file.".local/share/flatpak/overrides/org.gnome.TextEditor".text = ''
       [Context]
@@ -785,7 +975,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.remmina.Remmina".text = ''
       [Context]
-      filesystems=!xdg-download;!xdg-run/gvfsd;~/.ssh;!home
+      filesystems=!xdg-download;!xdg-run/gvfsd;~/.ssh;!home;xdg-documents
       devices=!all;dri
     '';
     home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = ''
@@ -836,7 +1026,6 @@ let
             "org.gnome.TextEditor"
             "org.gnome.Characters"
             "org.gnome.Logs"
-            "org.gnome.Boxes"
             "ca.desrt.dconf-editor"
             "com.github.tchx84.Flatseal"
             "rest.insomnia.Insomnia"
@@ -847,9 +1036,8 @@ let
             "com.obsproject.Studio"
             "org.gnome.seahorse.Application"
             "org.gnome.PowerStats"
-            "org.gnome.Boxes"
             "com.usebottles.bottles"
-            "org.gnome.GHex"
+            "net.werwolv.ImHex"
             "org.gnome.Extensions"
             "org.localsend.localsend_app"
             "org.gnome.dspy"
@@ -869,7 +1057,8 @@ let
             "app.moosync.moosync"
             "org.polymc.PolyMC"
             "org.gimp.GIMP"
-            "org.onlyoffice.desktopeditors"
+            "org.libreoffice.LibreOffice"
+            "io.gitlab.librewolf-community"
           ];
         };
         # flathub-beta = {
@@ -921,6 +1110,10 @@ let
         tap-to-click = true;
         two-finger-scrolling-enabled = true;
       };
+      "org/gnome/desktop/peripherals/keyboard" = {
+        delay=lib.hm.gvariant.mkUint32 300;
+        repeat-interval=lib.hm.gvariant.mkUint32 25;
+      };
       "org/gnome/desktop/background" = {
         color-shading-type = "solid";
         picture-options = "zoom";
@@ -946,8 +1139,8 @@ let
         close = [ "<Super>q" ];
         # move-to-workspace-left = [ "<Alt>Left" ];
         # move-to-workspace-right = [ "<Alt>Right" ];
-        move-to-workspace-left = [ ];
-        move-to-workspace-right = [ ];
+        # move-to-workspace-left = [ ];
+        # move-to-workspace-right = [ ];
       };
       "org/gnome/desktop/wm/preferences" = {
         button-layout = ":close";
@@ -965,11 +1158,16 @@ let
         play = [ "<Super>space" ];
         # previous = [ "<Super>Left" ];
       };
-      # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-      #   binding = "<Control><Alt>t";
-      #   command = "gnome-terminal";
-      #   name = "Terminal";
-      # };
+      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+        binding = "<Shift><Super>p";
+        command = "gnome-session-quit --power-off";
+        name = "Poweroff";
+      };
+      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
+        binding = "<Super>Return";
+        command = "foot";
+        name = "Terminal";
+      };
       # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
       #   binding = "<Control><Alt>b";
       #   command = "flatpak run com.brave.Browser";
@@ -995,8 +1193,9 @@ let
           "burn-my-windows@schneegans.github.com"
           "system-monitor-indicator@mknap.com"
           "stopwatch@aliakseiz.github.com"
+          "gnome-one-window-wonderland@jqno.nl"
         ];
-        favorite-apps = [ "com.brave.Browser.desktop" "org.gnome.Nautilus.desktop" "code.desktop" "org.gnome.Console.desktop" ];
+        favorite-apps = [ "io.gitlab.librewolf-community.desktop" "org.gnome.Nautilus.desktop" "code.desktop" "org.codeberg.dnkl.foot.desktop" ];
       };
       "org/gnome/desktop/privacy" = {
         remove-old-trash-files = true;
@@ -1030,9 +1229,6 @@ let
         if [ ! -d ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp ]; then
           sudo mkdir ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
           sudo chown $USER:$USER ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
-        fi
-        if [[ ! -x ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/bin/cpptools ]]; then
-          sudo chmod +x ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/bin/* ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/LLVM/bin/* ${nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/*
         fi
       '';
     };

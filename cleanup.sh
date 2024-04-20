@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
-podman system prune -a --volumes -f
+podman system prune --all --volumes --force
+podman rmi --all --force
 nix-store --gc
 nix-store --optimise
