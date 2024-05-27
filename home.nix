@@ -32,7 +32,7 @@ let
       iputils
       binutils
       unixtools.netstat
-      gnomeExtensions.espresso
+      gnomeExtensions.caffeine
       gnomeExtensions.alphabetical-app-grid
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.compiz-alike-magic-lamp-effect
@@ -70,7 +70,7 @@ let
       playerctl
       vbindiff
       trash-cli
-      pipx
+      python312Packages.pipx
       distrobox
     ];
 
@@ -113,106 +113,19 @@ let
       '';
     };
     home.file.".config/ranger/rifle.conf".text = ''
-      !mime ^application/json|^text|^inode, flag f = xdg-open "$1"
+      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl, flag f = xdg-open "$1"
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
     programs.foot = { enable = true; settings = { main = { shell = "${pkgs.tmux}/bin/tmux new-session 'exec ranger'"; font = "FiraCode Nerd Font Mono:size=16"; }; }; };
     programs.lazygit.enable = true;
-    wayland.windowManager.sway = {
-      enable = true;
-      config = {
-        bars = [{ statusCommand = "${pkgs.i3blocks}/bin/i3blocks"; }];
-        workspaceLayout = "tabbed";
-        terminal = "foot";
-        modifier = "Mod4";
-        menu = "${pkgs.j4-dmenu-desktop}/bin/j4-dmenu-desktop --dmenu '${pkgs.bemenu}/bin/bemenu -i'";
-      };
-      extraConfig = ''
-        input type:touchpad {
-            tap enabled
-            natural_scroll enabled
-        }
-        input type:keyboard {
-            repeat_delay 250
-            repeat_rate 25
-        }
-        bindsym Mod4+Tab focus next
-        focus_wrapping workspace
-        for_window [shell="xwayland"] title_format "[XWayland] %title"
-        bindsym Mod4+Shift+p exec systemctl poweroff
-        bindsym Mod4+Shift+r exec systemctl reboot
-        bindsym Mod4+Shift+o exec swaylock
-        bindsym XF86AudioRaiseVolume exec ${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ +5%
-        bindsym XF86AudioLowerVolume exec ${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ -5%
-        bindsym XF86AudioMute exec ${pkgs.pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle
-        bindsym XF86MonBrightnessDown exec ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
-        bindsym XF86MonBrightnessUp exec ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
-        bindsym XF86AudioPlay exec ${pkgs.playerctl}/bin/playerctl play-pause
-        bindsym XF86AudioNext exec ${pkgs.playerctl}/bin/playerctl next
-        bindsym XF86AudioPrev exec ${pkgs.playerctl}/bin/playerctl previous
-        exec bash -c 'nohup ${pkgs.gammastep}/bin/gammastep -O 3600 > /dev/null 2> /dev/null &'
-        include /etc/sway/config.d/*
-      '';
-    };
-    programs.swaylock = {
-      enable = true;
-      settings = {
-        color = "333333";
-        ignore-empty-password = true;
-        show-failed-attempts = true;
-      };
-    };
-    home.file.".config/i3blocks/config".text = ''
-      [volume]
-      command=${pkgs.pulseaudio}/bin/pactl get-sink-volume $(${pkgs.pulseaudio}/bin/pactl get-default-sink) | awk '{print "vol: " $5}'
-      interval=3
-
-      [audio-device]
-      command=${pkgs.pulseaudio}/bin/pactl get-default-sink | cut -d. -f1
-      interval=5
-
-      [light]
-      command=echo "bri: $(($(${pkgs.brightnessctl}/bin/brightnessctl g)*100/$(${pkgs.brightnessctl}/bin/brightnessctl m)))%"
-      interval=3
-
-      [wifi]
-      command=echo "wifi: $(nmcli -t connection show --active | awk -F: '/wlp0s20f3/ {print $1}')"
-      interval=5
-
-      [date]
-      command=/usr/bin/date '+%a %d %b %Y'
-      interval=once
-
-      [date]
-      command=/usr/bin/date '+%H:%M'
-      interval=10
-
-      [bat]
-      command=echo "bat: $(cat /sys/class/power_supply/BAT0/capacity)%"
-      interval=10
-
-      [power]
-      command=powerprofilesctl get
-      interval=5
-            
-      [ram]
-      command=echo 'ram:' $((100-$(awk '/MemAvailable/ {print $2}' /proc/meminfo)*100/$(awk '/MemTotal/ {print $2}' /proc/meminfo)))%
-      interval=5
-            
-
-      [swap]
-      command=echo 'swap:' $((100-$(awk '/SwapFree/ {print $2}' /proc/meminfo)*100/$(awk '/SwapTotal/ {print $2}' /proc/meminfo)))%
-      interval=5
-            
-    '';
 
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
 
     home.sessionVariables = {
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      VISUAL = "${pkgs.micro}/bin/micro";
+      VISUAL = "${pkgs.vim}/bin/vim";
       EDITOR = "${pkgs.vim}/bin/vim";
       SUDO_EDITOR = "${pkgs.vim}/bin/vim";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
@@ -230,7 +143,6 @@ let
       _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${config.xdg.configHome}/java";
       NIXOS_OZONE_WL = "1";
       LIBVIRT_DEFAULT_URI = "qemu:///system";
-      SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent.socket";
     };
 
     fonts.fontconfig.enable = true;
@@ -248,12 +160,17 @@ let
     };
     programs.direnv.enable = true;
 
-    programs.pandoc.enable = true;
-
     programs.ssh = {
       enable = true;
       addKeysToAgent = "yes";
     };
+
+    home.file.".config/distrobox/distrobox.conf".text = ''
+      container_generate_entry=0
+      container_manager="podman"
+      container_image_default="quay.io/toolbx/ubuntu-toolbox:latest"
+      container_name_default="test"
+    '';
 
     # programs.bash = {
     #   enable = true;
@@ -265,12 +182,9 @@ let
       enable = true;
       autosuggestion.enable = true;
       initExtra = ''
-        function arch-wiki(){w3m "https://wiki.archlinux.org/index.php?search=$1"}
+        bindkey -e
         source $HOME/.config/theme.zsh
-        if [[ -n "$VSCODE_INJECTION" && -z "$VSCODE_TERMINAL_DIRENV_LOADED" && -f .envrc ]]; then
-          # direnv reload
-          export VSCODE_TERMINAL_DIRENV_LOADED=1
-        fi'';
+      '';
       shellAliases = {
         cat = "bat";
         du = "dust";
@@ -308,44 +222,59 @@ let
       extraLuaConfig = ''
                 vim.opt.termguicolors = true
                 local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,settings={python={analysis={typeCheckingMode="strict",stubPath="/var/home/riky/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
-                require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities}
-                require'lspconfig'.ansiblels.setup{}
-                require'lspconfig'.bashls.setup{}
-                require'lspconfig'.hls.setup{cmd={"haskell-language-server-wrapper","--lsp"}}
-                require'lspconfig'.dockerls.setup{}
-                require'lspconfig'.yamlls.setup{}
-                require'lspconfig'.jdtls.setup{cmd={"${pkgs.jdt-language-server}/bin/jdtls"}}
-                require'lspconfig'.tsserver.setup{cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
+                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="/var/home/riky/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
+                require'lspconfig'.ruff.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}}
+                require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}}
+                require'lspconfig'.ansiblels.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ansible-language-server}/bin/ansible-language-server","--stdio"}}
+                require'lspconfig'.bashls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.bash-language-server}/bin/bash-language-server","--stdio"}}
+                require'lspconfig'.hls.setup{capabilities=lsp_capabilities,cmd={"haskell-language-server-wrapper","--lsp"}}
+                require'lspconfig'.dockerls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dockerfile-language-server-nodejs}/bin/docker-langserver","--stdio"}}
+                require'lspconfig'.yamlls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.yaml-language-server}/bin/yaml-language-server","--stdio"}}
+                require'lspconfig'.jdtls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.jdt-language-server}/bin/jdtls", "-configuration", "${home.homeDirectory}/.cache/jdtls/config", "-data", "${home.homeDirectory}/.cache/jdtls/workspace"}}
+                require'lspconfig'.tsserver.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
                 local capabilities = vim.lsp.protocol.make_client_capabilities()
                 capabilities.textDocument.completion.completionItem.snippetSupport = true
-                require'lspconfig'.jsonls.setup{cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities}
-                require'lspconfig'.taplo.setup{cmd={"${pkgs.taplo}/bin/taplo","lsp","stdio"}}
-                require'lspconfig'.lemminx.setup{cmd={"${pkgs.lemminx}/bin/lemminx"}}
+                require'lspconfig'.jsonls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities}
+                require'lspconfig'.taplo.setup{capabilities=lsp_capabilities,cmd={"${pkgs.taplo}/bin/taplo","lsp","stdio"}}
+                require'lspconfig'.lemminx.setup{capabilities=lsp_capabilities,cmd={"${pkgs.lemminx}/bin/lemminx"}}
+                require'lspconfig'.psalm.setup{capabilities=lsp_capabilities,cmd={"${pkgs.php83Packages.psalm}/bin/psalm","--language-server"}}
+                require'lspconfig'.intelephense.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.intelephense}/bin/intelephense","--stdio"}}
+                require'lspconfig'.cssls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}}
+                -- require'lspconfig'.arduino_language_server.setup{capabilities=lsp_capabilities,cmd={"${pkgs.arduino-language-server}/bin/arduino-language-server"}}
+                require'lspconfig'.rust_analyzer.setup{capabilities=lsp_capabilities,cmd={"rust-analyzer"}}
                 require("bufferline").setup{}
                 require("toggleterm").setup{open_mapping=[[<C-t>]],direction="float"}
-                -- require("nvim-tree").setup()
                 require("feline").setup()
                 require("auto-session").setup{}
                 require("autoclose").setup()
-                require("stickybuf").setup()
+                -- require("stickybuf").setup()
                 require("formatter").setup{
                     filetype={
                         python={function()return {exe="${pkgs.python312Packages.black}/bin/black",args={"-"},stdin=true} end},
-                        haskell={function()return {exe="${pkgs.haskellPackages.floskell}/bin/floskell",stdin=true} end},
+                        haskell={function()return {exe="${pkgs.haskellPackages.fourmolu}/bin/fourmolu",args={"--no-cabal","-"},stdin=true} end},
                         java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
-                        javascript={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
-                        typescript={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
-                        json={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
-                        jsonc={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
-                        yaml={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
-                        markdown={function()return {exe="${pkgs.nodePackages.prettier}/bin/prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
+                        javascript={function()return {exe="prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
+                        typescript={function()return {exe="prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
+                        css={function()return {exe="prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
+                        json={function()return {exe="prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
+                        jsonc={function()return {exe="prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
+                        yaml={function()return {exe="prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
+                        markdown={function()return {exe="prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
                         xml={function()return {exe="${pkgs.libxml2}/bin/xmllint",args={"--format","-"},stdin=true} end},
                         nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
+                        bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
+                        dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
+                        -- php={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
+                        toml={function()return {exe="prettier",args={"--stdin-filepath=test.toml"},stdin=true} end},
+                        arduino={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
+                        c={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
+                        cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
+                        rust={function()return {exe="${pkgs.rustfmt}/bin/rustfmt",stdin=true} end},
                     }
                 }
-                require("auto-save").setup{enabled=true,trigger_events={"BufLeave"}}
+                vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
                 require("Comment").setup{}
+                require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
                 require("trouble").setup{icons=false,action_keys={jump={}}}
                 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
                 local cmp=require("cmp")
@@ -391,16 +320,20 @@ let
                 -- vim.g.rnvimr_enable_ex=1
                 vim.opt.incsearch = true
                 vim.opt.shortmess:remove({ 'S' })
-                -- vim.opt.clipboard = "unnamedplus" 
         	    vim.keymap.set('n', '<C-e>', '<cmd>RnvimrToggle<cr>')
         	    vim.keymap.set('n', '<C-k><C-f>', '<cmd>Format<cr>')
         	    vim.keymap.set('n', '<C-k><C-m>', '<cmd>TroubleToggle<cr>')
         	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
         	    vim.keymap.set('n', "<C-g>", '<cmd>LazyGit<cr>')
-        	    vim.keymap.set('n', "<C-w>", '<cmd>bd<cr>')
-        	    vim.keymap.set('n', "<C-Tab>", '<cmd>bnext<cr>')
+        	    -- vim.keymap.set('n', "<C-w>", '<cmd>bd<cr>')
+        	    vim.keymap.set('n', "gt", '<cmd>bn<cr>')
+        	    vim.keymap.set('n', "gT", '<cmd>bp<cr>')
+        	    -- vim.keymap.set('n', "<C-Tab>", '<cmd>bnext<cr>')
         	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
         	    vim.keymap.set('n', "<C-k><C-i>", vim.lsp.buf.hover)
+                vim.keymap.set('n', '<C-k><C-r>', vim.lsp.buf.rename)
+                vim.keymap.set('n', '<C-k><C-d>', vim.diagnostic.open_float)
+                vim.keymap.set('n', 'mt', MiniMap.toggle)
         	    vim.keymap.set({'n','v'}, "<C-.>", vim.lsp.buf.code_action)
                 function _G.set_terminal_keymaps()
                     local opts = {buffer = 0}
@@ -413,6 +346,8 @@ let
                 vim.api.nvim_set_hl(0, 'TelescopeNormal', {bg='#3B4252'})
                 vim.api.nvim_set_hl(0, 'TelescopeBorder', {bg='#3B4252'})
                 vim.g.rnvimr_enable_picker = 1
+                vim.g.rnvimr_enable_ex = 1
+                vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
       '';
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -420,8 +355,6 @@ let
         bufferline-nvim
         toggleterm-nvim
         feline-nvim
-        nvim-tree-lua
-        auto-save-nvim
         telescope-nvim
         nvim-treesitter.withAllGrammars
         lazygit-nvim
@@ -438,6 +371,8 @@ let
         formatter-nvim
         rnvimr
         pkgs.vimExtraPlugins.Comment-nvim
+        # codewindow-nvim
+        mini-nvim
         (pkgs.vimUtils.buildVimPlugin {
           name = "stickybuf-nvim";
           src = pkgs.fetchFromGitHub {
@@ -449,20 +384,19 @@ let
         })
       ];
       extraPackages = with pkgs; [
-        nodePackages.pyright
-        nil
+        haskell-language-server
+        nodePackages.prettier-plugin-toml
+        nodePackages.prettier
         ripgrep
         lazygit
         nodePackages.diagnostic-languageserver
         wl-clipboard
         gcc
         tree-sitter
-        ansible-language-server
-        nodePackages.bash-language-server
-        dockerfile-language-server-nodejs
-        yaml-language-server
-        haskell-language-server
         ghc
+        jdt-language-server
+        rust-analyzer
+        # clang-tools
       ];
     };
 
@@ -865,6 +799,7 @@ let
     '';
 
 
+    home.file.".local/bin/qemu".source = ./qemu.py;
     home.file.".local/bin/jupynvim".source = ./jupynvim.py;
 
     home.file.".local/flatpak/brave" = {
@@ -910,6 +845,7 @@ let
       [Context]
       sockets=!ssh-auth
       filesystems=!home
+      persistent=.local/share/DBeaverData
     '';
     home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = ''
       [Environment]
@@ -975,7 +911,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.remmina.Remmina".text = ''
       [Context]
-      filesystems=!xdg-download;!xdg-run/gvfsd;~/.ssh;!home;xdg-documents
+      filesystems=!xdg-run/gvfsd;~/.ssh;!home;xdg-documents
       devices=!all;dri
     '';
     home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = ''
@@ -1059,6 +995,7 @@ let
             "org.gimp.GIMP"
             "org.libreoffice.LibreOffice"
             "io.gitlab.librewolf-community"
+            "eu.betterbird.Betterbird"
           ];
         };
         # flathub-beta = {
@@ -1094,6 +1031,7 @@ let
         clock-show-date = true;
         clock-show-seconds = false;
         clock-show-weekday = true;
+        clock-format = "24h";
         color-scheme = "prefer-dark";
         font-antialiasing = "rgba";
         font-hinting = "full";
@@ -1111,8 +1049,8 @@ let
         two-finger-scrolling-enabled = true;
       };
       "org/gnome/desktop/peripherals/keyboard" = {
-        delay=lib.hm.gvariant.mkUint32 300;
-        repeat-interval=lib.hm.gvariant.mkUint32 25;
+        delay = lib.hm.gvariant.mkUint32 300;
+        repeat-interval = lib.hm.gvariant.mkUint32 25;
       };
       "org/gnome/desktop/background" = {
         color-shading-type = "solid";
@@ -1180,7 +1118,7 @@ let
       # };
       "org/gnome/settings-daemon/plugins/power" = {
         idle-brightness = 20;
-        power-button-action = "interactive";
+        power-button-action = "nothing";
         sleep-inactive-battery-timeout = 300;
         sleep-inactive-ac-type = "nothing";
       };
@@ -1189,13 +1127,13 @@ let
           "compiz-alike-magic-lamp-effect@hermes83.github.com"
           "compiz-windows-effect@hermes83.github.com"
           "AlphabeticalAppGrid@stuarthayhurst"
-          "espresso@coadmunkee.github.com"
+          "caffeine@patapon.info"
           "burn-my-windows@schneegans.github.com"
           "system-monitor-indicator@mknap.com"
           "stopwatch@aliakseiz.github.com"
           "gnome-one-window-wonderland@jqno.nl"
         ];
-        favorite-apps = [ "io.gitlab.librewolf-community.desktop" "org.gnome.Nautilus.desktop" "code.desktop" "org.codeberg.dnkl.foot.desktop" ];
+        favorite-apps = [ "io.gitlab.librewolf-community.desktop" "org.gnome.Nautilus.desktop" "org.codeberg.dnkl.foot.desktop" ];
       };
       "org/gnome/desktop/privacy" = {
         remove-old-trash-files = true;
@@ -1205,13 +1143,27 @@ let
       "org/gnome/shell/extensions/burn-my-windows" = {
         active-profile = toString ./window-animation.conf;
       };
-      "org/gnome/shell/extensions/espresso" = {
-        has-battery = true;
+      "org/gnome/shell/extensions/caffeine" = {
         show-notifications = false;
       };
     };
 
-    nix.package = pkgs.nix;
+    nix = {
+      enable=true;
+      package = pkgs.nix;
+      settings = {
+        experimental-features = [ "nix-command" "flakes" ];
+        build-users-group = "nixbld";
+        auto-optimise-store = true;
+        bash-prompt-prefix = "(nix:$name)\\040";
+        max-jobs = "auto";
+        extra-nix-path = "nixpkgs=flake:nixpkgs";
+      };
+        # registry.local = {
+        #   from = { type = "indirect"; id = "nixpkgs"; };
+        #   flake = nixpkgs;
+        # };
+    };
 
     home.activation = {
       setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

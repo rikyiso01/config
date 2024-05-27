@@ -22,6 +22,10 @@
           {
             programs.nix-index-database.comma.enable = true;
             home.sessionVariables.NIX_PATH = nixpkgs.outPath;
+            nix.registry.local={
+                from = {type="indirect"; id="nixpkgs"; };
+                flake = nixpkgs;
+            };
           }
           ({pkgs, ...}: { nixpkgs.overlays = [nixneovimplugins.overlays.default]; })
         ];
