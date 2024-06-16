@@ -15,3 +15,5 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="2a03", ATTRS{idProduct}=="0043", TAG+="uacc
 
 # Latest 2018 Arduino Nano's from arduino.cc
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC", TAG+="uaccess" , GROUP="dialout"
+
+SUBSYSTEMS=="usb-serial", MODE="0660", TAG+="uaccess"

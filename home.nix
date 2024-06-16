@@ -44,12 +44,10 @@ let
       fira-code-nerdfont
       php
       powertop
-      micro
       android-tools
       nmap
       exiftool
       imagemagick
-      jre
       brightnessctl
       traceroute
       xdg-ninja
@@ -64,14 +62,17 @@ let
       w3m
       bluetuith
       networkmanager
-      neofetch
-      pulseaudio
+      fastfetch
+      pamixer
+      pavucontrol
+      networkmanagerapplet
       brightnessctl
       playerctl
       vbindiff
       trash-cli
       python312Packages.pipx
       distrobox
+      xclip
     ];
 
     programs.git = {
@@ -93,15 +94,36 @@ let
       keyMode = "vi";
       terminal = "tmux-256color";
       mouse = true;
+      prefix = "C-s";
+      plugins = with pkgs.tmuxPlugins; [ catppuccin ];
       extraConfig = ''
         bind-key -T copy-mode-vi 'v' send -X begin-selection
         bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
         bind '"' split-window -c "#{pane_current_path}"
         bind % split-window -h -c "#{pane_current_path}"
         bind c new-window -c "#{pane_current_path}"
+        bind-key @ choose-tree "join-pane -h -s '%%'"
+        bind-key C-@ choose-tree "join-pane -s '%%'"
+        bind-key ! break-pane -d
+        bind-key C-! break-pane
+        bind-key -n Pageup send-keys left
+        bind-key -n Pagedown send-keys right
         set-window-option -g mode-keys vi
         set-option -sa terminal-features ',foot:RGB'
         set-option -sg escape-time 10
+        set -g @catppuccin_flavour 'mocha' # latte,frappe, macchiato or mocha
+
+        # is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?\.?(view|n?vim?x?)(-wrapped)?(diff)?$'"
+        #
+        # bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' { if -F '#{pane_at_left}' "" 'select-pane -L' }
+        # bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' { if -F '#{pane_at_bottom}' "" 'select-pane -D' }
+        # bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' { if -F '#{pane_at_top}' "" 'select-pane -U' }
+        # bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' { if -F '#{pane_at_right}' "" 'select-pane -R' }
+        #
+        # bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' "" 'select-pane -L'
+        # bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' "" 'select-pane -D'
+        # bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' "" 'select-pane -U'
+        # bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' "" 'select-pane -R'
       '';
     };
     programs.htop.enable = true;
@@ -110,14 +132,18 @@ let
       extraConfig = ''
         map dT shell ${pkgs.trash-cli}/bin/trash-put %s
         map dD shell ${pkgs.trash-cli}/bin/trash-put %s
+        setlocal path=~/Downloads sort mtime
       '';
     };
     home.file.".config/ranger/rifle.conf".text = ''
-      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl, flag f = xdg-open "$1"
+      mime application/zip, flag f = /bin/unzip "$1"
+      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext dart, flag f = xdg-open "$1"
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
-    programs.foot = { enable = true; settings = { main = { shell = "${pkgs.tmux}/bin/tmux new-session 'exec ranger'"; font = "FiraCode Nerd Font Mono:size=16"; }; }; };
+    programs.foot = { enable = true; settings = { main = { shell = "zsh -c \"${pkgs.tmux}/bin/tmux new-session -As default 'exec ${pkgs.ranger}/bin/ranger'\""; font = "FiraCode Nerd Font Mono:size=16"; }; }; };
+    programs.kitty = { enable = true; font.name = "FiraCode Nerd Font Mono"; font.size = 16; settings = { enable_audio_bell = false; startup_session = "${home.homeDirectory}/.config/kitty/session.conf"; }; };
+    home.file.".config/kitty/session.conf".text = "cd ${home.homeDirectory}/backup/Documents\nlaunch zsh -c \"${pkgs.tmux}/bin/tmux new-session -As default 'exec ${pkgs.ranger}/bin/ranger'\"";
     programs.lazygit.enable = true;
 
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
@@ -125,14 +151,11 @@ let
     home.sessionVariables = {
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      VISUAL = "${pkgs.vim}/bin/vim";
-      EDITOR = "${pkgs.vim}/bin/vim";
-      SUDO_EDITOR = "${pkgs.vim}/bin/vim";
+      EDITOR="${pkgs.vim}/bin/vim";
+      VISUAL = "$EDITOR";
+      SUDO_EDITOR = "$VISUAL";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
-      CPATH = "${pkgs.opencl-headers}/include";
-      LIBRARY_PATH = "${pkgs.ocl-icd}/lib";
       NIXPKGS_ACCEPT_ANDROID_SDK_LICENSE = "1";
-      OCL_ICD_VENDORS = "${pkgs.intel-compute-runtime}/etc/OpenCL/vendors/intel-neo.icd";
       ANDROID_HOME = "${config.xdg.dataHome}/android";
       GNUPGHOME = "${config.xdg.dataHome}/gnupg";
       GRADLE_USER_HOME = "${config.xdg.dataHome}/gradle";
@@ -143,8 +166,11 @@ let
       _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${config.xdg.configHome}/java";
       NIXOS_OZONE_WL = "1";
       LIBVIRT_DEFAULT_URI = "qemu:///system";
+      # GTK_THEME = "Adwaita:dark";
+      SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/gcr/ssh";
     };
 
+    programs.vim.enable=true;
     fonts.fontconfig.enable = true;
     programs.bat.enable = true;
     programs.eza.enable = true;
@@ -186,7 +212,7 @@ let
         source $HOME/.config/theme.zsh
       '';
       shellAliases = {
-        cat = "bat";
+        cat = "bat -p";
         du = "dust";
         find = "fd";
         ps = "procs";
@@ -197,6 +223,9 @@ let
         nix = "LD_LIBRARY_PATH='' nix";
         devbox = "LD_LIBRARY_PATH='' devbox";
         top = "htop";
+        neofetch = "fastfetch";
+        vim = "$VISUAL";
+        copy = "xclip -sel c <";
       };
       history.path = "${config.xdg.dataHome}/zsh/zsh_history";
       dotDir = ".config/zsh";
@@ -215,7 +244,6 @@ let
       };
     };
 
-    programs.vim.enable = true;
 
     programs.neovim = {
       enable = true;
@@ -226,7 +254,7 @@ let
                 require'lspconfig'.ruff.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}}
                 require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}}
                 require'lspconfig'.ansiblels.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ansible-language-server}/bin/ansible-language-server","--stdio"}}
-                require'lspconfig'.bashls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.bash-language-server}/bin/bash-language-server","--stdio"}}
+                require'lspconfig'.bashls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.bash-language-server}/bin/bash-language-server","start"}}
                 require'lspconfig'.hls.setup{capabilities=lsp_capabilities,cmd={"haskell-language-server-wrapper","--lsp"}}
                 require'lspconfig'.dockerls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dockerfile-language-server-nodejs}/bin/docker-langserver","--stdio"}}
                 require'lspconfig'.yamlls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.yaml-language-server}/bin/yaml-language-server","--stdio"}}
@@ -240,10 +268,10 @@ let
                 require'lspconfig'.psalm.setup{capabilities=lsp_capabilities,cmd={"${pkgs.php83Packages.psalm}/bin/psalm","--language-server"}}
                 require'lspconfig'.intelephense.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.intelephense}/bin/intelephense","--stdio"}}
                 require'lspconfig'.cssls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}}
-                -- require'lspconfig'.arduino_language_server.setup{capabilities=lsp_capabilities,cmd={"${pkgs.arduino-language-server}/bin/arduino-language-server"}}
                 require'lspconfig'.rust_analyzer.setup{capabilities=lsp_capabilities,cmd={"rust-analyzer"}}
+                require'lspconfig'.dartls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}}
                 require("bufferline").setup{}
-                require("toggleterm").setup{open_mapping=[[<C-t>]],direction="float"}
+                require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
                 require("feline").setup()
                 require("auto-session").setup{}
                 require("autoclose").setup()
@@ -264,18 +292,20 @@ let
                         nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
                         bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
                         dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
-                        -- php={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
+                        php={function()return {exe="${pkgs.phpPackages.php-cs-fixer}/bin/php-cs-fixer",args={"--rules=@Symfony","--using-cache=no","--no-interaction","fix"},stdin=false} end},
                         toml={function()return {exe="prettier",args={"--stdin-filepath=test.toml"},stdin=true} end},
                         arduino={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                         c={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                         cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                         rust={function()return {exe="${pkgs.rustfmt}/bin/rustfmt",stdin=true} end},
+                        dart={function()return {exe="${pkgs.dart}/bin/dart",args={"format"},stdin=false} end},
                     }
                 }
                 vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
                 require("Comment").setup{}
                 require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
                 require("trouble").setup{icons=false,action_keys={jump={}}}
+                -- require("tmux").setup()
                 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
                 local cmp=require("cmp")
                 cmp.setup{
@@ -320,21 +350,19 @@ let
                 -- vim.g.rnvimr_enable_ex=1
                 vim.opt.incsearch = true
                 vim.opt.shortmess:remove({ 'S' })
-        	    vim.keymap.set('n', '<C-e>', '<cmd>RnvimrToggle<cr>')
-        	    vim.keymap.set('n', '<C-k><C-f>', '<cmd>Format<cr>')
-        	    vim.keymap.set('n', '<C-k><C-m>', '<cmd>TroubleToggle<cr>')
-        	    vim.keymap.set('n', "<C-f>", '<cmd>Telescope live_grep<cr>')
-        	    vim.keymap.set('n', "<C-g>", '<cmd>LazyGit<cr>')
-        	    -- vim.keymap.set('n', "<C-w>", '<cmd>bd<cr>')
+        	    vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
+        	    vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
+        	    vim.keymap.set('n', '<Leader>m', '<cmd>TroubleToggle<cr>')
+        	    vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
+        	    vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
         	    vim.keymap.set('n', "gt", '<cmd>bn<cr>')
         	    vim.keymap.set('n', "gT", '<cmd>bp<cr>')
-        	    -- vim.keymap.set('n', "<C-Tab>", '<cmd>bnext<cr>')
         	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
-        	    vim.keymap.set('n', "<C-k><C-i>", vim.lsp.buf.hover)
-                vim.keymap.set('n', '<C-k><C-r>', vim.lsp.buf.rename)
-                vim.keymap.set('n', '<C-k><C-d>', vim.diagnostic.open_float)
-                vim.keymap.set('n', 'mt', MiniMap.toggle)
-        	    vim.keymap.set({'n','v'}, "<C-.>", vim.lsp.buf.code_action)
+        	    vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
+                vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename)
+                vim.keymap.set('n', '<Leader>d', vim.diagnostic.open_float)
+                vim.keymap.set('n', '<Leader>o', MiniMap.toggle)
+        	    vim.keymap.set({'n','v'}, "<Leader>.", vim.lsp.buf.code_action)
                 function _G.set_terminal_keymaps()
                     local opts = {buffer = 0}
                     vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
@@ -373,6 +401,9 @@ let
         pkgs.vimExtraPlugins.Comment-nvim
         # codewindow-nvim
         mini-nvim
+        vim-abolish
+        # tmux-nvim
+        close-buffers-vim
         (pkgs.vimUtils.buildVimPlugin {
           name = "stickybuf-nvim";
           src = pkgs.fetchFromGitHub {
@@ -396,7 +427,6 @@ let
         ghc
         jdt-language-server
         rust-analyzer
-        # clang-tools
       ];
     };
 
@@ -654,6 +684,15 @@ let
     xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; android_sdk.accept_license = true; }";
     home.enableNixpkgsReleaseCheck = true;
 
+    home.file.".config/xdg-desktop-portal/gnome-portals.conf".text = ''
+      [preferred]
+      default=gtk
+    '';
+    home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
+      [preferred]
+      default=hyprland
+    '';
+
     news.display = "show";
 
     qt = {
@@ -682,9 +721,9 @@ let
       gtk3.extraConfig = {
         gtk-application-prefer-dark-theme = 1;
       };
-      gtk4.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
-      };
+      # gtk4.extraConfig = {
+      #   gtk-application-prefer-dark-theme = 1;
+      # };
     };
     xdg = {
       enable = true;
@@ -695,29 +734,409 @@ let
       };
     };
 
+
+    home.file.".config/hypr/hyprland.conf".text = ''
+      # See https://wiki.hyprland.org/Configuring/Monitors/
+      monitor=eDP-1,1920x1080@60,auto,1
+      monitor=,preferred,auto,1,mirror,eDP-1
+    
+      # See https://wiki.hyprland.org/Configuring/Keywords/ for more
+    
+      # Execute your favorite apps at launch
+      # exec-once = waybar & hyprpaper & firefox
+      exec-once = ${pkgs.swaynotificationcenter}/bin/swaync
+      exec-once = /usr/libexec/polkit-gnome-authentication-agent-1
+      exec-once = ${pkgs.waybar}/bin/waybar
+      exec-once = ${pkgs.hypridle}/bin/hypridle
+      exec-once = dbus-update-activation-environment --systemd --all
+      exec-once=[workspace 1 silent] /bin/kitty
+      exec-once=[workspace 2 silent] sleep 5 && flatpak run io.gitlab.librewolf-community
+      exec-once=secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx
+      exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
+      exec-once=${pkgs.hyprpaper}/bin/hyprpaper
+    
+      # Source a file (multi-file configs)
+      # source = ~/.config/hypr/myColors.conf
+    
+      # Set programs that you use
+      $terminal = /bin/kitty
+      $fileManager = nautilus
+      $menu = ${pkgs.wofi}/bin/wofi --show drun
+    
+      # Some default env vars.
+      env = XCURSOR_SIZE,24
+      env = QT_QPA_PLATFORMTHEME,qt5ct # change to qt6ct if you have that
+      env = GTK_THEME,Adwaita:dark
+    
+      # For all categories, see https://wiki.hyprland.org/Configuring/Variables/
+      input {
+          kb_layout = us
+          kb_variant =
+          kb_model =
+          kb_options =
+          kb_rules =
+    
+          follow_mouse = 1
+    
+          touchpad {
+              natural_scroll = yes
+          }
+    
+          sensitivity = 1.0 # -1.0 to 1.0, 0 means no modification.
+          repeat_rate=50
+          repeat_delay=300
+      }
+    
+      general {
+          # See https://wiki.hyprland.org/Configuring/Variables/ for more
+    
+          gaps_in = 5
+          gaps_out = 20
+          border_size = 2
+          col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+          col.inactive_border = rgba(595959aa)
+    
+          layout = dwindle
+    
+          # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
+          allow_tearing = false
+      }
+    
+      decoration {
+          # See https://wiki.hyprland.org/Configuring/Variables/ for more
+    
+          rounding = 10
+        
+          blur {
+              enabled = true
+              size = 3
+              passes = 1
+          }
+    
+          drop_shadow = yes
+          shadow_range = 4
+          shadow_render_power = 3
+          col.shadow = rgba(1a1a1aee)
+      }
+    
+      animations {
+          enabled = yes
+    
+          # Some default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
+    
+          bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+    
+          animation = windows, 1, 7, myBezier
+          animation = windowsOut, 1, 7, default, popin 80%
+          animation = border, 1, 10, default
+          animation = borderangle, 1, 8, default
+          animation = fade, 1, 7, default
+          animation = workspaces, 1, 6, default
+      }
+    
+      dwindle {
+          # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
+          pseudotile = yes # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
+          preserve_split = yes # you probably want this
+      }
+    
+      master {
+          # See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
+          new_is_master = true
+      }
+    
+      gestures {
+          # See https://wiki.hyprland.org/Configuring/Variables/ for more
+          workspace_swipe = off
+      }
+    
+      misc {
+          # See https://wiki.hyprland.org/Configuring/Variables/ for more
+          force_default_wallpaper = 0 # Set to 0 or 1 to disable the anime mascot wallpapers
+      }
+    
+      # Example per-device config
+      # See https://wiki.hyprland.org/Configuring/Keywords/#per-device-input-configs for more
+      device {
+          name = epic-mouse-v1
+          sensitivity = -0.5
+      }
+    
+      # Example windowrule v1
+      # windowrule = float, ^(kitty)$
+      # Example windowrule v2
+      # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
+      # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
+      windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
+    
+    
+      # See https://wiki.hyprland.org/Configuring/Keywords/ for more
+      $mainMod = SUPER
+    
+      # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
+      bind = $mainMod, RETURN, exec, $terminal
+      bind = $mainMod, Q, killactive,
+      bind = $mainMod SHIFT, M, exit,
+      bind = $mainMod SHIFT, P, exec, poweroff
+      bind = $mainMod SHIFT, F, exec, if [[ $(powerprofilesctl get) = 'power-saver' ]]; then powerprofilesctl set balanced; else powerprofilesctl set power-saver; fi
+      bind = $mainMod SHIFT, W, exec, pkill hyprpaper
+      bind = $mainMod SHIFT, B, exec, rfkill toggle bluetooth
+      bind = $mainMod SHIFT, R, exec, nmcli d wifi rescan
+      bind = $mainMod, L, exec, swaylock
+      bind = $mainMod, E, exec, $fileManager
+      bind = $mainMod, V, togglefloating, 
+      bind = $mainMod, R, exec, $menu
+      bind = $mainMod, P, pseudo, # dwindle
+      bind = $mainMod, J, togglesplit, # dwindle
+    
+      # Move focus with mainMod + arrow keys
+      bind = $mainMod, left, movefocus, l
+      bind = $mainMod, right, movefocus, r
+      bind = $mainMod, up, movefocus, u
+      bind = $mainMod, down, movefocus, d
+
+      # Move window mainMod + arrow keys
+      bind = $mainMod SHIFT, left, movewindow, l
+      bind = $mainMod SHIFT, right, movewindow, r
+      bind = $mainMod SHIFT, up, movewindow, u
+      bind = $mainMod SHIFT, down, movewindow, d
+    
+      # Switch workspaces with mainMod + [0-9]
+      bind = $mainMod, 1, workspace, 1
+      bind = $mainMod, 2, workspace, 2
+      bind = $mainMod, 3, workspace, 3
+      bind = $mainMod, 4, workspace, 4
+      bind = $mainMod, 5, workspace, 5
+      bind = $mainMod, 6, workspace, 6
+      bind = $mainMod, 7, workspace, 7
+      bind = $mainMod, 8, workspace, 8
+      bind = $mainMod, 9, workspace, 9
+      bind = $mainMod, 0, workspace, 10
+    
+      # Move active window to a workspace with mainMod + SHIFT + [0-9]
+      bind = $mainMod SHIFT, 1, movetoworkspace, 1
+      bind = $mainMod SHIFT, 2, movetoworkspace, 2
+      bind = $mainMod SHIFT, 3, movetoworkspace, 3
+      bind = $mainMod SHIFT, 4, movetoworkspace, 4
+      bind = $mainMod SHIFT, 5, movetoworkspace, 5
+      bind = $mainMod SHIFT, 6, movetoworkspace, 6
+      bind = $mainMod SHIFT, 7, movetoworkspace, 7
+      bind = $mainMod SHIFT, 8, movetoworkspace, 8
+      bind = $mainMod SHIFT, 9, movetoworkspace, 9
+      bind = $mainMod SHIFT, 0, movetoworkspace, 10
+    
+      # Example special workspace (scratchpad)
+      bind = $mainMod, S, togglespecialworkspace, magic
+      bind = $mainMod SHIFT, S, movetoworkspace, special:magic
+    
+      # Scroll through existing workspaces with mainMod + scroll
+      bind = $mainMod, mouse_down, workspace, e+1
+      bind = $mainMod, mouse_up, workspace, e-1
+    
+      # Move/resize windows with mainMod + LMB/RMB and dragging
+      bindm = $mainMod, mouse:272, movewindow
+      bindm = $mainMod, mouse:273, resizewindow
+
+      bind = , XF86AudioRaiseVolume, exec, ${pkgs.pamixer}/bin/pamixer -i 5 
+      bind = , XF86AudioLowerVolume, exec, ${pkgs.pamixer}/bin/pamixer -d 5 
+      bind = , XF86AudioMicMute, exec, ${pkgs.pamixer}/bin/pamixer --default-source -m
+      bind = , XF86AudioMute, exec, ${pkgs.pamixer}/bin/pamixer -t
+      bind = , XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl play-pause
+      bind = , XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl play-pause
+      bind = , XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl next
+      bind = , XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous
+      bind = , XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
+      bind = , XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
+      bind = , Print, exec, ${pkgs.grim}/bin/grim "$(xdg-user-dir PICTURES)/$(date +'%s_grim.png')"
+    '';
+
+    programs.waybar = {
+      enable = true;
+      settings = {
+        mainBar = {
+          layer = "top";
+          position = "top";
+          margin = "9 13 -10 18";
+          spacing=8;
+          modules-left = [ "hyprland/workspaces" ];
+          modules-center = [ "clock" ];
+          modules-right = [ "pulseaudio" "cpu" "memory" "network" "bluetooth" "power-profiles-daemon" "backlight" "battery" "tray" ];
+          clock = {
+            format = "{:%a, %d %b, %I:%M %p}";
+          };
+          pulseaudio = {
+            reverse-scrolling = 1;
+            format = "{volume}% {icon} {format_source}";
+            format-bluetooth = "{volume}%  {format_source}";
+            format-bluetooth-muted = " {format_source}";
+            format-muted = "󰸈 {format_source}";
+            format-source = "{volume}% ";
+            format-source-muted = "";
+            format-icons = {
+              default = [ "" "" "" ];
+            };
+            on-click= "${pkgs.pavucontrol}/bin/pavucontrol";
+          };
+          cpu = {
+            interval = 2;
+            format = "{usage}% ";
+          };
+          memory = {
+              interval=2;
+              format="{percentage}% 󰍛 {swapPercentage}% ";
+          };
+          network={
+              format-wifi="{essid} 󰖩";
+              format-ethernet="󰈀";
+              format-disconnected="󰖪";
+              on-click="${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
+          };
+          bluetooth={
+              format="󰂯";
+              format-disabled="󰂲";
+              format-connected="󰂱";
+          };
+          power-profiles-daemon={
+              "format-icons"={
+                  "balanced"="";
+                  "performance"="󰈸";
+                  "power-saver"="󰌪";
+              };
+          };
+          backlight = {
+            device = "intel_backlight";
+            format = "{percent}% {icon}";
+            format-icons = [ "" ];
+          };
+
+          battery = {
+            states = {
+              warning = 30;
+              critical = 15;
+            };
+            format= "{capacity}% {icon}?";
+            format-plugged = "{capacity}% ";
+            format-charging = "{capacity}% ";
+            format-discharging = "{capacity}% {icon}";
+            format-icons = [ "" "" "" "" "" ];
+          };
+
+          tray = {
+            icon-size = 16;
+            spacing = 0;
+          };
+        };
+      };
+      style=''
+        *{
+            border: none;
+            font-family: 'FiraCode Nerd Font Mono';
+            font-size: 1em;
+            background: transparent;
+        }
+        .module{
+            background: #383c4a;
+            border-radius: 10px;
+            padding: 0 16px 0 16px;
+        }
+        #workspaces{
+            padding: 0;
+        }
+        #workspaces button.active{
+            border-radius: inherit;
+            background: #4e5263;
+        }
+        #workspaces button:hover{
+            transition: none;
+            box-shadow: none;
+            text-shadow: none;
+            border-radius: inherit;
+            background: #7c818c;
+        }
+        #battery.plugged{
+            color: #ffffff;
+            background-color: #26A65B;
+        }
+        #battery.charging{
+            color: #ffffff;
+            background-color: #26A65B;
+        }
+        #battery.warning:not(.charging) {
+            background-color: #ffbe61;
+            color: black;
+        }
+
+        #battery.critical:not(.charging) {
+            background-color: #f53c3c;
+            color: black;
+        }
+      '';
+    };
+    home.file.".config/wofi/config".text=''
+        hide_scroll=true
+        show=drun
+        width=30%
+        lines=8
+        line_wrap=word
+        term=kitty
+        allow_markup=true
+        always_parse_args=false
+        show_all=true
+        print_command=true
+        layer=overlay
+        allow_images=true
+        sort_order=alphabetical
+        gtk_dark=true
+        prompt=
+        image_size=20
+        display_generic=false
+        location=center
+        key_expand=Tab
+        insensitive=true
+    '';
+    home.file.".config/wofi/style.css".source = ./wofi.css;
+    home.file.".config/hypr/hypridle.conf".text = ''
+      general {
+          lock_cmd = pidof swaylock || swaylock       # avoid starting multiple hyprlock instances.
+          before_sleep_cmd = loginctl lock-session    # lock before suspend.
+          after_sleep_cmd = hyprctl dispatch dpms on  # to avoid having to press a key twice to turn on the display.
+      }
+    '';
+    home.file.".config/swaylock/config".text="color=333333";
+    home.file.".config/hypr/hyprpaper.conf".text=''
+        preload = ${./wallpaper2.png}
+        wallpaper = ,${./wallpaper2.png}
+    '';
+
+
     services.syncthing.enable = true;
 
     systemd.user.services = {
       startup = {
         Unit = { Description = "Startup"; };
-        Service = { ExecStart = "bash ${./startup.sh}"; };
-        Install = { WantedBy = [ "graphical-session.target" ]; };
+        Service = {
+          ExecStartPre = "/bin/sleep 5";
+          ExecStart = "bash ${./startup.sh}";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
       };
       rclone = {
         Unit = {
           Description = "rclone";
         };
         Service = {
-          ExecStart = "bash -c 'while ! host www.google.com; do sleep 5; done; ${pkgs.rclone}/bin/rclone copy --update ${home.homeDirectory}/backup/Syncthing drive:Syncthing'";
+          ExecStartPre = "bash -c 'while ! host www.google.com; do sleep 5; done'";
+          ExecStart = "${pkgs.rclone}/bin/rclone copy --update ${home.homeDirectory}/backup/Syncthing drive:Syncthing";
         };
-        Install = { WantedBy = [ "graphical-session.target" ]; };
+        Install = { WantedBy = [ "default.target" ]; };
       };
       keepass = {
         Unit = {
           Description = "KeepassXC";
         };
         Service = {
-          ExecStart = "bash -c 'sleep 5; secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx'";
+          ExecStartPre = "/bin/sleep 5";
+          ExecStart = "bash -c 'secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx'";
         };
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
@@ -730,6 +1149,24 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
+      foot = {
+        Unit = { Description = "Start foot on login"; };
+        Service = {
+          ExecStartPre = "/bin/sleep 5";
+          Type = "oneshot";
+          ExecStart = "${pkgs.foot}/bin/foot";
+        };
+        Install = { WantedBy = [ "graphical-session.target" ]; };
+      };
+      # firefox = {
+      #   Unit = { Description = "Start firefox on login"; };
+      #   Service = {
+      #     ExecStartPre = "/bin/sleep 10";
+      #     Type = "oneshot";
+      #     ExecStart = "flatpak run io.gitlab.librewolf-community";
+      #   };
+      #   Install = { WantedBy = [ "graphical-session.target" ]; };
+      # };
       #cat = {
       #  Unit = { Description = "X11 Cat"; };
       #  Service = {
@@ -739,7 +1176,7 @@ let
       #};
     };
 
-    home.file.".gdbinit".text = "source ${pkgs.gef}/share/gef/gef.py";
+    home.file.".gdbinit".text = "source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py";
     home.file."Templates/emptyfile.txt".text = "";
 
     home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
@@ -825,7 +1262,7 @@ let
     home.file.".local/share/flatpak/overrides/com.google.AndroidStudio".text = ''
       [Context]
       filesystems=xdg-documents;!host
-      persistent=.android;Android;.local/share/gradle
+      persistent=.android;Android;.local/share/gradle;.gradle
 
       [Session Bus Policy]
       org.freedesktop.Flatpak=none
@@ -1032,7 +1469,7 @@ let
         clock-show-seconds = false;
         clock-show-weekday = true;
         clock-format = "24h";
-        color-scheme = "prefer-dark";
+        # color-scheme = "prefer-dark";
         font-antialiasing = "rgba";
         font-hinting = "full";
         show-battery-percentage = true;
@@ -1149,7 +1586,7 @@ let
     };
 
     nix = {
-      enable=true;
+      enable = true;
       package = pkgs.nix;
       settings = {
         experimental-features = [ "nix-command" "flakes" ];
@@ -1159,10 +1596,10 @@ let
         max-jobs = "auto";
         extra-nix-path = "nixpkgs=flake:nixpkgs";
       };
-        # registry.local = {
-        #   from = { type = "indirect"; id = "nixpkgs"; };
-        #   flake = nixpkgs;
-        # };
+      # registry.local = {
+      #   from = { type = "indirect"; id = "nixpkgs"; };
+      #   flake = nixpkgs;
+      # };
     };
 
     home.activation = {
