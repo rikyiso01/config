@@ -32,14 +32,6 @@ let
       iputils
       binutils
       unixtools.netstat
-      gnomeExtensions.caffeine
-      gnomeExtensions.alphabetical-app-grid
-      gnomeExtensions.compiz-windows-effect
-      gnomeExtensions.compiz-alike-magic-lamp-effect
-      gnomeExtensions.burn-my-windows
-      gnomeExtensions.system-monitor-tray-indicator
-      gnomeExtensions.stopwatch
-      gnomeExtensions.one-window-wonderland
       fira-code
       fira-code-nerdfont
       php
@@ -54,9 +46,7 @@ let
       python311Packages.ipython
       devbox
       pre-commit
-      gnome-console
       git-ignore
-      evtest
       ascii
       virt-manager
       w3m
@@ -112,18 +102,6 @@ let
         set-option -sa terminal-features ',foot:RGB'
         set-option -sg escape-time 10
         set -g @catppuccin_flavour 'mocha' # latte,frappe, macchiato or mocha
-
-        # is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?\.?(view|n?vim?x?)(-wrapped)?(diff)?$'"
-        #
-        # bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' { if -F '#{pane_at_left}' "" 'select-pane -L' }
-        # bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' { if -F '#{pane_at_bottom}' "" 'select-pane -D' }
-        # bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' { if -F '#{pane_at_top}' "" 'select-pane -U' }
-        # bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' { if -F '#{pane_at_right}' "" 'select-pane -R' }
-        #
-        # bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' "" 'select-pane -L'
-        # bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' "" 'select-pane -D'
-        # bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' "" 'select-pane -U'
-        # bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' "" 'select-pane -R'
       '';
     };
     programs.htop.enable = true;
@@ -141,7 +119,6 @@ let
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
-    programs.foot = { enable = true; settings = { main = { shell = "zsh -c \"${pkgs.tmux}/bin/tmux new-session -As default 'exec ${pkgs.ranger}/bin/ranger'\""; font = "FiraCode Nerd Font Mono:size=16"; }; }; };
     programs.kitty = { enable = true; font.name = "FiraCode Nerd Font Mono"; font.size = 16; settings = { enable_audio_bell = false; startup_session = "${home.homeDirectory}/.config/kitty/session.conf"; }; };
     home.file.".config/kitty/session.conf".text = "cd ${home.homeDirectory}/backup/Documents\nlaunch zsh -c \"${pkgs.tmux}/bin/tmux new-session -As default 'exec ${pkgs.ranger}/bin/ranger'\"";
     programs.lazygit.enable = true;
@@ -166,7 +143,6 @@ let
       _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=${config.xdg.configHome}/java";
       NIXOS_OZONE_WL = "1";
       LIBVIRT_DEFAULT_URI = "qemu:///system";
-      # GTK_THEME = "Adwaita:dark";
       SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/gcr/ssh";
     };
 
@@ -198,17 +174,14 @@ let
       container_name_default="test"
     '';
 
-    # programs.bash = {
-    #   enable = true;
-    #   initExtra = "[[ $- == *i* ]] && exec ${pkgs.zsh}/bin/zsh";
-    #   historyFile = "${config.xdg.dataHome}/bash/bash_history";
-    # };
-
     programs.zsh = {
       enable = true;
       autosuggestion.enable = true;
       initExtra = ''
         bindkey -e
+        if [[ -r "$\{XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-$\{(%):-%n}.zsh" ]]; then
+            source "$\{XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-$\{(%):-%n}.zsh"
+        fi
         source $HOME/.config/theme.zsh
       '';
       shellAliases = {
@@ -275,7 +248,6 @@ let
                 require("feline").setup()
                 require("auto-session").setup{}
                 require("autoclose").setup()
-                -- require("stickybuf").setup()
                 require("formatter").setup{
                     filetype={
                         python={function()return {exe="${pkgs.python312Packages.black}/bin/black",args={"-"},stdin=true} end},
@@ -305,7 +277,6 @@ let
                 require("Comment").setup{}
                 require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
                 require("trouble").setup{icons=false,action_keys={jump={}}}
-                -- require("tmux").setup()
                 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
                 local cmp=require("cmp")
                 cmp.setup{
@@ -345,9 +316,6 @@ let
                 vim.opt.tabstop = 4
                 vim.opt.shiftwidth = 4
                 vim.opt.number = true
-                -- vim.g.loaded_netrw = 1
-                -- vim.g.loaded_netrwPlugin = 1
-                -- vim.g.rnvimr_enable_ex=1
                 vim.opt.incsearch = true
                 vim.opt.shortmess:remove({ 'S' })
         	    vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
@@ -399,10 +367,8 @@ let
         formatter-nvim
         rnvimr
         pkgs.vimExtraPlugins.Comment-nvim
-        # codewindow-nvim
         mini-nvim
         vim-abolish
-        # tmux-nvim
         close-buffers-vim
         (pkgs.vimUtils.buildVimPlugin {
           name = "stickybuf-nvim";
@@ -430,252 +396,6 @@ let
       ];
     };
 
-    programs.vscode = {
-      enable = true;
-      enableExtensionUpdateCheck = false;
-      enableUpdateCheck = false;
-      extensions = (with nix-vscode-extensions.extensions.x86_64-linux.open-vsx; [
-        mads-hartmann.bash-ide-vscode
-        jeff-hykin.better-cpp-syntax
-        ms-python.black-formatter
-        ms-vscode.cpptools-themes
-        streetsidesoftware.code-spell-checker
-        vscjava.vscode-java-debug
-        ms-azuretools.vscode-docker
-        # elmtooling.elm-ls-vscode
-        tamasfe.even-better-toml
-        haskell.haskell
-        justusadam.language-haskell
-        ms-python.isort
-        streetsidesoftware.code-spell-checker-italian
-        wholroyd.jinja
-        ms-toolsai.jupyter
-        ms-toolsai.vscode-jupyter-cell-tags
-        ms-toolsai.jupyter-keymap
-        ms-toolsai.jupyter-renderers
-        ms-toolsai.vscode-jupyter-slideshow
-        fwcd.kotlin
-        mathiasfrohlich.kotlin
-        redhat.java
-        ms-vscode.live-server
-        marp-team.marp-vscode
-        pkief.material-icon-theme
-        vscjava.vscode-maven
-        bbenoist.nix
-        jnoortheen.nix-ide
-        zhuangtongfa.material-theme
-        xdebug.php-debug
-        bmewburn.vscode-intelephense-client
-        esbenp.prettier-vscode
-        vscjava.vscode-java-dependency
-        getpsalm.psalm-vscode-plugin
-        ms-python.python
-        rust-lang.rust-analyzer
-        foxundermoon.shell-format
-        ms-vscode.test-adapter-converter
-        hbenl.vscode-test-explorer
-        vscjava.vscode-java-test
-        tomoki1207.pdf
-        redhat.vscode-xml
-        redhat.vscode-yaml
-        hbenl.test-adapter-converter
-        # surendrajat.apklab
-        loyieking.smalise
-        hashicorp.hcl
-        mechatroner.rainbow-csv
-        janisdd.vscode-edit-csv
-        redhat.ansible
-        # shopify.ruby-lsp
-        dhall.vscode-dhall-lsp-server
-        dhall.dhall-lang
-        bpruitt-goddard.mermaid-markdown-syntax-highlighting
-        tomoyukim.vscode-mermaid-editor
-        mkhl.direnv
-        aaron-bond.better-comments
-        # ms-vscode.makefile-tools
-        vscodevim.vim
-        vscjava.vscode-gradle
-        ryanluker.vscode-coverage-gutters
-        # codeium.codeium
-        alexkrechik.cucumberautocomplete
-      ]) ++ (with nix-vscode-extensions.extensions.x86_64-linux.vscode-marketplace; [
-        htmlhint.vscode-htmlhint
-        visualstudioexptteam.vscodeintellicode
-        ms-python.vscode-pylance
-        ms-vscode.cpptools
-      ]);
-      keybindings = [
-        {
-          "key" = "ctrl+e";
-          "command" = "-workbench.action.quickOpen";
-        }
-        {
-          "key" = "ctrl+[Minus]";
-          "command" = "workbench.action.terminal.toggleTerminal";
-        }
-        {
-          "key" = "down";
-          "command" = "-editor.action.scrollDownHover";
-          "when" = "editorHoverFocused";
-        }
-        {
-          "key" = "left";
-          "command" = "-editor.action.scrollLeftHover";
-          "when" = "editorHoverFocused";
-        }
-        {
-          "key" = "right";
-          "command" = "-editor.action.scrollRightHover";
-          "when" = "editorHoverFocused";
-        }
-        {
-          "key" = "up";
-          "command" = "-editor.action.scrollUpHover";
-          "when" = "editorHoverFocused";
-        }
-        {
-          "command" = "explorer.newFile";
-          "key" = "ctrl+n";
-        }
-        {
-          "command" = "workbench.action.toggleMaximizedPanel";
-          "key" = "ctrl+shift+b";
-        }
-      ];
-      mutableExtensionsDir = false;
-      userSettings = {
-        "editor.fontLigatures" = true;
-        "files.autoSave" = "onFocusChange";
-        "editor.fontSize" = 16;
-        "python.formatting.provider" = "none";
-        "explorer.confirmDragAndDrop" = false;
-        "git.confirmSync" = false;
-        "git.autofetch" = true;
-        "python.analysis.typeCheckingMode" = "strict";
-        "editor.formatOnSave" = true;
-        "git.enableCommitSigning" = true;
-        "update.mode" = "none";
-        "rust-analyzer.server.path" = "${pkgs.rust-analyzer}/bin/rust-analyzer";
-        "github.gitProtocol" = "ssh";
-        "editor.fontFamily" = "'Fira Code'";
-        "editor.linkedEditing" = true;
-        "search.smartCase" = true;
-        "git.enableSmartCommit" = true;
-        "[typescript]" = {
-          "editor.defaultFormatter" = "esbenp.prettier-vscode";
-        };
-        "prettier.tabWidth" = 4;
-        "[html]" = {
-          "editor.defaultFormatter" = "vscode.html-language-features";
-        };
-        "[css]" = {
-          "editor.defaultFormatter" = "esbenp.prettier-vscode";
-        };
-        "[javascript]" = {
-          "editor.defaultFormatter" = "esbenp.prettier-vscode";
-        };
-        "[json]" = {
-          "editor.defaultFormatter" = "esbenp.prettier-vscode";
-        };
-        "rust-analyzer.inlayHints.closureReturnTypeHints.enable" = true;
-        "[dockercompose]" = {
-          "editor.defaultFormatter" = "ms-azuretools.vscode-docker";
-        };
-        "[jsonc]" = {
-          "editor.defaultFormatter" = "vscode.json-language-features";
-        };
-        "python.defaultInterpreterPath" = "${pkgs.python3}/bin/python3";
-        "explorer.confirmDelete" = false;
-        "terminal.integrated.enableMultiLinePasteWarning" = false;
-        "git.autoStash" = true;
-        "git.fetchOnPull" = true;
-        "git.mergeEditor" = true;
-        "git.pullBeforeCheckout" = true;
-        "psalm.unusedVariableDetection" = true;
-        "terminal.integrated.commandsToSkipShell" = [
-          "language-julia.interrupt"
-        ];
-        "intelephense.diagnostics.typeErrors" = false;
-        "markdown.marp.enableHtml" = true;
-        "markdown.marp.themes" = [
-          "./theme.css"
-        ];
-        "cSpell.language" = "en;it";
-        "cSpell.enableFiletypes" = [
-          "!python"
-        ];
-        "[python]" = {
-          "editor.defaultFormatter" = "ms-python.black-formatter";
-          "editor.formatOnType" = true;
-        };
-        "redhat.telemetry.enabled" = true;
-        "workbench.editor.limit.value" = 7;
-        "workbench.editor.limit.enabled" = true;
-        "workbench.colorTheme" = "One Dark Pro Darker";
-        "workbench.preferredLightColorTheme" = "GitHub Light";
-        "workbench.preferredDarkColorTheme" = "One Dark Pro Darker";
-        "[yaml]" = {
-          "editor.defaultFormatter" = "redhat.vscode-yaml";
-        };
-        "[dockerfile]" = {
-          "editor.defaultFormatter" = "ms-azuretools.vscode-docker";
-        };
-        "java.configuration.runtimes" = [
-          {
-            "name" = "JavaSE-19";
-            "path" = "${pkgs.jdk19}/lib/openjdk";
-            "default" = true;
-          }
-        ];
-        "settingsSync.ignoredSettings" = [
-          "-python.formatting.blackPath"
-          "-python.defaultInterpreterPath"
-        ];
-        "java.configuration.updateBuildConfiguration" = "automatic";
-        "workbench.iconTheme" = "material-icon-theme";
-        "java.compile.nullAnalysis.mode" = "automatic";
-        "java.completion.filteredTypes" = [
-          "com.sun.*"
-          "sun.*"
-          "jdk.*"
-          "org.graalvm.*"
-          "io.micrometer.shaded.*"
-        ];
-        "haskell.manageHLS" = "PATH";
-        "window.zoomLevel" = 1;
-        "vsintellicode.modelDownloadPath" = "${home.homeDirectory}/.config/Code/User/intellicode";
-        "shellformat.path" = "${pkgs.shfmt}/bin/shfmt";
-        "apklab.apkSignerPath" = "${home.homeDirectory}/.config/Code/User/apklab/uber-apk-signer-1.3.0.jar";
-        "apklab.apktoolPath" = "${home.homeDirectory}/.config/Code/User/apklab/apktool_2.8.1.jar";
-        "apklab.jadxDirPath" = "${home.homeDirectory}/.config/Code/User/apklab/jadx-1.4.7";
-        "terminal.integrated.enablePersistentSessions" = false;
-        "ansible.python.interpreterPath" = "${pkgs.python3}/bin/python3";
-        "python.analysis.stubPath" = "/var/home/riky/backup/Documents/Projects/Python/common-stubs";
-        "python.analysis.extraPaths" = [ "typings" ];
-        "python.analysis.autoImportCompletions" = true;
-        "ansible.ansible.path" = "${pkgs.ansible}/bin/ansible";
-        "ansible.validation.lint.path" = "${pkgs.ansible-lint}/bin/ansible-lint";
-        "vscode-dhall-lsp-server.executable" = "${pkgs.dhall-lsp-server}/bin/dhall-lsp-server";
-        "rubyLsp.rubyVersionManager" = "custom";
-        "rubyLsp.customRubyCommand" = "${pkgs.ruby.withPackages (ps: with ps; [ ruby-lsp ])}/bin/ruby";
-        "nix.formatterPath" = "${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt";
-        "haskell.serverEnvironment" = {
-          "PATH" = "${pkgs.busybox}/bin:${pkgs.ghc}/bin:${pkgs.haskellPackages.haskell-language-server}/bin";
-        };
-        "vim.handleKeys" = {
-          "<C-w>" = false;
-          "<C-k>" = false;
-          "<C-d>" = true;
-          "<C-s>" = false;
-          "<C-z>" = false;
-        };
-        "codeium.enableConfig" = {
-          "*" = false;
-        };
-      };
-    };
-
-
     programs.nix-index.enable = true;
 
     programs.home-manager.enable = true;
@@ -684,47 +404,43 @@ let
     xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; android_sdk.accept_license = true; }";
     home.enableNixpkgsReleaseCheck = true;
 
-    home.file.".config/xdg-desktop-portal/gnome-portals.conf".text = ''
-      [preferred]
-      default=gtk
-    '';
     home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
       [preferred]
-      default=hyprland
+      default=hyprland;gtk
     '';
 
     news.display = "show";
 
-    qt = {
-      enable = true;
-      platformTheme.name = "adwaita";
-      style = {
-        name = "adwaita-dark";
-        package = pkgs.adwaita-qt;
-      };
-    };
-    gtk = {
-      enable = true;
-      cursorTheme = {
-        name = "Bibata-Modern-Amber";
-        package = pkgs.bibata-cursors;
-      };
-      iconTheme = {
-        name = "Adwaita";
-        package = pkgs.gnome.adwaita-icon-theme;
-      };
-      theme = {
-        name = "Adwaita-dark";
-        package = pkgs.gnome.gnome-themes-extra;
-      };
-      gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
-      gtk3.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
-      };
-      # gtk4.extraConfig = {
-      #   gtk-application-prefer-dark-theme = 1;
-      # };
-    };
+    # qt = {
+    #   enable = true;
+    #   platformTheme.name = "adwaita";
+    #   style = {
+    #     name = "adwaita-dark";
+    #     package = pkgs.adwaita-qt;
+    #   };
+    # };
+    # gtk = {
+    #   enable = true;
+    #   cursorTheme = {
+    #     name = "Bibata-Modern-Amber";
+    #     package = pkgs.bibata-cursors;
+    #   };
+    #   iconTheme = {
+    #     name = "Adwaita";
+    #     package = pkgs.gnome.adwaita-icon-theme;
+    #   };
+    #   theme = {
+    #     name = "Adwaita-dark";
+    #     package = pkgs.gnome.gnome-themes-extra;
+    #   };
+    #   gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+    #   gtk3.extraConfig = {
+    #     gtk-application-prefer-dark-theme = 1;
+    #   };
+    #   # gtk4.extraConfig = {
+    #   #   gtk-application-prefer-dark-theme = 1;
+    #   # };
+    # };
     xdg = {
       enable = true;
       userDirs = {
@@ -765,8 +481,7 @@ let
     
       # Some default env vars.
       env = XCURSOR_SIZE,24
-      env = QT_QPA_PLATFORMTHEME,qt5ct # change to qt6ct if you have that
-      env = GTK_THEME,Adwaita:dark
+      # env = QT_QPA_PLATFORMTHEME,qt5ct # change to qt6ct if you have that
     
       # For all categories, see https://wiki.hyprland.org/Configuring/Variables/
       input {
@@ -1033,6 +748,7 @@ let
             font-family: 'FiraCode Nerd Font Mono';
             font-size: 1em;
             background: transparent;
+            color: #ffffff;
         }
         .module{
             background: #383c4a;
@@ -1108,7 +824,6 @@ let
         wallpaper = ,${./wallpaper2.png}
     '';
 
-
     services.syncthing.enable = true;
 
     systemd.user.services = {
@@ -1130,16 +845,6 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
-      keepass = {
-        Unit = {
-          Description = "KeepassXC";
-        };
-        Service = {
-          ExecStartPre = "/bin/sleep 5";
-          ExecStart = "bash -c 'secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx'";
-        };
-        Install = { WantedBy = [ "graphical-session.target" ]; };
-      };
       autotune = {
         Unit = { Description = "Powertop autotune"; };
         Service = {
@@ -1149,35 +854,9 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
-      foot = {
-        Unit = { Description = "Start foot on login"; };
-        Service = {
-          ExecStartPre = "/bin/sleep 5";
-          Type = "oneshot";
-          ExecStart = "${pkgs.foot}/bin/foot";
-        };
-        Install = { WantedBy = [ "graphical-session.target" ]; };
-      };
-      # firefox = {
-      #   Unit = { Description = "Start firefox on login"; };
-      #   Service = {
-      #     ExecStartPre = "/bin/sleep 10";
-      #     Type = "oneshot";
-      #     ExecStart = "flatpak run io.gitlab.librewolf-community";
-      #   };
-      #   Install = { WantedBy = [ "graphical-session.target" ]; };
-      # };
-      #cat = {
-      #  Unit = { Description = "X11 Cat"; };
-      #  Service = {
-      #    ExecStart = "${pkgs.oneko}/bin/oneko -tora -bg 'dark gray'";
-      #  };
-      #  Install = { WantedBy = [ "gnome-session-x11-services.target" ]; };
-      #};
     };
 
     home.file.".gdbinit".text = "source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py";
-    home.file."Templates/emptyfile.txt".text = "";
 
     home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
       { }
@@ -1188,35 +867,23 @@ let
       };
     home.file.".config/theme.zsh".source = ./theme.zsh;
 
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
-      {
-      "name": "net.downloadhelper.coapp",
-      "description": "Video DownloadHelper companion app",
-      "path": "${pkgs.callPackage ./downloadhelper.nix { }}/bin/net.downloadhelper.coapp-linux-64",
-      "type": "stdio",
-      "allowed_origins": [
-      "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
-      ]
-      }
-    '';
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text = ''
-      {
-      "allowed_origins": [
-      "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
-      "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
-      ],
-      "description": "KeePassXC integration with native messaging support",
-      "name": "org.keepassxc.keepassxc_browser",
-      "path": "${./keepassxc-proxy}",
-      "type": "stdio"
-      }
+    dconf.settings={
+        "org.gnome.desktop.interface"={
+            "color-scheme"="prefer-dark";
+        };
+    };
+
+    home.file.".var/app/io.gitlab.librewolf-community/.librewolf/librewolf.overrides.cfg".text=''
+      defaultPref("privacy.resistFingerprinting", false);
+      defaultPref("webgl.disabled", false);
+      defaultPref("security.OCSP.require", false);
     '';
 
     home.file.".var/app/io.gitlab.librewolf-community/.librewolf/native-messaging-hosts/net.downloadhelper.coapp.json".text = ''
       {
       "name": "net.downloadhelper.coapp",
       "description": "Video DownloadHelper companion app",
-      "path": "${pkgs.callPackage ./downloadhelper.nix { }}/bin/net.downloadhelper.coapp-linux-64",
+      "path": "${pkgs.vdhcoapp}/bin/vdhcoapp",
       "type": "stdio",
       "allowed_extensions": [
       "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}"
@@ -1238,11 +905,6 @@ let
 
     home.file.".local/bin/qemu".source = ./qemu.py;
     home.file.".local/bin/jupynvim".source = ./jupynvim.py;
-
-    home.file.".local/flatpak/brave" = {
-      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sfT ${./brave.jsonc} /etc/brave/policies/managed/brave.json && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark -incognito \"$@\"";
-      executable = true;
-    };
 
     home.file.".local/flatpak/librewolf" = {
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/librewolf \"$@\"";
@@ -1287,13 +949,6 @@ let
     home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = ''
       [Environment]
       ANKI_WAYLAND=1
-    '';
-    home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
-      [Context]
-      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro;!xdg-desktop;!~/.local/share/icons;!xdg-run/dconf;!~/.config/dconf;!~/.config/kioslaverc;!~/.local/share/applications;!host-etc
-
-      [Environment]
-      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
     '';
     home.file.".local/share/flatpak/overrides/io.gitlab.librewolf-community".text = ''
       [Context]
@@ -1360,8 +1015,8 @@ let
       [General]
       ConfigVersion=2
       MinimizeAfterUnlock=true
-      UseAtomicSaves=false
-      AutoSaveAfterEveryChange=false
+      UseAtomicSaves=true
+      AutoSaveAfterEveryChange=true
 
       [Browser]
       AlwaysAllowAccess=true
@@ -1404,7 +1059,6 @@ let
             "rest.insomnia.Insomnia"
             "org.ghidra_sre.Ghidra"
             "org.wireshark.Wireshark"
-            "net.ankiweb.Anki"
             "io.dbeaver.DBeaverCommunity"
             "com.obsproject.Studio"
             "org.gnome.seahorse.Application"
@@ -1424,7 +1078,6 @@ let
             "org.gnome.Evince"
             "org.gnome.Loupe"
             "org.remmina.Remmina"
-            "com.brave.Browser"
             "org.gnome.SimpleScan"
             "io.github.flattool.Warehouse"
             "app.moosync.moosync"
@@ -1433,6 +1086,7 @@ let
             "org.libreoffice.LibreOffice"
             "io.gitlab.librewolf-community"
             "eu.betterbird.Betterbird"
+            "org.mozilla.firefox"
           ];
         };
         # flathub-beta = {
@@ -1461,129 +1115,6 @@ let
       '';
     };
 
-    home.file.".local/share/backgrounds/background.jpg".source = ./wallpaper.jpg;
-
-    dconf.settings = {
-      "org/gnome/desktop/interface" = {
-        clock-show-date = true;
-        clock-show-seconds = false;
-        clock-show-weekday = true;
-        clock-format = "24h";
-        # color-scheme = "prefer-dark";
-        font-antialiasing = "rgba";
-        font-hinting = "full";
-        show-battery-percentage = true;
-        toolkit-accessibility = false;
-      };
-      "org/gnome/desktop/peripherals/mouse" = {
-        speed = 1.0;
-      };
-      "org/gnome/desktop/peripherals/touchpad" = {
-        click-method = "areas";
-        speed = 0.6;
-        tap-and-drag = true;
-        tap-to-click = true;
-        two-finger-scrolling-enabled = true;
-      };
-      "org/gnome/desktop/peripherals/keyboard" = {
-        delay = lib.hm.gvariant.mkUint32 300;
-        repeat-interval = lib.hm.gvariant.mkUint32 25;
-      };
-      "org/gnome/desktop/background" = {
-        color-shading-type = "solid";
-        picture-options = "zoom";
-        picture-uri = "file:///usr/share/backgrounds/gnome/adwaita-l.webp";
-        primary-color = "#000000000000";
-        secondary-color = "#000000000000";
-      };
-      "org/gnome/desktop/session" = {
-        idle-delay = 300;
-      };
-      "org/gnome/desktop/sound" = {
-        allow-volume-above-100-percent = true;
-        event-sounds = true;
-        theme-name = "__custom";
-      };
-      "org/gnome/desktop/wm/keybindings" = {
-        # move-to-monitor-left = [ ];
-        # move-to-monitor-right = [ ];
-        switch-input-source = [ ];
-        switch-input-source-backward = [ ];
-        # switch-to-workspace-left = [ "<Alt>j" ];
-        # switch-to-workspace-right = [ "<Alt>k" ];
-        close = [ "<Super>q" ];
-        # move-to-workspace-left = [ "<Alt>Left" ];
-        # move-to-workspace-right = [ "<Alt>Right" ];
-        # move-to-workspace-left = [ ];
-        # move-to-workspace-right = [ ];
-      };
-      "org/gnome/desktop/wm/preferences" = {
-        button-layout = ":close";
-      };
-      "org/gnome/mutter/keybindings" = {
-        # toggle-tiled-left = [ "<Control><Alt>Left" ];
-        # toggle-tiled-right = [ "<Control><Alt>Right" ];
-      };
-      "org/gnome/settings-daemon/plugins/color" = {
-        night-light-enabled = true;
-      };
-      "org/gnome/settings-daemon/plugins/media-keys" = {
-        # custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/" "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/" ];
-        # next = [ "<Super>Right" ];
-        play = [ "<Super>space" ];
-        # previous = [ "<Super>Left" ];
-      };
-      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-        binding = "<Shift><Super>p";
-        command = "gnome-session-quit --power-off";
-        name = "Poweroff";
-      };
-      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
-        binding = "<Super>Return";
-        command = "foot";
-        name = "Terminal";
-      };
-      # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
-      #   binding = "<Control><Alt>b";
-      #   command = "flatpak run com.brave.Browser";
-      #   name = "Browser";
-      # };
-      # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2" = {
-      #   binding = "<Control><Alt>v";
-      #   command = "flatpak run com.vscodium.codium";
-      #   name = "VSCode";
-      # };
-      "org/gnome/settings-daemon/plugins/power" = {
-        idle-brightness = 20;
-        power-button-action = "nothing";
-        sleep-inactive-battery-timeout = 300;
-        sleep-inactive-ac-type = "nothing";
-      };
-      "org/gnome/shell" = {
-        enabled-extensions = [
-          "compiz-alike-magic-lamp-effect@hermes83.github.com"
-          "compiz-windows-effect@hermes83.github.com"
-          "AlphabeticalAppGrid@stuarthayhurst"
-          "caffeine@patapon.info"
-          "burn-my-windows@schneegans.github.com"
-          "system-monitor-indicator@mknap.com"
-          "stopwatch@aliakseiz.github.com"
-          "gnome-one-window-wonderland@jqno.nl"
-        ];
-        favorite-apps = [ "io.gitlab.librewolf-community.desktop" "org.gnome.Nautilus.desktop" "org.codeberg.dnkl.foot.desktop" ];
-      };
-      "org/gnome/desktop/privacy" = {
-        remove-old-trash-files = true;
-        remove-old-temp-files = true;
-        old-files-age = 30;
-      };
-      "org/gnome/shell/extensions/burn-my-windows" = {
-        active-profile = toString ./window-animation.conf;
-      };
-      "org/gnome/shell/extensions/caffeine" = {
-        show-notifications = false;
-      };
-    };
 
     nix = {
       enable = true;
@@ -1608,17 +1139,16 @@ let
         ln -sfT "$HOME/backup/id_ed25519" "$HOME/.ssh/id_ed25519"
         ln -sfT "$HOME/backup/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
         chmod 600 "$HOME/.ssh/id_ed25519"
-        ln -sfT "$HOME/.nix-profile/share/gnome-shell/extensions" "$HOME/.local/share/gnome-shell/extensions"
         ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
         ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
         
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         ${pkgs.python3}/bin/python3 ${./flatpak-switch.py}
-        if [ ! -d ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp ]; then
-          sudo mkdir ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
-          sudo chown $USER:$USER ${nix-vscode-extensions.extensions.x86_64-linux.open-vsx.ms-toolsai.jupyter}/share/vscode/extensions/ms-toolsai.jupyter/temp
-        fi
+        mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/org.mozilla.firefox/current/active/files/lib/firefox/distribution"
+        ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/org.mozilla.firefox/current/active/files/lib/firefox/distribution/policies.json"
+        mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
+        ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
       '';
     };
   };
