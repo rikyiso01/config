@@ -14,12 +14,13 @@ let
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
     home.username = "riky";
-    home.homeDirectory = "/var/home/riky";
+    home.homeDirectory = "/home/riky";
     targets.genericLinux.enable = true;
 
     # Packages that should be installed to the user profile.
     home.packages = with pkgs; [
       perl
+      less
       tldr
       man-pages
       man-pages-posix
@@ -31,7 +32,6 @@ let
       netcat-openbsd
       iputils
       binutils
-      unixtools.netstat
       fira-code
       fira-code-nerdfont
       php
@@ -43,12 +43,11 @@ let
       brightnessctl
       traceroute
       xdg-ninja
-      python311Packages.ipython
+      python312Packages.ipython
       devbox
       pre-commit
       git-ignore
       ascii
-      virt-manager
       w3m
       bluetuith
       networkmanager
@@ -58,11 +57,12 @@ let
       networkmanagerapplet
       brightnessctl
       playerctl
-      vbindiff
       trash-cli
       python312Packages.pipx
       distrobox
-      xclip
+      wl-clipboard
+      nixVersions.latest
+      rclone
     ];
 
     programs.git = {
@@ -85,7 +85,7 @@ let
       terminal = "tmux-256color";
       mouse = true;
       prefix = "C-s";
-      plugins = with pkgs.tmuxPlugins; [ catppuccin ];
+      plugins = with pkgs.tmuxPlugins; [ catppuccin  ];
       extraConfig = ''
         bind-key -T copy-mode-vi 'v' send -X begin-selection
         bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
@@ -102,6 +102,8 @@ let
         set-option -sa terminal-features ',foot:RGB'
         set-option -sg escape-time 10
         set -g @catppuccin_flavour 'mocha' # latte,frappe, macchiato or mocha
+
+        bind-key -T copy-mode-vi "o" send-keys -X copy-pipe-and-cancel "sed s/##/####/g | xargs -I {} tmux run-shell -b 'cd #{pane_current_path}; xdg-open \"{}\" > /dev/null'"
       '';
     };
     programs.htop.enable = true;
@@ -126,6 +128,7 @@ let
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
 
     home.sessionVariables = {
+      PAGER="less";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
       EDITOR="${pkgs.vim}/bin/vim";
@@ -158,7 +161,7 @@ let
     };
     programs.man = {
       enable = true;
-      generateCaches = true;
+      # generateCaches = true;
     };
     programs.direnv.enable = true;
 
@@ -198,9 +201,8 @@ let
         top = "htop";
         neofetch = "fastfetch";
         vim = "$VISUAL";
-        copy = "xclip -sel c <";
       };
-      history.path = "${config.xdg.dataHome}/zsh/zsh_history";
+      history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
       zplug = {
         enable = true;
@@ -243,10 +245,10 @@ let
                 require'lspconfig'.cssls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}}
                 require'lspconfig'.rust_analyzer.setup{capabilities=lsp_capabilities,cmd={"rust-analyzer"}}
                 require'lspconfig'.dartls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}}
-                require("bufferline").setup{}
+                -- require("bufferline").setup{}
                 require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
                 require("feline").setup()
-                require("auto-session").setup{}
+                -- require("auto-session").setup{}
                 require("autoclose").setup()
                 require("formatter").setup{
                     filetype={
@@ -322,9 +324,10 @@ let
         	    vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
         	    vim.keymap.set('n', '<Leader>m', '<cmd>TroubleToggle<cr>')
         	    vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
+        	    vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
         	    vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
-        	    vim.keymap.set('n', "gt", '<cmd>bn<cr>')
-        	    vim.keymap.set('n', "gT", '<cmd>bp<cr>')
+        	    -- vim.keymap.set('n', "gt", '<cmd>bn<cr>')
+        	    -- vim.keymap.set('n', "gT", '<cmd>bp<cr>')
         	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
         	    vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
                 vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename)
@@ -402,7 +405,7 @@ let
     home.stateVersion = "22.05";
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
     xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; android_sdk.accept_license = true; }";
-    home.enableNixpkgsReleaseCheck = true;
+    home.enableNixpkgsReleaseCheck = false;
 
     home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
       [preferred]
@@ -419,28 +422,28 @@ let
     #     package = pkgs.adwaita-qt;
     #   };
     # };
-    # gtk = {
-    #   enable = true;
-    #   cursorTheme = {
-    #     name = "Bibata-Modern-Amber";
-    #     package = pkgs.bibata-cursors;
-    #   };
-    #   iconTheme = {
-    #     name = "Adwaita";
-    #     package = pkgs.gnome.adwaita-icon-theme;
-    #   };
-    #   theme = {
-    #     name = "Adwaita-dark";
-    #     package = pkgs.gnome.gnome-themes-extra;
-    #   };
-    #   gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+    gtk = {
+      enable = true;
+      cursorTheme = {
+        name = "Bibata-Modern-Amber";
+        package = pkgs.bibata-cursors;
+      };
+      iconTheme = {
+        name = "Adwaita";
+        package = pkgs.gnome.adwaita-icon-theme;
+      };
+      theme = {
+        name = "Adwaita-dark";
+        package = pkgs.gnome.gnome-themes-extra;
+      };
+      gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
     #   gtk3.extraConfig = {
     #     gtk-application-prefer-dark-theme = 1;
     #   };
     #   # gtk4.extraConfig = {
     #   #   gtk-application-prefer-dark-theme = 1;
     #   # };
-    # };
+    };
     xdg = {
       enable = true;
       userDirs = {
@@ -455,7 +458,7 @@ let
       # See https://wiki.hyprland.org/Configuring/Monitors/
       monitor=eDP-1,1920x1080@60,auto,1
       monitor=,preferred,auto,1,mirror,eDP-1
-    
+
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
     
       # Execute your favorite apps at launch
@@ -467,7 +470,7 @@ let
       exec-once = dbus-update-activation-environment --systemd --all
       exec-once=[workspace 1 silent] /bin/kitty
       exec-once=[workspace 2 silent] sleep 5 && flatpak run io.gitlab.librewolf-community
-      exec-once=secret-tool lookup keepass password | flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx
+      exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx
       exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
       exec-once=${pkgs.hyprpaper}/bin/hyprpaper
     
@@ -475,9 +478,9 @@ let
       # source = ~/.config/hypr/myColors.conf
     
       # Set programs that you use
-      $terminal = /bin/kitty
-      $fileManager = nautilus
-      $menu = ${pkgs.wofi}/bin/wofi --show drun
+      $terminal = /usr/bin/kitty
+      $fileManager = /usr/bin/nautilus
+      $menu = /usr/bin/wofi
     
       # Some default env vars.
       env = XCURSOR_SIZE,24
@@ -523,12 +526,12 @@ let
           rounding = 10
         
           blur {
-              enabled = true
+              enabled = false
               size = 3
               passes = 1
           }
     
-          drop_shadow = yes
+          drop_shadow = false
           shadow_range = 4
           shadow_render_power = 3
           col.shadow = rgba(1a1a1aee)
@@ -544,7 +547,7 @@ let
           animation = windows, 1, 7, myBezier
           animation = windowsOut, 1, 7, default, popin 80%
           animation = border, 1, 10, default
-          animation = borderangle, 1, 8, default
+          # animation = borderangle, 1, 8, default
           animation = fade, 1, 7, default
           animation = workspaces, 1, 6, default
       }
@@ -557,7 +560,7 @@ let
     
       master {
           # See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
-          new_is_master = true
+          # new_is_master = true
       }
     
       gestures {
@@ -568,6 +571,7 @@ let
       misc {
           # See https://wiki.hyprland.org/Configuring/Variables/ for more
           force_default_wallpaper = 0 # Set to 0 or 1 to disable the anime mascot wallpapers
+          vfr=true
       }
     
       # Example per-device config
@@ -591,7 +595,6 @@ let
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
       bind = $mainMod, RETURN, exec, $terminal
       bind = $mainMod, Q, killactive,
-      bind = $mainMod SHIFT, M, exit,
       bind = $mainMod SHIFT, P, exec, poweroff
       bind = $mainMod SHIFT, F, exec, if [[ $(powerprofilesctl get) = 'power-saver' ]]; then powerprofilesctl set balanced; else powerprofilesctl set power-saver; fi
       bind = $mainMod SHIFT, W, exec, pkill hyprpaper
@@ -662,7 +665,7 @@ let
       bind = , XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous
       bind = , XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
       bind = , XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
-      bind = , Print, exec, ${pkgs.grim}/bin/grim "$(xdg-user-dir PICTURES)/$(date +'%s_grim.png')"
+      bind = , Print, exec, ${pkgs.grim}/bin/grim "$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir PICTURES)/$(date +'%s_grim.png')"
     '';
 
     programs.waybar = {
@@ -674,7 +677,7 @@ let
           margin = "9 13 -10 18";
           spacing=8;
           modules-left = [ "hyprland/workspaces" ];
-          modules-center = [ "clock" ];
+          # modules-center = [ "clock" ];
           modules-right = [ "pulseaudio" "cpu" "memory" "network" "bluetooth" "power-profiles-daemon" "backlight" "battery" "tray" ];
           clock = {
             format = "{:%a, %d %b, %I:%M %p}";
@@ -835,12 +838,24 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
+      shutdown={
+          Unit={
+              Description="Disconnect all tmux";
+              After="network.target";
+          };
+          Service={
+              Type="oneshot";
+              RemainAfterExit=true;
+              ExecStop="${pkgs.tmux}/bin/tmux -S %t/tmux-%U/default kill-server";
+          };
+          Install={WantedBy=["default.target"];};
+      };
       rclone = {
         Unit = {
           Description = "rclone";
         };
         Service = {
-          ExecStartPre = "bash -c 'while ! host www.google.com; do sleep 5; done'";
+          ExecStartPre = "bash -c 'while ! getent hosts www.google.com; do sleep 5; done'";
           ExecStart = "${pkgs.rclone}/bin/rclone copy --update ${home.homeDirectory}/backup/Syncthing drive:Syncthing";
         };
         Install = { WantedBy = [ "default.target" ]; };
@@ -868,8 +883,17 @@ let
     home.file.".config/theme.zsh".source = ./theme.zsh;
 
     dconf.settings={
-        "org.gnome.desktop.interface"={
+        "org/gnome/desktop/interface"={
             "color-scheme"="prefer-dark";
+        };
+        "org/gtk/settings/file-chooser"={
+            "show-hidden"=true;
+        };
+        "org/gtk/gtk4/settings"={
+            "show-hidden"=true;
+        };
+        "org/gnome/nautilus/preferences"={
+            "default-folder-viewer"="list-view";
         };
     };
 
@@ -877,6 +901,8 @@ let
       defaultPref("privacy.resistFingerprinting", false);
       defaultPref("webgl.disabled", false);
       defaultPref("security.OCSP.require", false);
+      defaultPref("privacy.clearOnShutdown_v2.cache", false);
+      defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
     '';
 
     home.file.".var/app/io.gitlab.librewolf-community/.librewolf/native-messaging-hosts/net.downloadhelper.coapp.json".text = ''
@@ -1010,6 +1036,10 @@ let
       [Context]
       filesystems=!xdg-config/kdeglobals;!xdg-public-share;xdg-download;!home
     '';
+    home.file.".local/share/flatpak/overrides/org.prismlauncher.PrismLauncher".text=''
+      [Context]
+      filesystems=~/backup/Games/Minecraft
+    '';
 
     home.file.".var/app/org.keepassxc.KeePassXC/config/keepassxc/keepassxc.ini".text = ''
       [General]
@@ -1017,6 +1047,9 @@ let
       MinimizeAfterUnlock=true
       UseAtomicSaves=true
       AutoSaveAfterEveryChange=true
+
+      [SSHAgent]
+      Enabled=true
 
       [Browser]
       AlwaysAllowAccess=true
@@ -1081,7 +1114,7 @@ let
             "org.gnome.SimpleScan"
             "io.github.flattool.Warehouse"
             "app.moosync.moosync"
-            "org.polymc.PolyMC"
+            "org.prismlauncher.PrismLauncher"
             "org.gimp.GIMP"
             "org.libreoffice.LibreOffice"
             "io.gitlab.librewolf-community"
@@ -1114,6 +1147,126 @@ let
         sudo udevadm trigger
       '';
     };
+    home.file.".local/nix-sources/packages"={
+        text="base
+        linux
+        linux-firmware
+        sof-firmware
+        networkmanager
+        zsh
+        sudo
+        nix
+        greetd
+        greetd-tuigreet
+        hyprland
+        kitty
+        swaylock
+        intel-ucode
+        reflector
+        intel-media-driver
+        util-linux
+        flatpak
+        xdg-desktop-portal
+        xdg-desktop-portal-gtk
+        xdg-desktop-portal-hyprland
+        polkit-gnome
+        pipewire
+        wireplumber
+        podman
+        wofi
+        pipewire-jack
+        pipewire-alsa
+        pipewire-pulse
+        pipewire-audio
+        qemu-desktop
+        vulkan-intel
+        gnome-keyring
+        power-profiles-daemon
+        libvirt
+        virt-manager
+        bluez
+        bluez-utils
+        nautilus
+        pacman-contrib";
+        onChange="
+            sudo pacman -S --noconfirm --needed $(cat $HOME/.local/nix-sources/packages)
+            sudo pacman -D --asdeps $(pacman -Qqe)
+            sudo pacman -D --asexplicit $(cat $HOME/.local/nix-sources/packages)
+            if pacman -Qdtq
+            then
+                pacman -Qdtq | sudo pacman --noconfirm -Rns -
+            fi
+        ";
+    };
+    home.file.".local/nix-sources/enabled-system-services"={
+        text="
+            reflector
+            fstrim.timer
+            polkit
+            power-profiles-daemon
+            virtqemud.socket
+            virtnodedevd.socket
+            virtstoraged.socket
+            virtnetworkd.socket
+            virtlogd.socket
+            virtlockd.socket
+            bluetooth
+        ";
+        onChange="sudo systemctl enable $(cat $HOME/.local/nix-sources/enabled-system-services)";
+    };
+    home.file.".local/nix-sources/groups"={
+        text="libvirt";
+        onChange="while read p; do sudo usermod -aG $p $USER; done < $HOME/.local/nix-sources/groups";
+    };
+    home.file.".local/nix-sources/pam"={
+        text=''#%PAM-1.0
+
+        auth       required     pam_securetty.so
+        auth       requisite    pam_nologin.so
+        auth       include      system-local-login
+        auth       optional     pam_gnome_keyring.so
+        account    include      system-local-login
+        session    include      system-local-login
+        session    optional     pam_gnome_keyring.so auto_start'';
+        onChange="sudo mkdir -p /etc/pam.d && sudo tee /etc/pam.d/greetd < $HOME/.local/nix-sources/pam";
+    };
+    home.file.".local/nix-sources/greetd"={
+        text=''[terminal]
+        vt = 1
+        [default_session]
+        command = "/usr/bin/tuigreet --cmd /usr/bin/Hyprland"
+        user = "greeter"
+        '';
+        onChange="sudo mkdir -p /etc/greetd && sudo tee /etc/greetd/config.toml < $HOME/.local/nix-sources/greetd";
+    };
+    home.file.".local/nix-sources/nix.conf"={
+        text=''
+        build-users-group = nixbld
+        auto-optimise-store = true
+        '';
+        onChange="sudo mkdir -p /etc/nix && sudo tee /etc/nix/nix.conf < $HOME/nix-sources/nix.conf";
+    };
+    home.file.".local/nix-sources/systemd-boot-hook"={
+        text=''
+        [Trigger]
+        Type = Package
+        Operation = Upgrade
+        Target = systemd
+
+        [Action]
+        Description = Gracefully upgrading systemd-boot...
+        When = PostTransaction
+        Exec = /usr/bin/systemctl restart systemd-boot-update.service
+        '';
+        onChange="sudo mkdir -p /etc/pacman.d/hooks && sudo tee /etc/pacman.d/hooks/95-systemd-boot.hook < $HOME/nix-sources/systemd-boot-hook";
+    };
+    home.file.".local/nix-sources/journald-config"={
+        text=''
+        [Journal]
+        SystemMaxUse=50M
+        '';
+        onChange="sudo mkdir -p /etc/systemd/journald.conf.d && sudo tee /etc/systemd/journald.conf.d/00-journal-size.conf < $HOME/.local/nix-sources/journald-config";
+    };
 
 
     nix = {
@@ -1121,8 +1274,8 @@ let
       package = pkgs.nix;
       settings = {
         experimental-features = [ "nix-command" "flakes" ];
-        build-users-group = "nixbld";
-        auto-optimise-store = true;
+        # build-users-group = "nixbld";
+        # auto-optimise-store = true;
         bash-prompt-prefix = "(nix:$name)\\040";
         max-jobs = "auto";
         extra-nix-path = "nixpkgs=flake:nixpkgs";
@@ -1136,19 +1289,21 @@ let
     home.activation = {
       setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         rmdir "$HOME/Documents" > /dev/null 2> /dev/null || true
-        ln -sfT "$HOME/backup/id_ed25519" "$HOME/.ssh/id_ed25519"
-        ln -sfT "$HOME/backup/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
-        chmod 600 "$HOME/.ssh/id_ed25519"
         ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
         ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
+
+        mkdir -p "$HOME/.local/share/applications"
+        chmod -w "$HOME/.local/share/applications" "$HOME/Desktop"
         
+        systemctl enable --user gcr-ssh-agent.socket
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         ${pkgs.python3}/bin/python3 ${./flatpak-switch.py}
-        mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/org.mozilla.firefox/current/active/files/lib/firefox/distribution"
-        ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/org.mozilla.firefox/current/active/files/lib/firefox/distribution/policies.json"
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
         ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
+
+        mkdir -p "$HOME/.var/app/org.prismlauncher.PrismLauncher/data"
+        ln -sfT "$HOME/backup/Games/Minecraft" "$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
       '';
     };
   };

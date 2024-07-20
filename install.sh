@@ -1,23 +1,42 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eou pipefail
+
 cd "$(dirname "$0")"
 
-bash update-nix.sh
+sudo pacman -S --noconfirm --needed nix
 
-flatpak remote-delete --system fedora flathub
-flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install flathub -y org.freedesktop.Sdk//22.08 org.freedesktop.Platform//22.08 org.freedesktop.Sdk.Extension.openjdk11/x86_64/22.08
+if ! grep '/intel-ucode.img' /boot/loader/entries/arch.conf
+then
+    sudo sed -i '3iinitrd  /intel-ucode.img' /boot/loader/entries/arch.conf
+fi
 
-sudo rpm-ostree --apply-live install libvirt libvirt-daemon-config-network libvirt-daemon-kvm qemu-kvm waydroid zsh
-sudo systemctl enable libvirtd.socket virtqemud.socket virtstoraged.socket virtnetworkd.socket
+sudo systemctl enable --now nix-daemon
+sudo systemctl enable --now systemd-resolved
+sudo systemctl enable --now systemd-timesyncd
 
-grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
-sudo usermod -aG libvirt "$USER"
-echo 'DNSSEC=no' | tee -a /etc/systemd/resolved.conf
-echo 'MulticastDNS=resolve' | tee -a /etc/systemd/resolved.conf
+sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-secret-tool store --label='Keepass password' keepass password
+sudo usermod -aG nix-users "$USER"
 
-# nix run nixpkgs#rclone config
-# xdg-open http://127.0.0.1:8384
+
+mkdir -p "$HOME/.config/nix"
+
+echo 'experimental-features = nix-command flakes' > "$HOME/.config/nix/nix.conf" || true
+
+
+sudo -Eu riky nix run nixpkgs#home-manager -- switch --flake . -b backup
+
+sudo flatpak remote-delete --system flathub || true
+
+if [[ ! -f /swapfile ]]
+then
+    sudo mkswap -U clear --size 16G --file /swapfile
+fi
+
+if ! grep '/swap' /etc/fstab
+then
+    echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+fi
+
+sudo systemctl enable greetd
