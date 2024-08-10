@@ -18,3 +18,4 @@ main = do
   writeFile "/sys/bus/pci/devices/0000:00:14.2/power/control" "auto"
   writeFile "/sys/bus/pci/devices/0000:00:0a.0/power/control" "auto"
   writeFile "/sys/bus/pci/devices/0000:01:00.0/power/control" "auto"
+  writeFile "/sys/module/snd_hda_intel/parameters/power_save" "1"

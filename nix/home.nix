@@ -1,10 +1,6 @@
 { config, pkgs, lib, nix-vscode-extensions, ... }:
 
 let
-  create_flatpak = file: {
-    source = file;
-    onChange = "cd /tmp && ${pkgs.flatpak-builder}/bin/flatpak-builder --force-clean --repo=${homeManager.home.homeDirectory}/.local/flatpak-repo /tmp/flatpak-builder ${file} && rm -rf /tmp/flatpak-builder && rm -rf /tmp/.flatpak-builder";
-  };
   homeManager = rec {
 
     manual.html.enable = false;
@@ -50,11 +46,9 @@ let
       ascii
       w3m
       bluetuith
-      networkmanager
       fastfetch
       pamixer
       pavucontrol
-      networkmanagerapplet
       brightnessctl
       playerctl
       trash-cli
@@ -63,6 +57,7 @@ let
       wl-clipboard
       nixVersions.latest
       rclone
+      mpc-cli
     ];
 
     programs.git = {
@@ -132,6 +127,7 @@ let
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
       EDITOR="${pkgs.vim}/bin/vim";
+      DIFFPROG="${pkgs.vim}/bin/vimdiff";
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
@@ -164,11 +160,6 @@ let
       # generateCaches = true;
     };
     programs.direnv.enable = true;
-
-    programs.ssh = {
-      enable = true;
-      addKeysToAgent = "yes";
-    };
 
     home.file.".config/distrobox/distrobox.conf".text = ''
       container_generate_entry=0
@@ -225,7 +216,7 @@ let
       extraLuaConfig = ''
                 vim.opt.termguicolors = true
                 local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="/var/home/riky/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
+                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="/var/home/riky/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
                 require'lspconfig'.ruff.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}}
                 require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}}
                 require'lspconfig'.ansiblels.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ansible-language-server}/bin/ansible-language-server","--stdio"}}
@@ -262,7 +253,8 @@ let
                         jsonc={function()return {exe="prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
                         yaml={function()return {exe="prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
                         markdown={function()return {exe="prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
-                        xml={function()return {exe="${pkgs.libxml2}/bin/xmllint",args={"--format","-"},stdin=true} end},
+                        xml={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i -xml - || true"},stdin=true} end},
+                        html={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i - || true"},stdin=true} end},
                         nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
                         bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
                         dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
@@ -278,7 +270,7 @@ let
                 vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
                 require("Comment").setup{}
                 require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
-                require("trouble").setup{icons=false,action_keys={jump={}}}
+                require("trouble").setup{icons={},warn_no_results = false,open_no_results = true,preview={type="main",size={width=0.8}}}
                 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
                 local cmp=require("cmp")
                 cmp.setup{
@@ -322,7 +314,7 @@ let
                 vim.opt.shortmess:remove({ 'S' })
         	    vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
         	    vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
-        	    vim.keymap.set('n', '<Leader>m', '<cmd>TroubleToggle<cr>')
+        	    vim.keymap.set('n', '<Leader>m', '<cmd>Trouble diagnostics toggle focus=true<cr>')
         	    vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
         	    vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
         	    vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
@@ -340,13 +332,14 @@ let
                 end
                 vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()') 
                 vim.env.NVIM_SERVER=vim.v.servername
-                vim.api.nvim_set_hl(0, 'FloatBorder', {bg='#3B4252', fg='#5E81AC'})
-                vim.api.nvim_set_hl(0, 'NormalFloat', {bg='#3B4252'})
-                vim.api.nvim_set_hl(0, 'TelescopeNormal', {bg='#3B4252'})
-                vim.api.nvim_set_hl(0, 'TelescopeBorder', {bg='#3B4252'})
+                -- vim.api.nvim_set_hl(0, 'FloatBorder', {bg='#3B4252', fg='#5E81AC'})
+                -- vim.api.nvim_set_hl(0, 'NormalFloat', {bg='#3B4252'})
+                -- vim.api.nvim_set_hl(0, 'TelescopeNormal', {bg='#3B4252'})
+                -- vim.api.nvim_set_hl(0, 'TelescopeBorder', {bg='#3B4252'})
                 vim.g.rnvimr_enable_picker = 1
                 vim.g.rnvimr_enable_ex = 1
                 vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+                vim.cmd [[colorscheme torte]]
       '';
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -430,11 +423,11 @@ let
       };
       iconTheme = {
         name = "Adwaita";
-        package = pkgs.gnome.adwaita-icon-theme;
+        package = pkgs.adwaita-icon-theme;
       };
       theme = {
         name = "Adwaita-dark";
-        package = pkgs.gnome.gnome-themes-extra;
+        package = pkgs.gnome-themes-extra;
       };
       gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
     #   gtk3.extraConfig = {
@@ -828,6 +821,18 @@ let
     '';
 
     services.syncthing.enable = true;
+    services.mpd={
+        enable=true;
+        musicDirectory="${config.xdg.userDirs.music}";
+        extraConfig=''
+        audio_output {
+            type "pipewire"
+            name "PipeWire Sound Server"
+        }
+        '';
+    };
+    services.mpd-mpris.enable=true;
+    programs.ncmpcpp.enable=true;
 
     systemd.user.services = {
       startup = {
@@ -866,6 +871,15 @@ let
           Type = "oneshot";
           RemainAfterExit = "yes";
           ExecStart = "${home.homeDirectory}/.local/bin/autotune";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
+      trash = {
+        Unit = { Description = "Automatically empty trash"; };
+        Service = {
+          Type = "oneshot";
+          RemainAfterExit = "yes";
+          ExecStart = "${pkgs.trash-cli}/bin/trash-empty 30";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -947,14 +961,6 @@ let
       [Context]
       filesystems=/nix/store:ro
     '';
-    home.file.".local/share/flatpak/overrides/com.google.AndroidStudio".text = ''
-      [Context]
-      filesystems=xdg-documents;!host
-      persistent=.android;Android;.local/share/gradle;.gradle
-
-      [Session Bus Policy]
-      org.freedesktop.Flatpak=none
-    '';
     home.file.".local/share/flatpak/overrides/com.obsproject.Studio".text = ''
       [Context]
       filesystems=!xdg-config/kdeglobals;xdg-videos;!host
@@ -1012,11 +1018,6 @@ let
     home.file.".local/share/flatpak/overrides/org.gnome.TextEditor".text = ''
       [Context]
       filesystems=!xdg-run/gvfsd;!host
-    '';
-    home.file.".local/share/flatpak/overrides/org.gnome.Totem".text = ''
-      [Context]
-      devices=!all
-      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/run/media;!xdg-videos;!xdg-pictures;!xdg-download
     '';
     home.file.".local/share/flatpak/overrides/org.keepassxc.KeePassXC".text = ''
       [Context]
@@ -1086,7 +1087,6 @@ let
           packages = [
             "org.gnome.TextEditor"
             "org.gnome.Characters"
-            "org.gnome.Logs"
             "ca.desrt.dconf-editor"
             "com.github.tchx84.Flatseal"
             "rest.insomnia.Insomnia"
@@ -1095,18 +1095,14 @@ let
             "io.dbeaver.DBeaverCommunity"
             "com.obsproject.Studio"
             "org.gnome.seahorse.Application"
-            "org.gnome.PowerStats"
             "com.usebottles.bottles"
             "net.werwolv.ImHex"
-            "org.gnome.Extensions"
             "org.localsend.localsend_app"
             "org.gnome.dspy"
             "org.gnome.Snapshot"
             "org.gnome.SoundRecorder"
             "org.pitivi.Pitivi"
             "org.keepassxc.KeePassXC"
-            "com.google.AndroidStudio"
-            "org.gnome.Totem"
             "org.gnome.FileRoller"
             "org.gnome.Evince"
             "org.gnome.Loupe"
@@ -1120,6 +1116,7 @@ let
             "io.gitlab.librewolf-community"
             "eu.betterbird.Betterbird"
             "org.mozilla.firefox"
+            "io.mpv.Mpv"
           ];
         };
         # flathub-beta = {
@@ -1153,6 +1150,7 @@ let
         linux-firmware
         sof-firmware
         networkmanager
+        networkmanager-openvpn
         zsh
         sudo
         nix
@@ -1187,7 +1185,8 @@ let
         bluez
         bluez-utils
         nautilus
-        pacman-contrib";
+        pacman-contrib
+        libnfc";
         onChange="
             sudo pacman -S --noconfirm --needed $(cat $HOME/.local/nix-sources/packages)
             sudo pacman -D --asdeps $(pacman -Qqe)
@@ -1234,7 +1233,7 @@ let
         text=''[terminal]
         vt = 1
         [default_session]
-        command = "/usr/bin/tuigreet --cmd /usr/bin/Hyprland"
+        command = "/usr/bin/tuigreet --remember --cmd /usr/bin/Hyprland"
         user = "greeter"
         '';
         onChange="sudo mkdir -p /etc/greetd && sudo tee /etc/greetd/config.toml < $HOME/.local/nix-sources/greetd";

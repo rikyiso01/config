@@ -5,13 +5,14 @@ cd "$(dirname "$0")"
 
 systemctl --failed
 systemctl --user --failed
-pacdiff
 
 nix flake update
 home-manager switch --flake .
 
 flatpak update -y
 
+pacdiff -s
+
 sudo pacman -Syu
 
-pacdiff
+pacdiff -s
