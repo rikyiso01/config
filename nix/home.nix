@@ -58,12 +58,14 @@ let
       nixVersions.latest
       rclone
       mpc-cli
+      termdown
+      yt-dlp
     ];
 
     programs.git = {
       enable = true;
       userName = "rikyiso01";
-      userEmail = "riky.isola@gmail.com";
+      userEmail = "31405152+rikyiso01@users.noreply.github.com";
       signing = {
         key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
         signByDefault = true;
@@ -72,6 +74,18 @@ let
         init.defaultBranch = "main";
         gpg.format = "ssh";
       };
+      includes=[
+        {
+            condition="gitdir:~/backup/Documents/School/";
+            contents={
+                user = {
+                    name="rikyiso01";
+                    email="4943369@studenti.unige.it";
+                    signingKey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPlqN7rO/To4JJjxYrljVmVWPsv7qSPwa+yQVsv0ahCq";
+                };
+            };
+        }
+      ];
     };
 
     programs.tmux = {
@@ -192,6 +206,8 @@ let
         top = "htop";
         neofetch = "fastfetch";
         vim = "$VISUAL";
+        flake-init="nix flake init -t github:nix-community/nix-direnv";
+        music-update="nix run github:rikyiso01/musicmanager auto Test2 Bardify 'Watch Later'";
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -216,7 +232,7 @@ let
       extraLuaConfig = ''
                 vim.opt.termguicolors = true
                 local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="/var/home/riky/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
+                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="${home.homeDirectory}/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
                 require'lspconfig'.ruff.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}}
                 require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}}
                 require'lspconfig'.ansiblels.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ansible-language-server}/bin/ansible-language-server","--stdio"}}
@@ -481,7 +497,7 @@ let
     
       # For all categories, see https://wiki.hyprland.org/Configuring/Variables/
       input {
-          kb_layout = us
+          kb_layout = us,it
           kb_variant =
           kb_model =
           kb_options =
@@ -659,6 +675,8 @@ let
       bind = , XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
       bind = , XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
       bind = , Print, exec, ${pkgs.grim}/bin/grim "$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir PICTURES)/$(date +'%s_grim.png')"
+
+      bind = $mainMod SHIFT, SPACE, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next
     '';
 
     programs.waybar = {

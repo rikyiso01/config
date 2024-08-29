@@ -6,10 +6,10 @@ cd "$(dirname "$0")"
 systemctl --failed
 systemctl --user --failed
 
+flatpak update -y
+
 nix flake update
 home-manager switch --flake .
-
-flatpak update -y
 
 pacdiff -s
 
