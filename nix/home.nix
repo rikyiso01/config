@@ -60,6 +60,9 @@ let
       mpc-cli
       termdown
       yt-dlp
+      jq
+      yq
+      libnotify
     ];
 
     programs.git = {
@@ -126,7 +129,7 @@ let
     };
     home.file.".config/ranger/rifle.conf".text = ''
       mime application/zip, flag f = /bin/unzip "$1"
-      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext dart, flag f = xdg-open "$1"
+      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext dart,!ext tex, flag f = xdg-open "$1"
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
@@ -171,7 +174,6 @@ let
     };
     programs.man = {
       enable = true;
-      # generateCaches = true;
     };
     programs.direnv.enable = true;
 
@@ -241,7 +243,7 @@ let
                 require'lspconfig'.dockerls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dockerfile-language-server-nodejs}/bin/docker-langserver","--stdio"}}
                 require'lspconfig'.yamlls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.yaml-language-server}/bin/yaml-language-server","--stdio"}}
                 require'lspconfig'.jdtls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.jdt-language-server}/bin/jdtls", "-configuration", "${home.homeDirectory}/.cache/jdtls/config", "-data", "${home.homeDirectory}/.cache/jdtls/workspace"}}
-                require'lspconfig'.tsserver.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
+                require'lspconfig'.ts_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
                 local capabilities = vim.lsp.protocol.make_client_capabilities()
                 capabilities.textDocument.completion.completionItem.snippetSupport = true
                 require'lspconfig'.jsonls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities}
@@ -252,11 +254,15 @@ let
                 require'lspconfig'.cssls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}}
                 require'lspconfig'.rust_analyzer.setup{capabilities=lsp_capabilities,cmd={"rust-analyzer"}}
                 require'lspconfig'.dartls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}}
-                -- require("bufferline").setup{}
+                require'lspconfig'.ltex.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls}/bin/ltex-ls"},settings={ltex={language="auto"}}}
+
                 require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
                 require("feline").setup()
-                -- require("auto-session").setup{}
-                require("autoclose").setup()
+                require("autoclose").setup({
+                   options = {
+                      disabled_filetypes = { "text", "markdown" },
+                   },
+                })
                 require("formatter").setup{
                     filetype={
                         python={function()return {exe="${pkgs.python312Packages.black}/bin/black",args={"-"},stdin=true} end},
@@ -328,30 +334,26 @@ let
                 vim.opt.number = true
                 vim.opt.incsearch = true
                 vim.opt.shortmess:remove({ 'S' })
-        	    vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
-        	    vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
-        	    vim.keymap.set('n', '<Leader>m', '<cmd>Trouble diagnostics toggle focus=true<cr>')
-        	    vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
-        	    vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
-        	    vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
-        	    -- vim.keymap.set('n', "gt", '<cmd>bn<cr>')
-        	    -- vim.keymap.set('n', "gT", '<cmd>bp<cr>')
-        	    vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
-        	    vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
+                vim.opt.colorcolumn = "90"
+                vim.opt.list = true
+                vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
+                vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
+                vim.keymap.set('n', '<Leader>m', '<cmd>Trouble diagnostics toggle focus=true<cr>')
+                vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
+                vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
+                vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
+                vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
+                vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
                 vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename)
                 vim.keymap.set('n', '<Leader>d', vim.diagnostic.open_float)
                 vim.keymap.set('n', '<Leader>o', MiniMap.toggle)
-        	    vim.keymap.set({'n','v'}, "<Leader>.", vim.lsp.buf.code_action)
+                vim.keymap.set({'n','v'}, "<Leader>.", vim.lsp.buf.code_action)
                 function _G.set_terminal_keymaps()
                     local opts = {buffer = 0}
                     vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
                 end
-                vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()') 
+                vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
                 vim.env.NVIM_SERVER=vim.v.servername
-                -- vim.api.nvim_set_hl(0, 'FloatBorder', {bg='#3B4252', fg='#5E81AC'})
-                -- vim.api.nvim_set_hl(0, 'NormalFloat', {bg='#3B4252'})
-                -- vim.api.nvim_set_hl(0, 'TelescopeNormal', {bg='#3B4252'})
-                -- vim.api.nvim_set_hl(0, 'TelescopeBorder', {bg='#3B4252'})
                 vim.g.rnvimr_enable_picker = 1
                 vim.g.rnvimr_enable_ex = 1
                 vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
@@ -360,19 +362,15 @@ let
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
         trouble-nvim
-        bufferline-nvim
         toggleterm-nvim
         feline-nvim
         telescope-nvim
         nvim-treesitter.withAllGrammars
         lazygit-nvim
-        auto-session
-        vim-move
         nvim-cmp
         cmp-nvim-lsp
         markdown-preview-nvim
         autoclose-nvim
-        pkgs.vimExtraPlugins.jupynium-nvim
         vim-illuminate
         ansible-vim
         vim-vsnip
@@ -381,16 +379,16 @@ let
         pkgs.vimExtraPlugins.Comment-nvim
         mini-nvim
         vim-abolish
-        close-buffers-vim
-        (pkgs.vimUtils.buildVimPlugin {
-          name = "stickybuf-nvim";
-          src = pkgs.fetchFromGitHub {
-            owner = "stevearc";
-            repo = "stickybuf.nvim";
-            rev = "f3398f8639e903991acdf66e2d63de7a78fe708e";
-            sha256 = "sha256-+ZcfItAtidLMQKSGJcU6EBlHbgHQGs/InQYxMknjnzw=";
-          };
-        })
+        # close-buffers-vim
+        # (pkgs.vimUtils.buildVimPlugin {
+        #   name = "stickybuf-nvim";
+        #   src = pkgs.fetchFromGitHub {
+        #     owner = "stevearc";
+        #     repo = "stickybuf.nvim";
+        #     rev = "f3398f8639e903991acdf66e2d63de7a78fe708e";
+        #     sha256 = "sha256-+ZcfItAtidLMQKSGJcU6EBlHbgHQGs/InQYxMknjnzw=";
+        #   };
+        # })
       ];
       extraPackages = with pkgs; [
         haskell-language-server
@@ -407,6 +405,15 @@ let
         rust-analyzer
       ];
     };
+
+    home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.spl".source=builtins.fetchurl {
+          url = "http://ftp.vim.org/vim/runtime/spell/it.utf-8.spl";
+          sha256 = "d80733903e836d53790c0ab8c1c2f29f663ca2a77aee7b381aea6b8762ae7413";
+        };
+    home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.sug".source=builtins.fetchurl {
+          url = "http://ftp.vim.org/vim/runtime/spell/fr.utf-8.sug";
+          sha256 = "0294bc32b42c90bbb286a89e23ca3773b7ef50eff1ab523b1513d6a25c6b3f58";
+        };
 
     programs.nix-index.enable = true;
 
@@ -861,18 +868,6 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
-      shutdown={
-          Unit={
-              Description="Disconnect all tmux";
-              After="network.target";
-          };
-          Service={
-              Type="oneshot";
-              RemainAfterExit=true;
-              ExecStop="${pkgs.tmux}/bin/tmux -S %t/tmux-%U/default kill-server";
-          };
-          Install={WantedBy=["default.target"];};
-      };
       rclone = {
         Unit = {
           Description = "rclone";
@@ -931,10 +926,13 @@ let
 
     home.file.".var/app/io.gitlab.librewolf-community/.librewolf/librewolf.overrides.cfg".text=''
       defaultPref("privacy.resistFingerprinting", false);
-      defaultPref("webgl.disabled", false);
+      defaultPref("webgl.disabled", true);
       defaultPref("security.OCSP.require", false);
-      defaultPref("privacy.clearOnShutdown_v2.cache", false);
-      defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
+      defaultPref("privacy.clearOnShutdown_v2.cache", true);
+      defaultPref("privacy.clearOnShutdown_v2.cookiesAndStorage", true);
+      defaultPref("network.http.referer.XOriginPolicy", 2);
+      defaultPref("browser.sessionstore.resume_from_crash", false);
+      defaultPref("media.autoplay.blocking_policy", 2);
     '';
 
     home.file.".var/app/io.gitlab.librewolf-community/.librewolf/native-messaging-hosts/net.downloadhelper.coapp.json".text = ''
@@ -1127,7 +1125,7 @@ let
             "org.remmina.Remmina"
             "org.gnome.SimpleScan"
             "io.github.flattool.Warehouse"
-            "app.moosync.moosync"
+            "io.freetubeapp.FreeTube"
             "org.prismlauncher.PrismLauncher"
             "org.gimp.GIMP"
             "org.libreoffice.LibreOffice"
@@ -1135,12 +1133,9 @@ let
             "eu.betterbird.Betterbird"
             "org.mozilla.firefox"
             "io.mpv.Mpv"
+            "app.moosync.moosync"
           ];
         };
-        # flathub-beta = {
-        #   url = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
-        #   packages = [ "org.gimp.GIMP" ];
-        # };
       };
 
     home.file.".local/nix-sources/powertop.hs" = {
@@ -1284,6 +1279,13 @@ let
         '';
         onChange="sudo mkdir -p /etc/systemd/journald.conf.d && sudo tee /etc/systemd/journald.conf.d/00-journal-size.conf < $HOME/.local/nix-sources/journald-config";
     };
+    home.file.".local/nix-sources/logind-config"={
+        text=''
+        [Login]
+        KillUserProcesses=yes
+        '';
+        onChange="sudo mkdir -p /etc/systemd/logind.conf.d && sudo tee /etc/systemd/logind.conf.d/00-kill-tmux.conf < $HOME/.local/nix-sources/logind-config";
+    };
 
 
     nix = {
@@ -1311,7 +1313,7 @@ let
 
         mkdir -p "$HOME/.local/share/applications"
         chmod -w "$HOME/.local/share/applications" "$HOME/Desktop"
-        
+
         systemctl enable --user gcr-ssh-agent.socket
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
