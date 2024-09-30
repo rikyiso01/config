@@ -76,17 +76,18 @@ let
       extraConfig = {
         init.defaultBranch = "main";
         gpg.format = "ssh";
+        credential.helper = "${pkgs.git-credential-keepassxc}/bin/git-credential-keepassxc --git-groups";
       };
-      includes=[
+      includes = [
         {
-            condition="gitdir:~/backup/Documents/School/";
-            contents={
-                user = {
-                    name="rikyiso01";
-                    email="4943369@studenti.unige.it";
-                    signingKey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPlqN7rO/To4JJjxYrljVmVWPsv7qSPwa+yQVsv0ahCq";
-                };
+          condition = "gitdir:~/backup/Documents/School/";
+          contents = {
+            user = {
+              name = "rikyiso01";
+              email = "4943369@studenti.unige.it";
+              signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPlqN7rO/To4JJjxYrljVmVWPsv7qSPwa+yQVsv0ahCq";
             };
+          };
         }
       ];
     };
@@ -97,7 +98,7 @@ let
       terminal = "tmux-256color";
       mouse = true;
       prefix = "C-s";
-      plugins = with pkgs.tmuxPlugins; [ catppuccin  ];
+      plugins = with pkgs.tmuxPlugins; [ catppuccin ];
       extraConfig = ''
         bind-key -T copy-mode-vi 'v' send -X begin-selection
         bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
@@ -140,11 +141,11 @@ let
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
 
     home.sessionVariables = {
-      PAGER="less";
+      PAGER = "less";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      EDITOR="${pkgs.vim}/bin/vim";
-      DIFFPROG="${pkgs.vim}/bin/vimdiff";
+      EDITOR = "${pkgs.vim}/bin/vim";
+      DIFFPROG = "${pkgs.vim}/bin/vimdiff";
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
@@ -162,7 +163,7 @@ let
       SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/gcr/ssh";
     };
 
-    programs.vim.enable=true;
+    programs.vim.enable = true;
     fonts.fontconfig.enable = true;
     programs.bat.enable = true;
     programs.eza.enable = true;
@@ -193,6 +194,22 @@ let
             source "$\{XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-$\{(%):-%n}.zsh"
         fi
         source $HOME/.config/theme.zsh
+
+        function xdg-open(){(
+            set -euo pipefail
+            file="$1";
+            if [[ "$file" == -* ]]; then
+                /usr/bin/xdg-open "$file"
+                return $?
+            fi
+            if [[ "$file" != /* && "$file" != *://* ]]; then
+                file="$(realpath -es "$file")"
+            fi
+            if [[ "$file" == /* ]]; then
+                realpath -e "$file" >/dev/null
+            fi
+            /usr/bin/xdg-open "$file" 0<&- &>/dev/null &!
+        )}
       '';
       shellAliases = {
         cat = "bat -p";
@@ -208,8 +225,8 @@ let
         top = "htop";
         neofetch = "fastfetch";
         vim = "$VISUAL";
-        flake-init="nix flake init -t github:nix-community/nix-direnv";
-        music-update="nix run github:rikyiso01/musicmanager auto Test2 Bardify 'Watch Later'";
+        flake-init = "nix flake init -t github:nix-community/nix-direnv";
+        music-update = "nix run github:rikyiso01/musicmanager auto Test2 Bardify 'Watch Later'";
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -232,132 +249,132 @@ let
     programs.neovim = {
       enable = true;
       extraLuaConfig = ''
-                vim.opt.termguicolors = true
-                local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-                require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="${home.homeDirectory}/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
-                require'lspconfig'.ruff.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}}
-                require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}}
-                require'lspconfig'.ansiblels.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ansible-language-server}/bin/ansible-language-server","--stdio"}}
-                require'lspconfig'.bashls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.bash-language-server}/bin/bash-language-server","start"}}
-                require'lspconfig'.hls.setup{capabilities=lsp_capabilities,cmd={"haskell-language-server-wrapper","--lsp"}}
-                require'lspconfig'.dockerls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dockerfile-language-server-nodejs}/bin/docker-langserver","--stdio"}}
-                require'lspconfig'.yamlls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.yaml-language-server}/bin/yaml-language-server","--stdio"}}
-                require'lspconfig'.jdtls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.jdt-language-server}/bin/jdtls", "-configuration", "${home.homeDirectory}/.cache/jdtls/config", "-data", "${home.homeDirectory}/.cache/jdtls/workspace"}}
-                require'lspconfig'.ts_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
-                local capabilities = vim.lsp.protocol.make_client_capabilities()
-                capabilities.textDocument.completion.completionItem.snippetSupport = true
-                require'lspconfig'.jsonls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities}
-                require'lspconfig'.taplo.setup{capabilities=lsp_capabilities,cmd={"${pkgs.taplo}/bin/taplo","lsp","stdio"}}
-                require'lspconfig'.lemminx.setup{capabilities=lsp_capabilities,cmd={"${pkgs.lemminx}/bin/lemminx"}}
-                require'lspconfig'.psalm.setup{capabilities=lsp_capabilities,cmd={"${pkgs.php83Packages.psalm}/bin/psalm","--language-server"}}
-                require'lspconfig'.intelephense.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.intelephense}/bin/intelephense","--stdio"}}
-                require'lspconfig'.cssls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}}
-                require'lspconfig'.rust_analyzer.setup{capabilities=lsp_capabilities,cmd={"rust-analyzer"}}
-                require'lspconfig'.dartls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}}
-                require'lspconfig'.ltex.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls}/bin/ltex-ls"},settings={ltex={language="auto"}}}
+        vim.opt.termguicolors = true
+        local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
+        require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="${home.homeDirectory}/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
+        require'lspconfig'.ruff.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}}
+        require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}}
+        require'lspconfig'.ansiblels.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ansible-language-server}/bin/ansible-language-server","--stdio"}}
+        require'lspconfig'.bashls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.bash-language-server}/bin/bash-language-server","start"}}
+        require'lspconfig'.hls.setup{capabilities=lsp_capabilities,cmd={"haskell-language-server-wrapper","--lsp"}}
+        require'lspconfig'.dockerls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dockerfile-language-server-nodejs}/bin/docker-langserver","--stdio"}}
+        require'lspconfig'.yamlls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.yaml-language-server}/bin/yaml-language-server","--stdio"}}
+        require'lspconfig'.jdtls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.jdt-language-server}/bin/jdtls", "-configuration", "${home.homeDirectory}/.cache/jdtls/config", "-data", "${home.homeDirectory}/.cache/jdtls/workspace"}}
+        require'lspconfig'.ts_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
+        local capabilities = vim.lsp.protocol.make_client_capabilities()
+        capabilities.textDocument.completion.completionItem.snippetSupport = true
+        require'lspconfig'.jsonls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities}
+        require'lspconfig'.taplo.setup{capabilities=lsp_capabilities,cmd={"${pkgs.taplo}/bin/taplo","lsp","stdio"}}
+        require'lspconfig'.lemminx.setup{capabilities=lsp_capabilities,cmd={"${pkgs.lemminx}/bin/lemminx"}}
+        require'lspconfig'.psalm.setup{capabilities=lsp_capabilities,cmd={"${pkgs.php83Packages.psalm}/bin/psalm","--language-server"}}
+        require'lspconfig'.intelephense.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.intelephense}/bin/intelephense","--stdio"}}
+        require'lspconfig'.cssls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}}
+        require'lspconfig'.rust_analyzer.setup{capabilities=lsp_capabilities,cmd={"rust-analyzer"}}
+        require'lspconfig'.dartls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}}
+        require'lspconfig'.ltex.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls}/bin/ltex-ls"},settings={ltex={language="auto"}}}
 
-                require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
-                require("feline").setup()
-                require("autoclose").setup({
-                   options = {
-                      disabled_filetypes = { "text", "markdown" },
-                   },
-                })
-                require("formatter").setup{
-                    filetype={
-                        python={function()return {exe="${pkgs.python312Packages.black}/bin/black",args={"-"},stdin=true} end},
-                        haskell={function()return {exe="${pkgs.haskellPackages.fourmolu}/bin/fourmolu",args={"--no-cabal","-"},stdin=true} end},
-                        java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
-                        javascript={function()return {exe="prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
-                        typescript={function()return {exe="prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
-                        css={function()return {exe="prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
-                        json={function()return {exe="prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
-                        jsonc={function()return {exe="prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
-                        yaml={function()return {exe="prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
-                        markdown={function()return {exe="prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
-                        xml={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i -xml - || true"},stdin=true} end},
-                        html={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i - || true"},stdin=true} end},
-                        nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
-                        bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
-                        dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
-                        php={function()return {exe="${pkgs.phpPackages.php-cs-fixer}/bin/php-cs-fixer",args={"--rules=@Symfony","--using-cache=no","--no-interaction","fix"},stdin=false} end},
-                        toml={function()return {exe="prettier",args={"--stdin-filepath=test.toml"},stdin=true} end},
-                        arduino={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
-                        c={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
-                        cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
-                        rust={function()return {exe="${pkgs.rustfmt}/bin/rustfmt",stdin=true} end},
-                        dart={function()return {exe="${pkgs.dart}/bin/dart",args={"format"},stdin=false} end},
-                    }
-                }
-                vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
-                require("Comment").setup{}
-                require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
-                require("trouble").setup{icons={},warn_no_results = false,open_no_results = true,preview={type="main",size={width=0.8}}}
-                vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
-                local cmp=require("cmp")
-                cmp.setup{
-                snippet = {
-                      -- REQUIRED - you must specify a snippet engine
-                      expand = function(args)
-                        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-                        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-                        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-                        -- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
-                      end,
-                    },
-                    sources={{name="nvim_lsp",keyword_length=1},},
-                    window={
-                        completion={
-                            border="rounded",
-                            winhighlight="Normal:CmpNormal",
-                        },
-                        documentation={
-                            border="rounded",
-                            winhighlight="Normal:CmpNormal",
-                        },
-                    },
-                    formatting={fields={"menu","abbr","kind"},},
-                    mapping={
-                        ['<CR>']=cmp.mapping.confirm({select=false}),
-                        ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
-                        ['<Down>'] = cmp.mapping.select_next_item(select_opts),
-                        ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-                        ['<C-d>'] = cmp.mapping.scroll_docs(4),
-                        ['<esc>'] = cmp.mapping.abort(),
-                    },
-                }
+        require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
+        require("feline").setup()
+        require("autoclose").setup({
+           options = {
+              disabled_filetypes = { "text", "markdown" },
+           },
+        })
+        require("formatter").setup{
+            filetype={
+                python={function()return {exe="${pkgs.python312Packages.black}/bin/black",args={"-"},stdin=true} end},
+                haskell={function()return {exe="${pkgs.haskellPackages.fourmolu}/bin/fourmolu",args={"--no-cabal","-"},stdin=true} end},
+                java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
+                javascript={function()return {exe="prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
+                typescript={function()return {exe="prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
+                css={function()return {exe="prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
+                json={function()return {exe="prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
+                jsonc={function()return {exe="prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
+                yaml={function()return {exe="prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
+                markdown={function()return {exe="prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
+                xml={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i -xml - || true"},stdin=true} end},
+                html={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i - || true"},stdin=true} end},
+                nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
+                bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
+                dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
+                php={function()return {exe="${pkgs.phpPackages.php-cs-fixer}/bin/php-cs-fixer",args={"--rules=@Symfony","--using-cache=no","--no-interaction","fix"},stdin=false} end},
+                toml={function()return {exe="prettier",args={"--stdin-filepath=test.toml"},stdin=true} end},
+                arduino={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
+                c={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
+                cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
+                rust={function()return {exe="${pkgs.rustfmt}/bin/rustfmt",stdin=true} end},
+                dart={function()return {exe="${pkgs.dart}/bin/dart",args={"format"},stdin=false} end},
+            }
+        }
+        vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
+        require("Comment").setup{}
+        require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
+        require("trouble").setup{icons={},warn_no_results = false,open_no_results = true,preview={type="main",size={width=0.8}}}
+        vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
+        local cmp=require("cmp")
+        cmp.setup{
+        snippet = {
+              -- REQUIRED - you must specify a snippet engine
+              expand = function(args)
+                vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+                -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+                -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+                -- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
+              end,
+            },
+            sources={{name="nvim_lsp",keyword_length=1},},
+            window={
+                completion={
+                    border="rounded",
+                    winhighlight="Normal:CmpNormal",
+                },
+                documentation={
+                    border="rounded",
+                    winhighlight="Normal:CmpNormal",
+                },
+            },
+            formatting={fields={"menu","abbr","kind"},},
+            mapping={
+                ['<CR>']=cmp.mapping.confirm({select=false}),
+                ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
+                ['<Down>'] = cmp.mapping.select_next_item(select_opts),
+                ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+                ['<C-d>'] = cmp.mapping.scroll_docs(4),
+                ['<esc>'] = cmp.mapping.abort(),
+            },
+        }
 
-                vim.opt.expandtab = true
-                vim.opt.smartindent = true
-                vim.opt.tabstop = 4
-                vim.opt.shiftwidth = 4
-                vim.opt.number = true
-                vim.opt.incsearch = true
-                vim.opt.shortmess:remove({ 'S' })
-                vim.opt.colorcolumn = "90"
-                vim.opt.list = true
-                vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
-                vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
-                vim.keymap.set('n', '<Leader>m', '<cmd>Trouble diagnostics toggle focus=true<cr>')
-                vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
-                vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
-                vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
-                vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
-                vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
-                vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename)
-                vim.keymap.set('n', '<Leader>d', vim.diagnostic.open_float)
-                vim.keymap.set('n', '<Leader>o', MiniMap.toggle)
-                vim.keymap.set({'n','v'}, "<Leader>.", vim.lsp.buf.code_action)
-                function _G.set_terminal_keymaps()
-                    local opts = {buffer = 0}
-                    vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
-                end
-                vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
-                vim.env.NVIM_SERVER=vim.v.servername
-                vim.g.rnvimr_enable_picker = 1
-                vim.g.rnvimr_enable_ex = 1
-                vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-                vim.cmd [[colorscheme torte]]
+        vim.opt.expandtab = true
+        vim.opt.smartindent = true
+        vim.opt.tabstop = 4
+        vim.opt.shiftwidth = 4
+        vim.opt.number = true
+        vim.opt.incsearch = true
+        vim.opt.shortmess:remove({ 'S' })
+        vim.opt.colorcolumn = "90"
+        vim.opt.list = true
+        vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
+        vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
+        vim.keymap.set('n', '<Leader>m', '<cmd>Trouble diagnostics toggle focus=true<cr>')
+        vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
+        vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
+        vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
+        vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
+        vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
+        vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename)
+        vim.keymap.set('n', '<Leader>d', vim.diagnostic.open_float)
+        vim.keymap.set('n', '<Leader>o', MiniMap.toggle)
+        vim.keymap.set({'n','v'}, "<Leader>.", vim.lsp.buf.code_action)
+        function _G.set_terminal_keymaps()
+            local opts = {buffer = 0}
+            vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
+        end
+        vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
+        vim.env.NVIM_SERVER=vim.v.servername
+        vim.g.rnvimr_enable_picker = 1
+        vim.g.rnvimr_enable_ex = 1
+        vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+        vim.cmd [[colorscheme torte]]
       '';
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -406,14 +423,14 @@ let
       ];
     };
 
-    home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.spl".source=builtins.fetchurl {
-          url = "http://ftp.vim.org/vim/runtime/spell/it.utf-8.spl";
-          sha256 = "d80733903e836d53790c0ab8c1c2f29f663ca2a77aee7b381aea6b8762ae7413";
-        };
-    home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.sug".source=builtins.fetchurl {
-          url = "http://ftp.vim.org/vim/runtime/spell/fr.utf-8.sug";
-          sha256 = "0294bc32b42c90bbb286a89e23ca3773b7ef50eff1ab523b1513d6a25c6b3f58";
-        };
+    home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.spl".source = builtins.fetchurl {
+      url = "http://ftp.vim.org/vim/runtime/spell/it.utf-8.spl";
+      sha256 = "d80733903e836d53790c0ab8c1c2f29f663ca2a77aee7b381aea6b8762ae7413";
+    };
+    home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.sug".source = builtins.fetchurl {
+      url = "http://ftp.vim.org/vim/runtime/spell/fr.utf-8.sug";
+      sha256 = "0294bc32b42c90bbb286a89e23ca3773b7ef50eff1ab523b1513d6a25c6b3f58";
+    };
 
     programs.nix-index.enable = true;
 
@@ -453,12 +470,12 @@ let
         package = pkgs.gnome-themes-extra;
       };
       gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
-    #   gtk3.extraConfig = {
-    #     gtk-application-prefer-dark-theme = 1;
-    #   };
-    #   # gtk4.extraConfig = {
-    #   #   gtk-application-prefer-dark-theme = 1;
-    #   # };
+      #   gtk3.extraConfig = {
+      #     gtk-application-prefer-dark-theme = 1;
+      #   };
+      #   # gtk4.extraConfig = {
+      #   #   gtk-application-prefer-dark-theme = 1;
+      #   # };
     };
     xdg = {
       enable = true;
@@ -476,7 +493,7 @@ let
       monitor=,preferred,auto,1,mirror,eDP-1
 
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
-    
+
       # Execute your favorite apps at launch
       # exec-once = waybar & hyprpaper & firefox
       exec-once = ${pkgs.swaynotificationcenter}/bin/swaync
@@ -489,19 +506,19 @@ let
       exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx
       exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
       exec-once=${pkgs.hyprpaper}/bin/hyprpaper
-    
+
       # Source a file (multi-file configs)
       # source = ~/.config/hypr/myColors.conf
-    
+
       # Set programs that you use
       $terminal = /usr/bin/kitty
       $fileManager = /usr/bin/nautilus
       $menu = /usr/bin/wofi
-    
+
       # Some default env vars.
       env = XCURSOR_SIZE,24
       # env = QT_QPA_PLATFORMTHEME,qt5ct # change to qt6ct if you have that
-    
+
       # For all categories, see https://wiki.hyprland.org/Configuring/Variables/
       input {
           kb_layout = us,it
@@ -509,57 +526,57 @@ let
           kb_model =
           kb_options =
           kb_rules =
-    
+
           follow_mouse = 1
-    
+
           touchpad {
               natural_scroll = yes
           }
-    
+
           sensitivity = 1.0 # -1.0 to 1.0, 0 means no modification.
           repeat_rate=50
           repeat_delay=300
       }
-    
+
       general {
           # See https://wiki.hyprland.org/Configuring/Variables/ for more
-    
+
           gaps_in = 5
           gaps_out = 20
           border_size = 2
           col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
           col.inactive_border = rgba(595959aa)
-    
-          layout = dwindle
-    
+
+          layout = master
+
           # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
           allow_tearing = false
       }
-    
+
       decoration {
           # See https://wiki.hyprland.org/Configuring/Variables/ for more
-    
+
           rounding = 10
-        
+
           blur {
               enabled = false
               size = 3
               passes = 1
           }
-    
+
           drop_shadow = false
           shadow_range = 4
           shadow_render_power = 3
           col.shadow = rgba(1a1a1aee)
       }
-    
+
       animations {
           enabled = yes
-    
+
           # Some default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
-    
+
           bezier = myBezier, 0.05, 0.9, 0.1, 1.05
-    
+
           animation = windows, 1, 7, myBezier
           animation = windowsOut, 1, 7, default, popin 80%
           animation = border, 1, 10, default
@@ -567,47 +584,47 @@ let
           animation = fade, 1, 7, default
           animation = workspaces, 1, 6, default
       }
-    
+
       dwindle {
           # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
           pseudotile = yes # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
           preserve_split = yes # you probably want this
       }
-    
+
       master {
           # See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
           # new_is_master = true
       }
-    
+
       gestures {
           # See https://wiki.hyprland.org/Configuring/Variables/ for more
           workspace_swipe = off
       }
-    
+
       misc {
           # See https://wiki.hyprland.org/Configuring/Variables/ for more
           force_default_wallpaper = 0 # Set to 0 or 1 to disable the anime mascot wallpapers
           vfr=true
       }
-    
+
       # Example per-device config
       # See https://wiki.hyprland.org/Configuring/Keywords/#per-device-input-configs for more
       device {
           name = epic-mouse-v1
           sensitivity = -0.5
       }
-    
+
       # Example windowrule v1
       # windowrule = float, ^(kitty)$
       # Example windowrule v2
       # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
       # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
       windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
-    
-    
+
+
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
       $mainMod = SUPER
-    
+
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
       bind = $mainMod, RETURN, exec, $terminal
       bind = $mainMod, Q, killactive,
@@ -616,25 +633,33 @@ let
       bind = $mainMod SHIFT, W, exec, pkill hyprpaper
       bind = $mainMod SHIFT, B, exec, rfkill toggle bluetooth
       bind = $mainMod SHIFT, R, exec, nmcli d wifi rescan
-      bind = $mainMod, L, exec, swaylock
+      bind = $mainMod SHIFT, G, exec, swaylock
       bind = $mainMod, E, exec, $fileManager
-      bind = $mainMod, V, togglefloating, 
+      bind = $mainMod, V, togglefloating,
       bind = $mainMod, R, exec, $menu
       bind = $mainMod, P, pseudo, # dwindle
       bind = $mainMod, J, togglesplit, # dwindle
-    
+
       # Move focus with mainMod + arrow keys
       bind = $mainMod, left, movefocus, l
       bind = $mainMod, right, movefocus, r
       bind = $mainMod, up, movefocus, u
       bind = $mainMod, down, movefocus, d
+      bind = $mainMod, H, movefocus, l
+      bind = $mainMod, L, movefocus, r
+      bind = $mainMod, K, movefocus, u
+      bind = $mainMod, J, movefocus, d
 
       # Move window mainMod + arrow keys
       bind = $mainMod SHIFT, left, movewindow, l
       bind = $mainMod SHIFT, right, movewindow, r
       bind = $mainMod SHIFT, up, movewindow, u
       bind = $mainMod SHIFT, down, movewindow, d
-    
+      bind = $mainMod SHIFT, H, movewindow, l
+      bind = $mainMod SHIFT, L, movewindow, r
+      bind = $mainMod SHIFT, K, movewindow, u
+      bind = $mainMod SHIFT, J, movewindow, d
+
       # Switch workspaces with mainMod + [0-9]
       bind = $mainMod, 1, workspace, 1
       bind = $mainMod, 2, workspace, 2
@@ -646,7 +671,7 @@ let
       bind = $mainMod, 8, workspace, 8
       bind = $mainMod, 9, workspace, 9
       bind = $mainMod, 0, workspace, 10
-    
+
       # Move active window to a workspace with mainMod + SHIFT + [0-9]
       bind = $mainMod SHIFT, 1, movetoworkspace, 1
       bind = $mainMod SHIFT, 2, movetoworkspace, 2
@@ -658,32 +683,35 @@ let
       bind = $mainMod SHIFT, 8, movetoworkspace, 8
       bind = $mainMod SHIFT, 9, movetoworkspace, 9
       bind = $mainMod SHIFT, 0, movetoworkspace, 10
-    
+
       # Example special workspace (scratchpad)
       bind = $mainMod, S, togglespecialworkspace, magic
       bind = $mainMod SHIFT, S, movetoworkspace, special:magic
-    
+
       # Scroll through existing workspaces with mainMod + scroll
       bind = $mainMod, mouse_down, workspace, e+1
       bind = $mainMod, mouse_up, workspace, e-1
-    
+
       # Move/resize windows with mainMod + LMB/RMB and dragging
       bindm = $mainMod, mouse:272, movewindow
       bindm = $mainMod, mouse:273, resizewindow
 
-      bind = , XF86AudioRaiseVolume, exec, ${pkgs.pamixer}/bin/pamixer -i 5 
-      bind = , XF86AudioLowerVolume, exec, ${pkgs.pamixer}/bin/pamixer -d 5 
+      bind = , XF86AudioRaiseVolume, exec, ${pkgs.pamixer}/bin/pamixer -i 5
+      bind = , XF86AudioLowerVolume, exec, ${pkgs.pamixer}/bin/pamixer -d 5
       bind = , XF86AudioMicMute, exec, ${pkgs.pamixer}/bin/pamixer --default-source -m
       bind = , XF86AudioMute, exec, ${pkgs.pamixer}/bin/pamixer -t
-      bind = , XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl play-pause
-      bind = , XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl play-pause
-      bind = , XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl next
-      bind = , XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous
+      bind = , XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause
+      bind = , XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause
+      bind = , XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl -a next
+      bind = , XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl -a previous
       bind = , XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
       bind = , XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
       bind = , Print, exec, ${pkgs.grim}/bin/grim "$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir PICTURES)/$(date +'%s_grim.png')"
 
       bind = $mainMod SHIFT, SPACE, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next
+
+      bind = $mainMod, F, fullscreen, 0
+      bind = $mainMod, M, fullscreen, 1
     '';
 
     programs.waybar = {
@@ -693,10 +721,15 @@ let
           layer = "top";
           position = "top";
           margin = "9 13 -10 18";
-          spacing=8;
+          spacing = 8;
           modules-left = [ "hyprland/workspaces" ];
-          # modules-center = [ "clock" ];
+          modules-center = [ "custom/clock" ];
           modules-right = [ "pulseaudio" "cpu" "memory" "network" "bluetooth" "power-profiles-daemon" "backlight" "battery" "tray" ];
+          "custom/clock" = {
+            format = "{}";
+            exec = "date +'%a, %d %b, %R'";
+            interval = 1;
+          };
           clock = {
             format = "{:%a, %d %b, %I:%M %p}";
           };
@@ -711,33 +744,33 @@ let
             format-icons = {
               default = [ "" "" "" ];
             };
-            on-click= "${pkgs.pavucontrol}/bin/pavucontrol";
+            on-click = "${pkgs.pavucontrol}/bin/pavucontrol";
           };
           cpu = {
             interval = 2;
             format = "{usage}% ";
           };
           memory = {
-              interval=2;
-              format="{percentage}% 󰍛 {swapPercentage}% ";
+            interval = 2;
+            format = "{percentage}% 󰍛 {swapPercentage}% ";
           };
-          network={
-              format-wifi="{essid} 󰖩";
-              format-ethernet="󰈀";
-              format-disconnected="󰖪";
-              on-click="${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
+          network = {
+            format-wifi = "{essid} 󰖩";
+            format-ethernet = "󰈀";
+            format-disconnected = "󰖪";
+            on-click = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
           };
-          bluetooth={
-              format="󰂯";
-              format-disabled="󰂲";
-              format-connected="󰂱";
+          bluetooth = {
+            format = "󰂯";
+            format-disabled = "󰂲";
+            format-connected = "󰂱";
           };
-          power-profiles-daemon={
-              "format-icons"={
-                  "balanced"="";
-                  "performance"="󰈸";
-                  "power-saver"="󰌪";
-              };
+          power-profiles-daemon = {
+            "format-icons" = {
+              "balanced" = "";
+              "performance" = "󰈸";
+              "power-saver" = "󰌪";
+            };
           };
           backlight = {
             device = "intel_backlight";
@@ -750,7 +783,7 @@ let
               warning = 30;
               critical = 15;
             };
-            format= "{capacity}% {icon}?";
+            format = "{capacity}% {icon}?";
             format-plugged = "{capacity}% ";
             format-charging = "{capacity}% ";
             format-discharging = "{capacity}% {icon}";
@@ -763,7 +796,7 @@ let
           };
         };
       };
-      style=''
+      style = ''
         *{
             border: none;
             font-family: 'FiraCode Nerd Font Mono';
@@ -809,27 +842,27 @@ let
         }
       '';
     };
-    home.file.".config/wofi/config".text=''
-        hide_scroll=true
-        show=drun
-        width=30%
-        lines=8
-        line_wrap=word
-        term=kitty
-        allow_markup=true
-        always_parse_args=false
-        show_all=true
-        print_command=true
-        layer=overlay
-        allow_images=true
-        sort_order=alphabetical
-        gtk_dark=true
-        prompt=
-        image_size=20
-        display_generic=false
-        location=center
-        key_expand=Tab
-        insensitive=true
+    home.file.".config/wofi/config".text = ''
+      hide_scroll=true
+      show=drun
+      width=30%
+      lines=8
+      line_wrap=word
+      term=kitty
+      allow_markup=true
+      always_parse_args=false
+      show_all=true
+      print_command=true
+      layer=overlay
+      allow_images=true
+      sort_order=alphabetical
+      gtk_dark=true
+      prompt=
+      image_size=20
+      display_generic=false
+      location=center
+      key_expand=Tab
+      insensitive=true
     '';
     home.file.".config/wofi/style.css".source = ./wofi.css;
     home.file.".config/hypr/hypridle.conf".text = ''
@@ -839,25 +872,25 @@ let
           after_sleep_cmd = hyprctl dispatch dpms on  # to avoid having to press a key twice to turn on the display.
       }
     '';
-    home.file.".config/swaylock/config".text="color=333333";
-    home.file.".config/hypr/hyprpaper.conf".text=''
-        preload = ${./wallpaper2.png}
-        wallpaper = ,${./wallpaper2.png}
+    home.file.".config/swaylock/config".text = "color=333333";
+    home.file.".config/hypr/hyprpaper.conf".text = ''
+      preload = ${./wallpaper2.png}
+      wallpaper = ,${./wallpaper2.png}
     '';
 
     services.syncthing.enable = true;
-    services.mpd={
-        enable=true;
-        musicDirectory="${config.xdg.userDirs.music}";
-        extraConfig=''
+    services.mpd = {
+      enable = true;
+      musicDirectory = "${config.xdg.userDirs.music}";
+      extraConfig = ''
         audio_output {
             type "pipewire"
             name "PipeWire Sound Server"
         }
-        '';
+      '';
     };
-    services.mpd-mpris.enable=true;
-    programs.ncmpcpp.enable=true;
+    services.mpd-mpris.enable = true;
+    programs.ncmpcpp.enable = true;
 
     systemd.user.services = {
       startup = {
@@ -896,6 +929,13 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
+      clear-playlist = {
+        Unit = { Description = "Clear mpd playlist on startup"; };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.mpc-cli}/bin/mpc clear";
+        };
+      };
     };
 
     home.file.".gdbinit".text = "source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py";
@@ -909,22 +949,22 @@ let
       };
     home.file.".config/theme.zsh".source = ./theme.zsh;
 
-    dconf.settings={
-        "org/gnome/desktop/interface"={
-            "color-scheme"="prefer-dark";
-        };
-        "org/gtk/settings/file-chooser"={
-            "show-hidden"=true;
-        };
-        "org/gtk/gtk4/settings"={
-            "show-hidden"=true;
-        };
-        "org/gnome/nautilus/preferences"={
-            "default-folder-viewer"="list-view";
-        };
+    dconf.settings = {
+      "org/gnome/desktop/interface" = {
+        "color-scheme" = "prefer-dark";
+      };
+      "org/gtk/settings/file-chooser" = {
+        "show-hidden" = true;
+      };
+      "org/gtk/gtk4/settings" = {
+        "show-hidden" = true;
+      };
+      "org/gnome/nautilus/preferences" = {
+        "default-folder-viewer" = "list-view";
+      };
     };
 
-    home.file.".var/app/io.gitlab.librewolf-community/.librewolf/librewolf.overrides.cfg".text=''
+    home.file.".var/app/io.gitlab.librewolf-community/.librewolf/librewolf.overrides.cfg".text = ''
       defaultPref("privacy.resistFingerprinting", false);
       defaultPref("webgl.disabled", true);
       defaultPref("security.OCSP.require", false);
@@ -1053,7 +1093,7 @@ let
       [Context]
       filesystems=!xdg-config/kdeglobals;!xdg-public-share;xdg-download;!home
     '';
-    home.file.".local/share/flatpak/overrides/org.prismlauncher.PrismLauncher".text=''
+    home.file.".local/share/flatpak/overrides/org.prismlauncher.PrismLauncher".text = ''
       [Context]
       filesystems=~/backup/Games/Minecraft
     '';
@@ -1134,6 +1174,7 @@ let
             "org.mozilla.firefox"
             "io.mpv.Mpv"
             "app.moosync.moosync"
+            "com.calibre_ebook.calibre"
           ];
         };
       };
@@ -1157,8 +1198,8 @@ let
         sudo udevadm trigger
       '';
     };
-    home.file.".local/nix-sources/packages"={
-        text="base
+    home.file.".local/nix-sources/packages" = {
+      text = "base
         linux
         linux-firmware
         sof-firmware
@@ -1200,7 +1241,7 @@ let
         nautilus
         pacman-contrib
         libnfc";
-        onChange="
+      onChange = "
             sudo pacman -S --noconfirm --needed $(cat $HOME/.local/nix-sources/packages)
             sudo pacman -D --asdeps $(pacman -Qqe)
             sudo pacman -D --asexplicit $(cat $HOME/.local/nix-sources/packages)
@@ -1210,8 +1251,8 @@ let
             fi
         ";
     };
-    home.file.".local/nix-sources/enabled-system-services"={
-        text="
+    home.file.".local/nix-sources/enabled-system-services" = {
+      text = "
             reflector
             fstrim.timer
             polkit
@@ -1224,14 +1265,14 @@ let
             virtlockd.socket
             bluetooth
         ";
-        onChange="sudo systemctl enable $(cat $HOME/.local/nix-sources/enabled-system-services)";
+      onChange = "sudo systemctl enable $(cat $HOME/.local/nix-sources/enabled-system-services)";
     };
-    home.file.".local/nix-sources/groups"={
-        text="libvirt";
-        onChange="while read p; do sudo usermod -aG $p $USER; done < $HOME/.local/nix-sources/groups";
+    home.file.".local/nix-sources/groups" = {
+      text = "libvirt";
+      onChange = "while read p; do sudo usermod -aG $p $USER; done < $HOME/.local/nix-sources/groups";
     };
-    home.file.".local/nix-sources/pam"={
-        text=''#%PAM-1.0
+    home.file.".local/nix-sources/pam" = {
+      text = ''#%PAM-1.0
 
         auth       required     pam_securetty.so
         auth       requisite    pam_nologin.so
@@ -1240,26 +1281,26 @@ let
         account    include      system-local-login
         session    include      system-local-login
         session    optional     pam_gnome_keyring.so auto_start'';
-        onChange="sudo mkdir -p /etc/pam.d && sudo tee /etc/pam.d/greetd < $HOME/.local/nix-sources/pam";
+      onChange = "sudo mkdir -p /etc/pam.d && sudo tee /etc/pam.d/greetd < $HOME/.local/nix-sources/pam";
     };
-    home.file.".local/nix-sources/greetd"={
-        text=''[terminal]
+    home.file.".local/nix-sources/greetd" = {
+      text = ''[terminal]
         vt = 1
         [default_session]
         command = "/usr/bin/tuigreet --remember --cmd /usr/bin/Hyprland"
         user = "greeter"
         '';
-        onChange="sudo mkdir -p /etc/greetd && sudo tee /etc/greetd/config.toml < $HOME/.local/nix-sources/greetd";
+      onChange = "sudo mkdir -p /etc/greetd && sudo tee /etc/greetd/config.toml < $HOME/.local/nix-sources/greetd";
     };
-    home.file.".local/nix-sources/nix.conf"={
-        text=''
+    home.file.".local/nix-sources/nix.conf" = {
+      text = ''
         build-users-group = nixbld
         auto-optimise-store = true
-        '';
-        onChange="sudo mkdir -p /etc/nix && sudo tee /etc/nix/nix.conf < $HOME/nix-sources/nix.conf";
+      '';
+      onChange = "sudo mkdir -p /etc/nix && sudo tee /etc/nix/nix.conf < $HOME/nix-sources/nix.conf";
     };
-    home.file.".local/nix-sources/systemd-boot-hook"={
-        text=''
+    home.file.".local/nix-sources/systemd-boot-hook" = {
+      text = ''
         [Trigger]
         Type = Package
         Operation = Upgrade
@@ -1269,22 +1310,22 @@ let
         Description = Gracefully upgrading systemd-boot...
         When = PostTransaction
         Exec = /usr/bin/systemctl restart systemd-boot-update.service
-        '';
-        onChange="sudo mkdir -p /etc/pacman.d/hooks && sudo tee /etc/pacman.d/hooks/95-systemd-boot.hook < $HOME/nix-sources/systemd-boot-hook";
+      '';
+      onChange = "sudo mkdir -p /etc/pacman.d/hooks && sudo tee /etc/pacman.d/hooks/95-systemd-boot.hook < $HOME/nix-sources/systemd-boot-hook";
     };
-    home.file.".local/nix-sources/journald-config"={
-        text=''
+    home.file.".local/nix-sources/journald-config" = {
+      text = ''
         [Journal]
         SystemMaxUse=50M
-        '';
-        onChange="sudo mkdir -p /etc/systemd/journald.conf.d && sudo tee /etc/systemd/journald.conf.d/00-journal-size.conf < $HOME/.local/nix-sources/journald-config";
+      '';
+      onChange = "sudo mkdir -p /etc/systemd/journald.conf.d && sudo tee /etc/systemd/journald.conf.d/00-journal-size.conf < $HOME/.local/nix-sources/journald-config";
     };
-    home.file.".local/nix-sources/logind-config"={
-        text=''
+    home.file.".local/nix-sources/logind-config" = {
+      text = ''
         [Login]
         KillUserProcesses=yes
-        '';
-        onChange="sudo mkdir -p /etc/systemd/logind.conf.d && sudo tee /etc/systemd/logind.conf.d/00-kill-tmux.conf < $HOME/.local/nix-sources/logind-config";
+      '';
+      onChange = "sudo mkdir -p /etc/systemd/logind.conf.d && sudo tee /etc/systemd/logind.conf.d/00-kill-tmux.conf < $HOME/.local/nix-sources/logind-config";
     };
 
 
