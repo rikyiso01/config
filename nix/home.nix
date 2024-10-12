@@ -63,6 +63,7 @@ let
       jq
       yq
       libnotify
+      timg
     ];
 
     programs.git = {
@@ -111,6 +112,10 @@ let
         bind-key C-! break-pane
         bind-key -n Pageup send-keys left
         bind-key -n Pagedown send-keys right
+        bind h select-pane -L
+        bind j select-pane -D
+        bind k select-pane -U
+        bind l select-pane -R
         set-window-option -g mode-keys vi
         set-option -sa terminal-features ',foot:RGB'
         set-option -sg escape-time 10
@@ -125,6 +130,7 @@ let
       extraConfig = ''
         map dT shell ${pkgs.trash-cli}/bin/trash-put %s
         map dD shell ${pkgs.trash-cli}/bin/trash-put %s
+        map O shell xdg-mime default $(${pkgs.gnused}/bin/sed -n '1{p;q}').desktop $(xdg-mime query filetype %s)
         setlocal path=~/Downloads sort mtime
       '';
     };
@@ -227,6 +233,7 @@ let
         vim = "$VISUAL";
         flake-init = "nix flake init -t github:nix-community/nix-direnv";
         music-update = "nix run github:rikyiso01/musicmanager auto Test2 Bardify 'Watch Later'";
+        timg="timg -pk";
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -251,7 +258,7 @@ let
       extraLuaConfig = ''
         vim.opt.termguicolors = true
         local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-        require'lspconfig'.pyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.pyright}/bin/pyright-langserver","--stdio"},settings={python={analysis={typeCheckingMode="strict",stubPath="${home.homeDirectory}/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
+        require'lspconfig'.basedpyright.setup{capabilities=lsp_capabilities,cmd={"${pkgs.basedpyright}/bin/basedpyright-langserver","--stdio"},settings={basedpyright={analysis={typeCheckingMode="strict",stubPath="${home.homeDirectory}/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}}
         require'lspconfig'.ruff.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}}
         require'lspconfig'.nil_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}}
         require'lspconfig'.ansiblels.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ansible-language-server}/bin/ansible-language-server","--stdio"}}
@@ -272,6 +279,7 @@ let
         require'lspconfig'.rust_analyzer.setup{capabilities=lsp_capabilities,cmd={"rust-analyzer"}}
         require'lspconfig'.dartls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}}
         require'lspconfig'.ltex.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls}/bin/ltex-ls"},settings={ltex={language="auto"}}}
+        require'lspconfig'.dhall_lsp_server.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dhall-lsp-server}/bin/dhall-lsp-server"}}
 
         require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
         require("feline").setup()
@@ -304,6 +312,7 @@ let
                 cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                 rust={function()return {exe="${pkgs.rustfmt}/bin/rustfmt",stdin=true} end},
                 dart={function()return {exe="${pkgs.dart}/bin/dart",args={"format"},stdin=false} end},
+                dhall={function()return {exe="${pkgs.dhall}/bin/dhall",args={"format"},stdin=true} end},
             }
         }
         vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
@@ -375,6 +384,16 @@ let
         vim.g.rnvimr_enable_ex = 1
         vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
         vim.cmd [[colorscheme torte]]
+        vim.o.splitright=true
+        vim.o.splitbelow=true
+        vim.api.nvim_create_autocmd('TermOpen', {
+            pattern = { '*' },
+            callback = function()
+                vim.opt.number = false
+            end,
+            group = generalSettingsGroup,
+        })
+
       '';
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -396,6 +415,7 @@ let
         pkgs.vimExtraPlugins.Comment-nvim
         mini-nvim
         vim-abolish
+        dhall-vim
         # close-buffers-vim
         # (pkgs.vimUtils.buildVimPlugin {
         #   name = "stickybuf-nvim";
@@ -501,9 +521,10 @@ let
       exec-once = ${pkgs.waybar}/bin/waybar
       exec-once = ${pkgs.hypridle}/bin/hypridle
       exec-once = dbus-update-activation-environment --systemd --all
-      exec-once=[workspace 1 silent] /bin/kitty
-      exec-once=[workspace 2 silent] sleep 5 && flatpak run io.gitlab.librewolf-community
-      exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx
+      exec-once=[workspace 1 silent; maximize] /bin/kitty
+      exec-once=[workspace 1 silent; noinitialfocus] sleep 5 && flatpak run io.gitlab.librewolf-community
+      exec-once=[workspace 2 silent] secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx
+      exec-once=sleep 1 && hyprctl dispatch focuswindow kitty
       exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
       exec-once=${pkgs.hyprpaper}/bin/hyprpaper
 
@@ -641,24 +662,24 @@ let
       bind = $mainMod, J, togglesplit, # dwindle
 
       # Move focus with mainMod + arrow keys
-      bind = $mainMod, left, movefocus, l
-      bind = $mainMod, right, movefocus, r
-      bind = $mainMod, up, movefocus, u
-      bind = $mainMod, down, movefocus, d
-      bind = $mainMod, H, movefocus, l
-      bind = $mainMod, L, movefocus, r
-      bind = $mainMod, K, movefocus, u
-      bind = $mainMod, J, movefocus, d
+      bind = $mainMod, left, layoutmsg, cycleprev
+      bind = $mainMod, right, layoutmsg, cyclenext
+      bind = $mainMod, up, layoutmsg, cycleprev
+      bind = $mainMod, down, layoutmsg, cyclenext
+      bind = $mainMod, H, layoutmsg, cycleprev
+      bind = $mainMod, L, layoutmsg, cyclenext
+      bind = $mainMod, K, layoutmsg, cycleprev
+      bind = $mainMod, J, layoutmsg, cyclenext
 
       # Move window mainMod + arrow keys
-      bind = $mainMod SHIFT, left, movewindow, l
-      bind = $mainMod SHIFT, right, movewindow, r
-      bind = $mainMod SHIFT, up, movewindow, u
-      bind = $mainMod SHIFT, down, movewindow, d
-      bind = $mainMod SHIFT, H, movewindow, l
-      bind = $mainMod SHIFT, L, movewindow, r
-      bind = $mainMod SHIFT, K, movewindow, u
-      bind = $mainMod SHIFT, J, movewindow, d
+      bind = $mainMod SHIFT, left, layoutmsg, swapprev
+      bind = $mainMod SHIFT, right, layoutmsg, swapnext
+      bind = $mainMod SHIFT, up, layoutmsg, swapprev
+      bind = $mainMod SHIFT, down, layoutmsg, swapnext
+      bind = $mainMod SHIFT, H, layoutmsg, swapprev
+      bind = $mainMod SHIFT, L, layoutmsg, swapnext
+      bind = $mainMod SHIFT, K, layoutmsg, swapprev
+      bind = $mainMod SHIFT, J, layoutmsg, swapnext
 
       # Switch workspaces with mainMod + [0-9]
       bind = $mainMod, 1, workspace, 1
@@ -722,7 +743,7 @@ let
           position = "top";
           margin = "9 13 -10 18";
           spacing = 8;
-          modules-left = [ "hyprland/workspaces" ];
+          modules-left = [ "hyprland/language" "hyprland/workspaces" ];
           modules-center = [ "custom/clock" ];
           modules-right = [ "pulseaudio" "cpu" "memory" "network" "bluetooth" "power-profiles-daemon" "backlight" "battery" "tray" ];
           "custom/clock" = {
@@ -788,6 +809,13 @@ let
             format-charging = "{capacity}% ";
             format-discharging = "{capacity}% {icon}";
             format-icons = [ "" "" "" "" "" ];
+          };
+
+          "hyprland/language"={
+              format="{}";
+              format-en="EN";
+              format-it="IT";
+              keyboard="at-translated-set-2-keyboard";
           };
 
           tray = {
@@ -1048,7 +1076,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
       [Context]
-      filesystems=xdg-documents/CTF:ro;!home
+      filesystems=xdg-documents:ro;xdg-downloads:ro;!home
       persistent=.ghidra
     '';
     home.file.".local/share/flatpak/overrides/org.gimp.GIMP".text = ''
@@ -1097,6 +1125,13 @@ let
       [Context]
       filesystems=~/backup/Games/Minecraft
     '';
+    home.file.".local/share/flatpak/overrides/com.github.IsmaelMartinez.teams_for_linux".text = ''
+      [Context]
+      sockets=!x11
+
+      [Environment]
+      ELECTRON_OZONE_PLATFORM_HINT=wayland
+    '';
 
     home.file.".var/app/org.keepassxc.KeePassXC/config/keepassxc/keepassxc.ini".text = ''
       [General]
@@ -1136,48 +1171,89 @@ let
       LockDatabaseScreenLock=false
     '';
 
-    home.file.".local/nix-sources/flatpak.json".text = builtins.toJSON
-      {
-        flathub = {
-          url = "https://flathub.org/repo/flathub.flatpakrepo";
-          packages = [
-            "org.gnome.TextEditor"
-            "org.gnome.Characters"
-            "ca.desrt.dconf-editor"
-            "com.github.tchx84.Flatseal"
-            "rest.insomnia.Insomnia"
-            "org.ghidra_sre.Ghidra"
-            "org.wireshark.Wireshark"
-            "io.dbeaver.DBeaverCommunity"
-            "com.obsproject.Studio"
-            "org.gnome.seahorse.Application"
-            "com.usebottles.bottles"
-            "net.werwolv.ImHex"
-            "org.localsend.localsend_app"
-            "org.gnome.dspy"
-            "org.gnome.Snapshot"
-            "org.gnome.SoundRecorder"
-            "org.pitivi.Pitivi"
-            "org.keepassxc.KeePassXC"
-            "org.gnome.FileRoller"
-            "org.gnome.Evince"
-            "org.gnome.Loupe"
-            "org.remmina.Remmina"
-            "org.gnome.SimpleScan"
-            "io.github.flattool.Warehouse"
-            "io.freetubeapp.FreeTube"
-            "org.prismlauncher.PrismLauncher"
-            "org.gimp.GIMP"
-            "org.libreoffice.LibreOffice"
-            "io.gitlab.librewolf-community"
-            "eu.betterbird.Betterbird"
-            "org.mozilla.firefox"
-            "io.mpv.Mpv"
-            "app.moosync.moosync"
-            "com.calibre_ebook.calibre"
-          ];
-        };
-      };
+    # home.file.".local/nix-sources/flatpak.json".text = builtins.toJSON
+    #   {
+    #     flathub = {
+    #       url = "https://flathub.org/repo/flathub.flatpakrepo";
+    #       packages = [
+    #         "org.gnome.TextEditor"
+    #         "org.gnome.Characters"
+    #         "ca.desrt.dconf-editor"
+    #         "com.github.tchx84.Flatseal"
+    #         "rest.insomnia.Insomnia"
+    #         "org.ghidra_sre.Ghidra"
+    #         "org.wireshark.Wireshark"
+    #         "io.dbeaver.DBeaverCommunity"
+    #         "com.obsproject.Studio"
+    #         "org.gnome.seahorse.Application"
+    #         "com.usebottles.bottles"
+    #         "net.werwolv.ImHex"
+    #         "org.localsend.localsend_app"
+    #         "org.gnome.dspy"
+    #         "org.gnome.Snapshot"
+    #         "org.gnome.SoundRecorder"
+    #         "org.pitivi.Pitivi"
+    #         "org.keepassxc.KeePassXC"
+    #         "org.gnome.FileRoller"
+    #         "org.gnome.Evince"
+    #         "org.gnome.Loupe"
+    #         "org.remmina.Remmina"
+    #         "org.gnome.SimpleScan"
+    #         "io.github.flattool.Warehouse"
+    #         "io.freetubeapp.FreeTube"
+    #         "org.prismlauncher.PrismLauncher"
+    #         "org.gimp.GIMP"
+    #         "org.libreoffice.LibreOffice"
+    #         "io.gitlab.librewolf-community"
+    #         "eu.betterbird.Betterbird"
+    #         "org.mozilla.firefox"
+    #         "io.mpv.Mpv"
+    #         "app.moosync.moosync"
+    #         "com.calibre_ebook.calibre"
+    #       ];
+    #     };
+    #   };
+    home.file.".local/nix-sources/flatpak"={
+        text=''
+            org.gnome.TextEditor
+            org.gnome.Characters
+            ca.desrt.dconf-editor
+            com.github.tchx84.Flatseal
+            rest.insomnia.Insomnia
+            org.ghidra_sre.Ghidra
+            org.wireshark.Wireshark
+            io.dbeaver.DBeaverCommunity
+            com.obsproject.Studio
+            org.gnome.seahorse.Application
+            com.usebottles.bottles
+            net.werwolv.ImHex
+            org.localsend.localsend_app
+            org.gnome.dspy
+            org.gnome.Snapshot
+            org.gnome.SoundRecorder
+            org.pitivi.Pitivi
+            org.keepassxc.KeePassXC
+            org.gnome.FileRoller
+            org.gnome.Evince
+            org.gnome.Loupe
+            org.remmina.Remmina
+            org.gnome.SimpleScan
+            io.github.flattool.Warehouse
+            io.freetubeapp.FreeTube
+            org.prismlauncher.PrismLauncher
+            org.gimp.GIMP
+            org.libreoffice.LibreOffice
+            io.gitlab.librewolf-community
+            eu.betterbird.Betterbird
+            org.mozilla.firefox
+            io.mpv.Mpv
+            app.moosync.moosync
+            com.calibre_ebook.calibre'';
+        onChange=''
+            flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
+            flatpak remove --user -y $(comm -13 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
+        '';
+    };
 
     home.file.".local/nix-sources/powertop.hs" = {
       source = ./powertop.hs;
@@ -1358,7 +1434,7 @@ let
         systemctl enable --user gcr-ssh-agent.socket
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
-        ${pkgs.python3}/bin/python3 ${./flatpak-switch.py}
+        # ${pkgs.python3}/bin/python3 ${./flatpak-switch.py}
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
         ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
 
