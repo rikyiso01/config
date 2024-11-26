@@ -64,6 +64,7 @@ let
       yq
       libnotify
       timg
+      yewtube
     ];
 
     programs.git = {
@@ -233,7 +234,11 @@ let
         vim = "$VISUAL";
         flake-init = "nix flake init -t github:nix-community/nix-direnv";
         music-update = "nix run github:rikyiso01/musicmanager auto Test2 Bardify 'Watch Later'";
-        timg="timg -pk";
+        timg = "timg -pk";
+        assistant = "nix run -- nixpkgs#llama-cpp -m ~/backup/llama-2-7b-chat.Q4_K_M.gguf -p 'You are a helpful assistant' -cnv --chat-template deepseek 2> /dev/null";
+        search = "sh -c \"xdg-open https://search.brave.com/search?q=$1\"";
+        gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh";
+        rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone";
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -250,6 +255,11 @@ let
         enable = true;
         plugins = [ "git" ];
       };
+    };
+
+    programs.fzf = {
+      enable = true;
+      enableZshIntegration = true;
     };
 
 
@@ -280,6 +290,8 @@ let
         require'lspconfig'.dartls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}}
         require'lspconfig'.ltex.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls}/bin/ltex-ls"},settings={ltex={language="auto"}}}
         require'lspconfig'.dhall_lsp_server.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dhall-lsp-server}/bin/dhall-lsp-server"}}
+        require'lspconfig'.clangd.setup{capabilities=lsp_capabilities,cmd={"${pkgs.clang-tools}/bin/clangd"}}
+        require'lspconfig'.solc.setup{capabilities=lsp_capabilities,cmd={"${pkgs.solc}/bin/solc","--lsp"}}
 
         require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
         require("feline").setup()
@@ -290,7 +302,7 @@ let
         })
         require("formatter").setup{
             filetype={
-                python={function()return {exe="${pkgs.python312Packages.black}/bin/black",args={"-"},stdin=true} end},
+                python={function()return {exe="${pkgs.ruff}/bin/ruff",args={"format","-"},stdin=true} end},
                 haskell={function()return {exe="${pkgs.haskellPackages.fourmolu}/bin/fourmolu",args={"--no-cabal","-"},stdin=true} end},
                 java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
                 javascript={function()return {exe="prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
@@ -300,8 +312,8 @@ let
                 jsonc={function()return {exe="prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
                 yaml={function()return {exe="prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
                 markdown={function()return {exe="prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
-                xml={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i -xml - || true"},stdin=true} end},
-                html={function()return {exe="/bin/sh",args={"-c","${pkgs.html-tidy}/bin/tidy -i - || true"},stdin=true} end},
+                xml={function()return {exe="${pkgs.html-tidy}/bin/tidy",args={"-i","-xml"},stdin=true} end},
+                html={function()return {exe="${pkgs.html-tidy}/bin/tidy",args={"-i"},stdin=true} end},
                 nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
                 bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
                 dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
@@ -358,6 +370,7 @@ let
         vim.opt.tabstop = 4
         vim.opt.shiftwidth = 4
         vim.opt.number = true
+        vim.wo.relativenumber = true
         vim.opt.incsearch = true
         vim.opt.shortmess:remove({ 'S' })
         vim.opt.colorcolumn = "90"
@@ -416,16 +429,6 @@ let
         mini-nvim
         vim-abolish
         dhall-vim
-        # close-buffers-vim
-        # (pkgs.vimUtils.buildVimPlugin {
-        #   name = "stickybuf-nvim";
-        #   src = pkgs.fetchFromGitHub {
-        #     owner = "stevearc";
-        #     repo = "stickybuf.nvim";
-        #     rev = "f3398f8639e903991acdf66e2d63de7a78fe708e";
-        #     sha256 = "sha256-+ZcfItAtidLMQKSGJcU6EBlHbgHQGs/InQYxMknjnzw=";
-        #   };
-        # })
       ];
       extraPackages = with pkgs; [
         haskell-language-server
@@ -585,10 +588,10 @@ let
               passes = 1
           }
 
-          drop_shadow = false
-          shadow_range = 4
-          shadow_render_power = 3
-          col.shadow = rgba(1a1a1aee)
+          # drop_shadow = false
+          # shadow_range = 4
+          # shadow_render_power = 3
+          # col.shadow = rgba(1a1a1aee)
       }
 
       animations {
@@ -642,7 +645,6 @@ let
       # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
       windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 
-
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
       $mainMod = SUPER
 
@@ -662,20 +664,20 @@ let
       bind = $mainMod, J, togglesplit, # dwindle
 
       # Move focus with mainMod + arrow keys
-      bind = $mainMod, left, layoutmsg, cycleprev
-      bind = $mainMod, right, layoutmsg, cyclenext
-      bind = $mainMod, up, layoutmsg, cycleprev
-      bind = $mainMod, down, layoutmsg, cyclenext
+      # bind = $mainMod, left, layoutmsg, cycleprev
+      # bind = $mainMod, right, layoutmsg, cyclenext
+      # bind = $mainMod, up, layoutmsg, cycleprev
+      # bind = $mainMod, down, layoutmsg, cyclenext
       bind = $mainMod, H, layoutmsg, cycleprev
       bind = $mainMod, L, layoutmsg, cyclenext
       bind = $mainMod, K, layoutmsg, cycleprev
       bind = $mainMod, J, layoutmsg, cyclenext
 
       # Move window mainMod + arrow keys
-      bind = $mainMod SHIFT, left, layoutmsg, swapprev
-      bind = $mainMod SHIFT, right, layoutmsg, swapnext
-      bind = $mainMod SHIFT, up, layoutmsg, swapprev
-      bind = $mainMod SHIFT, down, layoutmsg, swapnext
+      # bind = $mainMod SHIFT, left, layoutmsg, swapprev
+      # bind = $mainMod SHIFT, right, layoutmsg, swapnext
+      # bind = $mainMod SHIFT, up, layoutmsg, swapprev
+      # bind = $mainMod SHIFT, down, layoutmsg, swapnext
       bind = $mainMod SHIFT, H, layoutmsg, swapprev
       bind = $mainMod SHIFT, L, layoutmsg, swapnext
       bind = $mainMod SHIFT, K, layoutmsg, swapprev
@@ -719,7 +721,7 @@ let
 
       bind = , XF86AudioRaiseVolume, exec, ${pkgs.pamixer}/bin/pamixer -i 5
       bind = , XF86AudioLowerVolume, exec, ${pkgs.pamixer}/bin/pamixer -d 5
-      bind = , XF86AudioMicMute, exec, ${pkgs.pamixer}/bin/pamixer --default-source -m
+      bind = , XF86AudioMicMute, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t
       bind = , XF86AudioMute, exec, ${pkgs.pamixer}/bin/pamixer -t
       bind = , XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause
       bind = , XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause
@@ -729,10 +731,14 @@ let
       bind = , XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
       bind = , Print, exec, ${pkgs.grim}/bin/grim "$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir PICTURES)/$(date +'%s_grim.png')"
 
+      bind = , XF86HomePage, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
+      bind = , XF86Mail, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
+
       bind = $mainMod SHIFT, SPACE, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next
 
       bind = $mainMod, F, fullscreen, 0
       bind = $mainMod, M, fullscreen, 1
+      bind = $mainMod SHIFT, M, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t
     '';
 
     programs.waybar = {
@@ -811,11 +817,11 @@ let
             format-icons = [ "" "" "" "" "" ];
           };
 
-          "hyprland/language"={
-              format="{}";
-              format-en="EN";
-              format-it="IT";
-              keyboard="at-translated-set-2-keyboard";
+          "hyprland/language" = {
+            format = "{}";
+            format-en = "EN";
+            format-it = "IT";
+            keyboard = "at-translated-set-2-keyboard";
           };
 
           tray = {
@@ -902,8 +908,8 @@ let
     '';
     home.file.".config/swaylock/config".text = "color=333333";
     home.file.".config/hypr/hyprpaper.conf".text = ''
-      preload = ${./wallpaper2.png}
-      wallpaper = ,${./wallpaper2.png}
+      preload = ${./wallpapers/wallpaper2.png}
+      wallpaper = ,${./wallpapers/wallpaper2.png}
     '';
 
     services.syncthing.enable = true;
@@ -915,6 +921,7 @@ let
             type "pipewire"
             name "PipeWire Sound Server"
         }
+        auto_update "yes"
       '';
     };
     services.mpd-mpris.enable = true;
@@ -936,6 +943,7 @@ let
         Service = {
           ExecStartPre = "bash -c 'while ! getent hosts www.google.com; do sleep 5; done'";
           ExecStart = "${pkgs.rclone}/bin/rclone copy --update ${home.homeDirectory}/backup/Syncthing drive:Syncthing";
+          Environment = "RCLONE_PASSWORD_COMMAND='${./password.sh} show -a Password rclone'";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -966,7 +974,10 @@ let
       };
     };
 
-    home.file.".gdbinit".text = "source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py";
+    home.file.".gdbinit".text = ''
+      source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py
+      set history filename ~/.local/state/gdb_history
+    '';
 
     home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
       { }
@@ -991,6 +1002,32 @@ let
         "default-folder-viewer" = "list-view";
       };
     };
+
+    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
+      {
+      "name": "net.downloadhelper.coapp",
+      "description": "Video DownloadHelper companion app",
+      "path": "${pkgs.vdhcoapp}/bin/vdhcoapp",
+      "type": "stdio",
+      "allowed_origins": [
+      "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
+      ]
+      }
+    '';
+    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text =
+      ''
+        {
+        "allowed_origins": [
+        "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
+        "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
+        ],
+        "description": "KeePassXC integration with native messaging support",
+        "name": "org.keepassxc.keepassxc_browser",
+        "path": "${pkgs.keepassxc}/bin/keepassxc-proxy",
+        "type": "stdio"
+        }
+      '';
+
 
     home.file.".var/app/io.gitlab.librewolf-community/.librewolf/librewolf.overrides.cfg".text = ''
       defaultPref("privacy.resistFingerprinting", false);
@@ -1021,14 +1058,31 @@ let
       ],
       "description": "KeePassXC integration with native messaging support",
       "name": "org.keepassxc.keepassxc_browser",
-      "path": "${./keepassxc-proxy}",
+      "path": "${pkgs.keepassxc}/bin/keepassxc-proxy",
       "type": "stdio"
       }
     '';
 
 
-    home.file.".local/bin/qemu".source = ./qemu.py;
-    home.file.".local/bin/jupynvim".source = ./jupynvim.py;
+    home.file.".local/bin/password" = {
+      text = ''
+        #!/usr/bin/env bash
+
+            set -euo pipefail
+
+            action="$1"
+            shift
+
+            secret-tool lookup keepass password | ${pkgs.keepassxc}/bin/keepassxc-cli "$action" ~/backup/Syncthing/keepass.kdbx "$@"
+      '';
+      executable = true;
+    };
+
+    home.file.".local/flatpak/brave" = {
+      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sfT ${./brave.jsonc} /etc/brave/policies/managed/brave.json && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
+      executable = true;
+    };
+
 
     home.file.".local/flatpak/librewolf" = {
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/librewolf \"$@\"";
@@ -1066,6 +1120,14 @@ let
       [Environment]
       ANKI_WAYLAND=1
     '';
+    home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
+      [Context]
+      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro;!xdg-desktop;!~/.local/share/icons;!xdg-run/dconf;!~/.config/dconf;!~/.config/kioslaverc;!~/.local/share/applications;!host-etc
+
+      [Environment]
+      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
+    '';
+
     home.file.".local/share/flatpak/overrides/io.gitlab.librewolf-community".text = ''
       [Context]
       devices=all
@@ -1076,7 +1138,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
       [Context]
-      filesystems=xdg-documents:ro;xdg-downloads:ro;!home
+      filesystems=xdg-documents;xdg-downloads;!home;/nix/store:ro
       persistent=.ghidra
     '';
     home.file.".local/share/flatpak/overrides/org.gimp.GIMP".text = ''
@@ -1171,88 +1233,43 @@ let
       LockDatabaseScreenLock=false
     '';
 
-    # home.file.".local/nix-sources/flatpak.json".text = builtins.toJSON
-    #   {
-    #     flathub = {
-    #       url = "https://flathub.org/repo/flathub.flatpakrepo";
-    #       packages = [
-    #         "org.gnome.TextEditor"
-    #         "org.gnome.Characters"
-    #         "ca.desrt.dconf-editor"
-    #         "com.github.tchx84.Flatseal"
-    #         "rest.insomnia.Insomnia"
-    #         "org.ghidra_sre.Ghidra"
-    #         "org.wireshark.Wireshark"
-    #         "io.dbeaver.DBeaverCommunity"
-    #         "com.obsproject.Studio"
-    #         "org.gnome.seahorse.Application"
-    #         "com.usebottles.bottles"
-    #         "net.werwolv.ImHex"
-    #         "org.localsend.localsend_app"
-    #         "org.gnome.dspy"
-    #         "org.gnome.Snapshot"
-    #         "org.gnome.SoundRecorder"
-    #         "org.pitivi.Pitivi"
-    #         "org.keepassxc.KeePassXC"
-    #         "org.gnome.FileRoller"
-    #         "org.gnome.Evince"
-    #         "org.gnome.Loupe"
-    #         "org.remmina.Remmina"
-    #         "org.gnome.SimpleScan"
-    #         "io.github.flattool.Warehouse"
-    #         "io.freetubeapp.FreeTube"
-    #         "org.prismlauncher.PrismLauncher"
-    #         "org.gimp.GIMP"
-    #         "org.libreoffice.LibreOffice"
-    #         "io.gitlab.librewolf-community"
-    #         "eu.betterbird.Betterbird"
-    #         "org.mozilla.firefox"
-    #         "io.mpv.Mpv"
-    #         "app.moosync.moosync"
-    #         "com.calibre_ebook.calibre"
-    #       ];
-    #     };
-    #   };
-    home.file.".local/nix-sources/flatpak"={
-        text=''
-            org.gnome.TextEditor
-            org.gnome.Characters
-            ca.desrt.dconf-editor
-            com.github.tchx84.Flatseal
-            rest.insomnia.Insomnia
-            org.ghidra_sre.Ghidra
-            org.wireshark.Wireshark
-            io.dbeaver.DBeaverCommunity
-            com.obsproject.Studio
-            org.gnome.seahorse.Application
-            com.usebottles.bottles
-            net.werwolv.ImHex
-            org.localsend.localsend_app
-            org.gnome.dspy
-            org.gnome.Snapshot
-            org.gnome.SoundRecorder
-            org.pitivi.Pitivi
-            org.keepassxc.KeePassXC
-            org.gnome.FileRoller
-            org.gnome.Evince
-            org.gnome.Loupe
-            org.remmina.Remmina
-            org.gnome.SimpleScan
-            io.github.flattool.Warehouse
-            io.freetubeapp.FreeTube
-            org.prismlauncher.PrismLauncher
-            org.gimp.GIMP
-            org.libreoffice.LibreOffice
-            io.gitlab.librewolf-community
-            eu.betterbird.Betterbird
-            org.mozilla.firefox
-            io.mpv.Mpv
-            app.moosync.moosync
-            com.calibre_ebook.calibre'';
-        onChange=''
-            flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
-            flatpak remove --user -y $(comm -13 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
-        '';
+    home.file.".local/nix-sources/flatpak" = {
+      text = ''
+        org.gnome.TextEditor
+        org.gnome.Characters
+        ca.desrt.dconf-editor
+        com.github.tchx84.Flatseal
+        com.obsproject.Studio
+        org.gnome.seahorse.Application
+        com.usebottles.bottles
+        org.localsend.localsend_app
+        org.gnome.dspy
+        org.gnome.Snapshot
+        org.gnome.SoundRecorder
+        org.pitivi.Pitivi
+        org.keepassxc.KeePassXC
+        org.gnome.FileRoller
+        org.gnome.Evince
+        org.gnome.Loupe
+        org.remmina.Remmina
+        org.gnome.SimpleScan
+        io.github.flattool.Warehouse
+        io.freetubeapp.FreeTube
+        org.prismlauncher.PrismLauncher
+        org.gimp.GIMP
+        org.libreoffice.LibreOffice
+        io.gitlab.librewolf-community
+        eu.betterbird.Betterbird
+        io.mpv.Mpv
+        app.moosync.moosync
+        com.calibre_ebook.calibre
+        com.github.IsmaelMartinez.teams_for_linux
+        com.brave.Browser
+        org.gnome.Evolution'';
+      onChange = ''
+        flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
+        flatpak remove --user -y $(comm -13 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
+      '';
     };
 
     home.file.".local/nix-sources/powertop.hs" = {
@@ -1315,8 +1332,7 @@ let
         bluez
         bluez-utils
         nautilus
-        pacman-contrib
-        libnfc";
+        pacman-contrib";
       onChange = "
             sudo pacman -S --noconfirm --needed $(cat $HOME/.local/nix-sources/packages)
             sudo pacman -D --asdeps $(pacman -Qqe)
@@ -1434,7 +1450,6 @@ let
         systemctl enable --user gcr-ssh-agent.socket
         systemctl enable --user podman.socket
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
-        # ${pkgs.python3}/bin/python3 ${./flatpak-switch.py}
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
         ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
 

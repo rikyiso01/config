@@ -11,8 +11,8 @@ flatpak update -y
 nix flake update
 home-manager switch --flake .
 
-pacdiff -s
+sudo -E pacdiff
 
 sudo pacman -Syu
 
-pacdiff -s
+sudo -E pacdiff
