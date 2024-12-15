@@ -2,6 +2,7 @@
   description = "Home manager configuration";
 
   inputs = {
+    # nixpkgs.url = "flake:nixpkgs/nixos-24.11";
     nixpkgs.url = "flake:nixpkgs/nixpkgs-unstable";
     homeManager = {
       url = "github:nix-community/home-manager";

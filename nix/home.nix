@@ -29,7 +29,8 @@ let
       iputils
       binutils
       fira-code
-      fira-code-nerdfont
+      nerd-fonts.fira-code
+      nerd-fonts.fira-mono
       php
       powertop
       android-tools
@@ -65,6 +66,7 @@ let
       libnotify
       timg
       yewtube
+      ffmpeg
     ];
 
     programs.git = {
@@ -121,11 +123,27 @@ let
         set-option -sa terminal-features ',foot:RGB'
         set-option -sg escape-time 10
         set -g @catppuccin_flavour 'mocha' # latte,frappe, macchiato or mocha
+        set -g allow-passthrough on
 
         bind-key -T copy-mode-vi "o" send-keys -X copy-pipe-and-cancel "sed s/##/####/g | xargs -I {} tmux run-shell -b 'cd #{pane_current_path}; xdg-open \"{}\" > /dev/null'"
       '';
     };
     programs.htop.enable = true;
+    nixpkgs.overlays = [
+      (self: super: {
+        # Use ranger PR, fixes freeze after opening image in kitty: https://github.com/ranger/ranger/pull/2856
+        ranger = super.ranger.overrideAttrs (old: {
+          version = "1.9.3";
+          src = super.fetchFromGitHub {
+            owner = "Ethsan";
+            repo = "ranger";
+            rev = "71a06f28551611d192d3e644d95ad04023e10801";
+            sha256 = "sha256-Yjdn1oE5VtJMGnmQ2VC764UXKm1PrkIPXXQ8MzQ8u1U=";
+          };
+          propagatedBuildInputs = old.propagatedBuildInputs ++ (with super.python3Packages; [ astroid pylint ]);
+        });
+      })
+    ];
     programs.ranger = {
       enable = true;
       extraConfig = ''
@@ -133,6 +151,8 @@ let
         map dD shell ${pkgs.trash-cli}/bin/trash-put %s
         map O shell xdg-mime default $(${pkgs.gnused}/bin/sed -n '1{p;q}').desktop $(xdg-mime query filetype %s)
         setlocal path=~/Downloads sort mtime
+        set preview_images true
+        set preview_images_method kitty
       '';
     };
     home.file.".config/ranger/rifle.conf".text = ''
@@ -141,7 +161,15 @@ let
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
-    programs.kitty = { enable = true; font.name = "FiraCode Nerd Font Mono"; font.size = 16; settings = { enable_audio_bell = false; startup_session = "${home.homeDirectory}/.config/kitty/session.conf"; }; };
+    programs.kitty = {
+      enable = true;
+      font.name = "FiraMono Nerd Font Mono";
+      # font.name = "FiraCode Nerd Font Mono";
+      # font.name = "Fira Code";
+      # font.name="DejaVu Sans";
+      font.size = 16;
+      settings = { enable_audio_bell = false; startup_session = "${home.homeDirectory}/.config/kitty/session.conf"; };
+    };
     home.file.".config/kitty/session.conf".text = "cd ${home.homeDirectory}/backup/Documents\nlaunch zsh -c \"${pkgs.tmux}/bin/tmux new-session -As default 'exec ${pkgs.ranger}/bin/ranger'\"";
     programs.lazygit.enable = true;
 
@@ -151,7 +179,7 @@ let
       PAGER = "less";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      EDITOR = "${pkgs.vim}/bin/vim";
+      EDITOR = "nvim";
       DIFFPROG = "${pkgs.vim}/bin/vimdiff";
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
@@ -278,6 +306,7 @@ let
         require'lspconfig'.yamlls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.yaml-language-server}/bin/yaml-language-server","--stdio"}}
         require'lspconfig'.jdtls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.jdt-language-server}/bin/jdtls", "-configuration", "${home.homeDirectory}/.cache/jdtls/config", "-data", "${home.homeDirectory}/.cache/jdtls/workspace"}}
         require'lspconfig'.ts_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}}
+        require'lspconfig'.eslint.setup{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-eslint-language-server","--stdio"}}
         local capabilities = vim.lsp.protocol.make_client_capabilities()
         capabilities.textDocument.completion.completionItem.snippetSupport = true
         require'lspconfig'.jsonls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities}
@@ -325,6 +354,7 @@ let
                 rust={function()return {exe="${pkgs.rustfmt}/bin/rustfmt",stdin=true} end},
                 dart={function()return {exe="${pkgs.dart}/bin/dart",args={"format"},stdin=false} end},
                 dhall={function()return {exe="${pkgs.dhall}/bin/dhall",args={"format"},stdin=true} end},
+                just={function()return {exe="${pkgs.just}/bin/just",args={"--dump"},stdin=true} end},
             }
         }
         vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
@@ -364,13 +394,27 @@ let
                 ['<esc>'] = cmp.mapping.abort(),
             },
         }
+        require'nvim-treesitter.configs'.setup {
+          highlight = {
+            enable = true,
+            -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+            -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+            -- Using this option may slow down your editor, and you may see some duplicate highlights.
+            -- Instead of true it can also be a list of languages
+            additional_vim_regex_highlighting = false,
+          },
+        }
+        require('gitblame').setup {
+            enabled = true,
+            message_when_not_committed = ""
+        }
+        require('gitsigns').setup()
 
         vim.opt.expandtab = true
         vim.opt.smartindent = true
         vim.opt.tabstop = 4
         vim.opt.shiftwidth = 4
         vim.opt.number = true
-        vim.wo.relativenumber = true
         vim.opt.incsearch = true
         vim.opt.shortmess:remove({ 'S' })
         vim.opt.colorcolumn = "90"
@@ -395,6 +439,7 @@ let
         vim.env.NVIM_SERVER=vim.v.servername
         vim.g.rnvimr_enable_picker = 1
         vim.g.rnvimr_enable_ex = 1
+        vim.g.rnvimr_ranger_cmd = {'ranger', '--cmd=set preview_images false'}
         vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
         vim.cmd [[colorscheme torte]]
         vim.o.splitright=true
@@ -429,6 +474,8 @@ let
         mini-nvim
         vim-abolish
         dhall-vim
+        git-blame-nvim
+        gitsigns-nvim
       ];
       extraPackages = with pkgs; [
         haskell-language-server
@@ -526,7 +573,7 @@ let
       exec-once = dbus-update-activation-environment --systemd --all
       exec-once=[workspace 1 silent; maximize] /bin/kitty
       exec-once=[workspace 1 silent; noinitialfocus] sleep 5 && flatpak run io.gitlab.librewolf-community
-      exec-once=[workspace 2 silent] secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run org.keepassxc.KeePassXC --pw-stdin ${home.homeDirectory}/backup/Syncthing/keepass.kdbx
+      exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/Syncthing/keepass.kdbx @@
       exec-once=sleep 1 && hyprctl dispatch focuswindow kitty
       exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
       exec-once=${pkgs.hyprpaper}/bin/hyprpaper
@@ -833,7 +880,8 @@ let
       style = ''
         *{
             border: none;
-            font-family: 'FiraCode Nerd Font Mono';
+            font-family: 'FiraMono Nerd Font Mono';
+            /*font-family: 'FiraCode Nerd Font Mono';*/
             font-size: 1em;
             background: transparent;
             color: #ffffff;
@@ -908,8 +956,8 @@ let
     '';
     home.file.".config/swaylock/config".text = "color=333333";
     home.file.".config/hypr/hyprpaper.conf".text = ''
-      preload = ${./wallpapers/wallpaper2.png}
-      wallpaper = ,${./wallpapers/wallpaper2.png}
+      preload = ${./wallpapers/christmas.png}
+      wallpaper = ,${./wallpapers/christmas.png}
     '';
 
     services.syncthing.enable = true;
@@ -943,7 +991,7 @@ let
         Service = {
           ExecStartPre = "bash -c 'while ! getent hosts www.google.com; do sleep 5; done'";
           ExecStart = "${pkgs.rclone}/bin/rclone copy --update ${home.homeDirectory}/backup/Syncthing drive:Syncthing";
-          Environment = "RCLONE_PASSWORD_COMMAND='${./password.sh} show -a Password rclone'";
+          Environment = "RCLONE_PASSWORD_COMMAND='${home.homeDirectory}/.local/bin/password show -a Password rclone'";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -969,8 +1017,25 @@ let
         Unit = { Description = "Clear mpd playlist on startup"; };
         Service = {
           Type = "oneshot";
+          ExecStartPre = "sleep 1";
           ExecStart = "${pkgs.mpc-cli}/bin/mpc clear";
         };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
+      redlib = {
+        Unit = { Description = "Custom frontend for Reddit"; };
+        Service = {
+          ExecStart = "${pkgs.redlib}/bin/redlib -p 8385";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
+      gh-token = {
+        Unit = { Description = "Github token loader"; };
+        Service = {
+          ExecStart = "systemctl --user import-environment GH_TOKEN";
+          Environment = "GH_TOKEN='${home.homeDirectory}/.local/bin/password show -a 'gh token' Github'";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
       };
     };
 
@@ -1002,32 +1067,6 @@ let
         "default-folder-viewer" = "list-view";
       };
     };
-
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/net.downloadhelper.coapp.json".text = ''
-      {
-      "name": "net.downloadhelper.coapp",
-      "description": "Video DownloadHelper companion app",
-      "path": "${pkgs.vdhcoapp}/bin/vdhcoapp",
-      "type": "stdio",
-      "allowed_origins": [
-      "chrome-extension://lmjnegcaeklhafolokijcfjliaokphfk/"
-      ]
-      }
-    '';
-    home.file.".var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text =
-      ''
-        {
-        "allowed_origins": [
-        "chrome-extension://pdffhmdngciaglkoonimfcmckehcpafo/",
-        "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
-        ],
-        "description": "KeePassXC integration with native messaging support",
-        "name": "org.keepassxc.keepassxc_browser",
-        "path": "${pkgs.keepassxc}/bin/keepassxc-proxy",
-        "type": "stdio"
-        }
-      '';
-
 
     home.file.".var/app/io.gitlab.librewolf-community/.librewolf/librewolf.overrides.cfg".text = ''
       defaultPref("privacy.resistFingerprinting", false);
@@ -1078,11 +1117,6 @@ let
       executable = true;
     };
 
-    home.file.".local/flatpak/brave" = {
-      text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && mkdir -p /etc/brave/policies/managed && ln -sfT ${./brave.jsonc} /etc/brave/policies/managed/brave.json && exec /app/bin/cobalt --ozone-platform-hint=auto --enable-features=WebContentsForceDark \"$@\"";
-      executable = true;
-    };
-
 
     home.file.".local/flatpak/librewolf" = {
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/librewolf \"$@\"";
@@ -1120,18 +1154,18 @@ let
       [Environment]
       ANKI_WAYLAND=1
     '';
-    home.file.".local/share/flatpak/overrides/com.brave.Browser".text = ''
-      [Context]
-      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro;!xdg-desktop;!~/.local/share/icons;!xdg-run/dconf;!~/.config/dconf;!~/.config/kioslaverc;!~/.local/share/applications;!host-etc
-
-      [Environment]
-      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-    '';
-
     home.file.".local/share/flatpak/overrides/io.gitlab.librewolf-community".text = ''
       [Context]
       devices=all
       filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro
+
+      [Environment]
+      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
+    '';
+    home.file.".local/share/flatpak/overrides/org.qutebrowser.qutebrowser".text = ''
+      [Context]
+      devices=all
+      filesystems=xdg-documents;/nix/store:ro
 
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
@@ -1168,7 +1202,7 @@ let
     home.file.".local/share/flatpak/overrides/org.keepassxc.KeePassXC".text = ''
       [Context]
       devices=!all;dri
-      filesystems=!xdg-config/kdeglobals;!/tmp;/nix/store:ro;!host;xdg-download;~/backup/Syncthing
+      filesystems=!xdg-config/kdeglobals;/nix/store:ro;!host
     '';
     home.file.".local/share/flatpak/overrides/org.pitivi.Pitivi".text = ''
       [Context]
@@ -1261,11 +1295,11 @@ let
         io.gitlab.librewolf-community
         eu.betterbird.Betterbird
         io.mpv.Mpv
-        app.moosync.moosync
         com.calibre_ebook.calibre
         com.github.IsmaelMartinez.teams_for_linux
-        com.brave.Browser
-        org.gnome.Evolution'';
+        org.telegram.desktop
+        org.ghidra_sre.Ghidra
+        com.rtosta.zapzap'';
       onChange = ''
         flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
         flatpak remove --user -y $(comm -13 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
