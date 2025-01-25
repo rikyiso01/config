@@ -1,0 +1,14 @@
+services:
+  radicale:
+    init: true
+    build:
+      dockerfile: ./radicale.dockerfile
+      context: .
+    ports:
+      - "127.0.0.1:5232:5232"
+    volumes:
+      - ~/backup/Syncthing/decsync:/decsync
+      - ~/.local/share/radicale/collections:/collections
+    annotations:
+      - "org.systemd.property.KillMode='none'"
+    read_only: true

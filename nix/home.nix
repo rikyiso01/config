@@ -67,6 +67,8 @@ let
       timg
       yewtube
       ffmpeg
+      asciinema
+      khal
     ];
 
     programs.git = {
@@ -157,7 +159,7 @@ let
     };
     home.file.".config/ranger/rifle.conf".text = ''
       mime application/zip, flag f = /bin/unzip "$1"
-      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext dart,!ext tex, flag f = xdg-open "$1"
+      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext tsx,!ext rs,!ext dart,!ext tex, flag f = xdg-open "$1"
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
@@ -179,7 +181,7 @@ let
       PAGER = "less";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      EDITOR = "nvim";
+      EDITOR = "${home.homeDirectory}/.nix-profile/bin/nvim";
       DIFFPROG = "${pkgs.vim}/bin/vimdiff";
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
@@ -267,6 +269,7 @@ let
         search = "sh -c \"xdg-open https://search.brave.com/search?q=$1\"";
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh";
         rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone";
+        record = ''sleep 1 && /bin/kitty sh -c 'asciinema rec "$HOME/Videos/asciinema/recording-$(date "+%Y-%m-%d-%H-%M-%S").cast" -c "tmux new-session \"exec ranger\""' >/dev/null 2>/dev/null &!'';
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -320,7 +323,8 @@ let
         require'lspconfig'.ltex.setup{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls}/bin/ltex-ls"},settings={ltex={language="auto"}}}
         require'lspconfig'.dhall_lsp_server.setup{capabilities=lsp_capabilities,cmd={"${pkgs.dhall-lsp-server}/bin/dhall-lsp-server"}}
         require'lspconfig'.clangd.setup{capabilities=lsp_capabilities,cmd={"${pkgs.clang-tools}/bin/clangd"}}
-        require'lspconfig'.solc.setup{capabilities=lsp_capabilities,cmd={"${pkgs.solc}/bin/solc","--lsp"}}
+        -- require'lspconfig'.solc.setup{capabilities=lsp_capabilities,cmd={"${pkgs.solc}/bin/solc","--lsp"}}
+        require'lspconfig'.solargraph.setup{capabilities=lsp_capabilities,cmd={"${pkgs.rubyPackages.solargraph}/bin/solargraph","stdio"}}
 
         require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
         require("feline").setup()
@@ -355,6 +359,7 @@ let
                 dart={function()return {exe="${pkgs.dart}/bin/dart",args={"format"},stdin=false} end},
                 dhall={function()return {exe="${pkgs.dhall}/bin/dhall",args={"format"},stdin=true} end},
                 just={function()return {exe="${pkgs.just}/bin/just",args={"--dump"},stdin=true} end},
+                ruby={function()return {exe="${pkgs.rufo}/bin/rufo",args={"--simple-exit"},stdin=true} end},
             }
         }
         vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
@@ -426,9 +431,9 @@ let
         vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
         vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
         vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
-        vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
+        -- vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
         vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename)
-        vim.keymap.set('n', '<Leader>d', vim.diagnostic.open_float)
+        -- vim.keymap.set('n', '<Leader>d', vim.diagnostic.open_float)
         vim.keymap.set('n', '<Leader>o', MiniMap.toggle)
         vim.keymap.set({'n','v'}, "<Leader>.", vim.lsp.buf.code_action)
         function _G.set_terminal_keymaps()
@@ -956,8 +961,8 @@ let
     '';
     home.file.".config/swaylock/config".text = "color=333333";
     home.file.".config/hypr/hyprpaper.conf".text = ''
-      preload = ${./wallpapers/christmas.png}
-      wallpaper = ,${./wallpapers/christmas.png}
+      preload = ${./wallpapers/wallpaper2.png}
+      wallpaper = ,${./wallpapers/wallpaper2.png}
     '';
 
     services.syncthing.enable = true;
@@ -974,6 +979,58 @@ let
     };
     services.mpd-mpris.enable = true;
     programs.ncmpcpp.enable = true;
+
+    services.vdirsyncer.enable = true;
+    home.file.".config/vdirsyncer/config".text = ''
+      [general]
+      status_path = "~/.vdirsyncer/status/"
+
+      [pair my_calendar]
+      a = "my_calendar_local"
+      b = "my_calendar_remote"
+      collections = ["from a", "from b"]
+
+      [storage my_calendar_local]
+      type = "filesystem"
+      path = "~/.calendar/"
+      fileext = ".ics"
+
+      [storage my_calendar_remote]
+      type = "caldav"
+
+      # We can simplify this URL here as well. In theory it shouldn't matter.
+      url = "http://127.0.0.1:5232"
+      username = "t"
+      password = "t"
+    '';
+    home.file.".config/khal/config".text=''
+    [calendars]
+
+      [[lessons]]
+        path = ~/.calendar/calendars-fad4fc34-12ee-4f75-98ed-2f77eb2a6419
+        color = dark green
+        priority = 20
+      [[events]]
+        path = ~/.calendar/calendars-88424f24-751c-49b2-8783-2218dc5d2dcd
+        color = dark green
+        priority = 20
+      [[events2]]
+        path = ~/.calendar/calendars-85c59956-f652-4410-89e4-57cf8d55b17f
+        color = dark green
+        priority = 20
+      [[sport]]
+        path = ~/.calendar/calendars-53019f4a-8f2a-4809-aeba-d22c4c393fc5
+        color = dark green
+        priority = 20
+      [[tasks]]
+        path = ~/.calendar/calendars-d87a7978-7196-4208-a861-fcaeb09d39a7
+        color = dark green
+        priority = 20
+      [[transports]]
+        path = ~/.calendar/calendars-c97798c1-8ec6-484e-8a28-52e41109b474
+        color = dark green
+        priority = 20
+    '';
 
     systemd.user.services = {
       startup = {
@@ -1037,7 +1094,23 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
+      radicale = {
+        Unit = {
+          Description = "Radicale server";
+        };
+        Service = {
+          ExecStart = "sh -c 'podman build -t radicale ${./docker} -f radicale.dockerfile && podman run --name radicale --rm -p 127.0.0.1:5232:5232 -v ${home.homeDirectory}/backup/Syncthing/decsync:/decsync -v ${home.homeDirectory}/.local/share/radicale/collections:/collections --read-only radicale'";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
     };
+
+    home.file.".config/radicale/config".text = ''
+      [storage]
+      type = radicale_storage_decsync
+      filesystem_folder = ${home.homeDirectory}/.local/share/radicale/collections
+      decsync_dir = ${home.homeDirectory}/backup/Syncthing/decsync
+    '';
 
     home.file.".gdbinit".text = ''
       source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py
@@ -1206,7 +1279,7 @@ let
     '';
     home.file.".local/share/flatpak/overrides/org.pitivi.Pitivi".text = ''
       [Context]
-      filesystems=xdg-videos;!host
+      filesystems=xdg-videos;xdg-music;xdg-download;!host
     '';
     home.file.".local/share/flatpak/overrides/org.remmina.Remmina".text = ''
       [Context]
