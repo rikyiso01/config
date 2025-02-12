@@ -58,6 +58,7 @@ let
       wl-clipboard
       nixVersions.latest
       rclone
+      rsync
       mpc-cli
       termdown
       yt-dlp
@@ -69,6 +70,7 @@ let
       ffmpeg
       asciinema
       khal
+      python3Packages.tqdm
     ];
 
     programs.git = {
@@ -198,6 +200,8 @@ let
       NIXOS_OZONE_WL = "1";
       LIBVIRT_DEFAULT_URI = "qemu:///system";
       SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/gcr/ssh";
+      XCURSOR_THEME = "Bibata-Modern-Amber";
+      XCURSOR_SIZE = "36";
     };
 
     programs.vim.enable = true;
@@ -268,7 +272,7 @@ let
         assistant = "nix run -- nixpkgs#llama-cpp -m ~/backup/llama-2-7b-chat.Q4_K_M.gguf -p 'You are a helpful assistant' -cnv --chat-template deepseek 2> /dev/null";
         search = "sh -c \"xdg-open https://search.brave.com/search?q=$1\"";
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh";
-        rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone";
+        rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone --config ${home.homeDirectory}/backup/rclone.conf";
         record = ''sleep 1 && /bin/kitty sh -c 'asciinema rec "$HOME/Videos/asciinema/recording-$(date "+%Y-%m-%d-%H-%M-%S").cast" -c "tmux new-session \"exec ranger\""' >/dev/null 2>/dev/null &!'';
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
@@ -499,12 +503,12 @@ let
     };
 
     home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.spl".source = builtins.fetchurl {
-      url = "http://ftp.vim.org/vim/runtime/spell/it.utf-8.spl";
+      url = "https://vim.mirror.garr.it/pub/vim/runtime/spell/it.utf-8.spl";
       sha256 = "d80733903e836d53790c0ab8c1c2f29f663ca2a77aee7b381aea6b8762ae7413";
     };
     home.file."${config.xdg.configHome}/nvim/spell/it.utf-8.sug".source = builtins.fetchurl {
-      url = "http://ftp.vim.org/vim/runtime/spell/fr.utf-8.sug";
-      sha256 = "0294bc32b42c90bbb286a89e23ca3773b7ef50eff1ab523b1513d6a25c6b3f58";
+      url = "https://vim.mirror.garr.it/pub/vim/runtime/spell/it.utf-8.sug";
+      sha256 = "e0bb1761a79270926b75a8faf4f4d0d840d55a2b34518fd8e512927c2724ce4a";
     };
 
     programs.nix-index.enable = true;
@@ -558,6 +562,7 @@ let
         createDirectories = true;
         enable = true;
         documents = "${home.homeDirectory}/backup/Documents";
+        music = "${home.homeDirectory}/backup/Music";
       };
     };
 
@@ -578,7 +583,7 @@ let
       exec-once = dbus-update-activation-environment --systemd --all
       exec-once=[workspace 1 silent; maximize] /bin/kitty
       exec-once=[workspace 1 silent; noinitialfocus] sleep 5 && flatpak run io.gitlab.librewolf-community
-      exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/Syncthing/keepass.kdbx @@
+      exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@
       exec-once=sleep 1 && hyprctl dispatch focuswindow kitty
       exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
       exec-once=${pkgs.hyprpaper}/bin/hyprpaper
@@ -592,7 +597,8 @@ let
       $menu = /usr/bin/wofi
 
       # Some default env vars.
-      env = XCURSOR_SIZE,24
+      env = XCURSOR_SIZE,36
+      env = XCURSOR_THEME,Bibata-Modern-Amber
       # env = QT_QPA_PLATFORMTHEME,qt5ct # change to qt6ct if you have that
 
       # For all categories, see https://wiki.hyprland.org/Configuring/Variables/
@@ -966,6 +972,7 @@ let
     '';
 
     services.syncthing.enable = true;
+    services.syncthing.extraOptions = [ "-config=${home.homeDirectory}/backup/syncthing" "-data=${home.homeDirectory}/.local/state/syncthing" ];
     services.mpd = {
       enable = true;
       musicDirectory = "${config.xdg.userDirs.music}";
@@ -1003,33 +1010,33 @@ let
       username = "t"
       password = "t"
     '';
-    home.file.".config/khal/config".text=''
-    [calendars]
+    home.file.".config/khal/config".text = ''
+      [calendars]
 
-      [[lessons]]
-        path = ~/.calendar/calendars-fad4fc34-12ee-4f75-98ed-2f77eb2a6419
-        color = dark green
-        priority = 20
-      [[events]]
-        path = ~/.calendar/calendars-88424f24-751c-49b2-8783-2218dc5d2dcd
-        color = dark green
-        priority = 20
-      [[events2]]
-        path = ~/.calendar/calendars-85c59956-f652-4410-89e4-57cf8d55b17f
-        color = dark green
-        priority = 20
-      [[sport]]
-        path = ~/.calendar/calendars-53019f4a-8f2a-4809-aeba-d22c4c393fc5
-        color = dark green
-        priority = 20
-      [[tasks]]
-        path = ~/.calendar/calendars-d87a7978-7196-4208-a861-fcaeb09d39a7
-        color = dark green
-        priority = 20
-      [[transports]]
-        path = ~/.calendar/calendars-c97798c1-8ec6-484e-8a28-52e41109b474
-        color = dark green
-        priority = 20
+        [[lessons]]
+          path = ~/.calendar/calendars-fad4fc34-12ee-4f75-98ed-2f77eb2a6419
+          color = dark green
+          priority = 20
+        [[events]]
+          path = ~/.calendar/calendars-88424f24-751c-49b2-8783-2218dc5d2dcd
+          color = dark green
+          priority = 20
+        [[events2]]
+          path = ~/.calendar/calendars-85c59956-f652-4410-89e4-57cf8d55b17f
+          color = dark green
+          priority = 20
+        [[sport]]
+          path = ~/.calendar/calendars-53019f4a-8f2a-4809-aeba-d22c4c393fc5
+          color = dark green
+          priority = 20
+        [[tasks]]
+          path = ~/.calendar/calendars-d87a7978-7196-4208-a861-fcaeb09d39a7
+          color = dark green
+          priority = 20
+        [[transports]]
+          path = ~/.calendar/calendars-c97798c1-8ec6-484e-8a28-52e41109b474
+          color = dark green
+          priority = 20
     '';
 
     systemd.user.services = {
@@ -1047,7 +1054,7 @@ let
         };
         Service = {
           ExecStartPre = "bash -c 'while ! getent hosts www.google.com; do sleep 5; done'";
-          ExecStart = "${pkgs.rclone}/bin/rclone copy --update ${home.homeDirectory}/backup/Syncthing drive:Syncthing";
+          ExecStart = "${pkgs.rclone}/bin/rclone --config ${home.homeDirectory}/backup/rclone.conf copy --update ${home.homeDirectory}/backup/phone/Drive drive:Syncthing";
           Environment = "RCLONE_PASSWORD_COMMAND='${home.homeDirectory}/.local/bin/password show -a Password rclone'";
         };
         Install = { WantedBy = [ "default.target" ]; };
@@ -1099,18 +1106,11 @@ let
           Description = "Radicale server";
         };
         Service = {
-          ExecStart = "sh -c 'podman build -t radicale ${./docker} -f radicale.dockerfile && podman run --name radicale --rm -p 127.0.0.1:5232:5232 -v ${home.homeDirectory}/backup/Syncthing/decsync:/decsync -v ${home.homeDirectory}/.local/share/radicale/collections:/collections --read-only radicale'";
+          ExecStart = "sh -c 'podman build -t radicale ${./docker} -f radicale.dockerfile && podman run --name radicale --rm -p 127.0.0.1:5232:5232 -v ${home.homeDirectory}/backup/phone/Drive/DecSync:/decsync -v ${home.homeDirectory}/.local/share/radicale/collections:/collections --read-only radicale'";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
     };
-
-    home.file.".config/radicale/config".text = ''
-      [storage]
-      type = radicale_storage_decsync
-      filesystem_folder = ${home.homeDirectory}/.local/share/radicale/collections
-      decsync_dir = ${home.homeDirectory}/backup/Syncthing/decsync
-    '';
 
     home.file.".gdbinit".text = ''
       source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py
@@ -1185,7 +1185,7 @@ let
             action="$1"
             shift
 
-            secret-tool lookup keepass password | ${pkgs.keepassxc}/bin/keepassxc-cli "$action" ~/backup/Syncthing/keepass.kdbx "$@"
+            secret-tool lookup keepass password | ${pkgs.keepassxc}/bin/keepassxc-cli "$action" ~/backup/phone/Drive/keepass.kdbx "$@"
       '';
       executable = true;
     };
@@ -1208,14 +1208,14 @@ let
     '';
     home.file.".local/share/flatpak/overrides/com.obsproject.Studio".text = ''
       [Context]
-      filesystems=!xdg-config/kdeglobals;xdg-videos;!host
+      filesystems=!xdg-config/kdeglobals;xdg-videos;!host;~/backup/Flatpaks/obs-studio
 
       [Session Bus Policy]
       org.freedesktop.Flatpak=none
     '';
     home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
       [Context]
-      filesystems=!xdg-download
+      filesystems=!xdg-download;~/backup/Flatpaks/bottles
     '';
     home.file.".local/share/flatpak/overrides/io.dbeaver.DBeaverCommunity".text = ''
       [Context]
@@ -1301,6 +1301,15 @@ let
       [Environment]
       ELECTRON_OZONE_PLATFORM_HINT=wayland
     '';
+    home.file.".local/share/flatpak/overrides/com.calibre_ebook.calibre".text = ''
+      [Context]
+      filesystems=~/backup/Flatpaks/calibre;~/backup/Books;!host
+    '';
+    home.file.".local/share/flatpak/overrides/eu.betterbird.Betterbird".text = ''
+      [Context]
+      filesystems=~/backup/Flatpaks/.thunderbird
+    '';
+
 
     home.file.".var/app/org.keepassxc.KeePassXC/config/keepassxc/keepassxc.ini".text = ''
       [General]
@@ -1374,6 +1383,7 @@ let
         org.ghidra_sre.Ghidra
         com.rtosta.zapzap'';
       onChange = ''
+        flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
         flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
         flatpak remove --user -y $(comm -13 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
       '';
@@ -1478,9 +1488,14 @@ let
         auth       include      system-local-login
         auth       optional     pam_gnome_keyring.so
         account    include      system-local-login
+        session    optional     pam_fde_boot_pw.so inject_for=gkr
         session    include      system-local-login
         session    optional     pam_gnome_keyring.so auto_start'';
       onChange = "sudo mkdir -p /etc/pam.d && sudo tee /etc/pam.d/greetd < $HOME/.local/nix-sources/pam";
+    };
+    home.file.".local/nix-sources/pam_fde_boot_pw.so" = {
+      source = ./pam_fde_boot_pw.so;
+      onChange = "sudo cp ${./pam_fde_boot_pw.so} /lib/security/pam_fde_boot_pw.so";
     };
     home.file.".local/nix-sources/greetd" = {
       text = ''[terminal]
@@ -1488,6 +1503,9 @@ let
         [default_session]
         command = "/usr/bin/tuigreet --remember --cmd /usr/bin/Hyprland"
         user = "greeter"
+        [initial_session]
+        command = "/usr/bin/Hyprland"
+        user = "riky"
         '';
       onChange = "sudo mkdir -p /etc/greetd && sudo tee /etc/greetd/config.toml < $HOME/.local/nix-sources/greetd";
     };
@@ -1526,6 +1544,13 @@ let
       '';
       onChange = "sudo mkdir -p /etc/systemd/logind.conf.d && sudo tee /etc/systemd/logind.conf.d/00-kill-tmux.conf < $HOME/.local/nix-sources/logind-config";
     };
+    home.file.".local/nix-sources/hosts" = {
+      text = ''
+        127.0.0.1        localhost
+        ::1              localhost
+      '';
+      onChange = "sudo tee /etc/hosts < $HOME/.local/nix-sources/hosts";
+    };
 
 
     nix = {
@@ -1548,6 +1573,7 @@ let
     home.activation = {
       setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         rmdir "$HOME/Documents" > /dev/null 2> /dev/null || true
+        rmdir "$HOME/Music" > /dev/null 2> /dev/null || true
         ln -sfT "$HOME/.nix-profile/share/fonts" "$HOME/.local/share/fonts"
         ln -sfT "$HOME/.nix-profile/share/icons" "$HOME/.local/share/icons"
 
@@ -1562,6 +1588,21 @@ let
 
         mkdir -p "$HOME/.var/app/org.prismlauncher.PrismLauncher/data"
         ln -sfT "$HOME/backup/Games/Minecraft" "$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
+
+        mkdir -p "$HOME/.var/app/com.calibre_ebook.calibre/config"
+        ln -sfT "$HOME/backup/Flatpaks/calibre" "$HOME/.var/app/com.calibre_ebook.calibre/config/calibre"
+
+        mkdir -p "$HOME/.var/app/com.obsproject.Studio/config"
+        ln -sfT "$HOME/backup/Flatpaks/obs-studio" "$HOME/.var/app/com.obsproject.Studio/config/obs-studio"
+
+        mkdir -p "$HOME/.var/app/com.usebottles.bottles/data"
+        ln -sfT "$HOME/backup/Flatpaks/bottles" "$HOME/.var/app/com.usebottles.bottles/data/bottles"
+
+        mkdir -p "$HOME/.var/app/eu.betterbird.Betterbird"
+        # ln -sfT "$HOME/backup/Flatpaks/.thunderbird" "$HOME/.var/app/eu.betterbird.Betterbird/.thunderbird"
+
+        mkdir -p "$HOME/.local/share"
+        ln -sfT "$HOME/backup/keyrings" "$HOME/.local/share/keyrings"
       '';
     };
   };

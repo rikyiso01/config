@@ -16,6 +16,8 @@ source:
       net_device: "virtio-net"
       disk_interface: "virtio"
       efi_boot: true
+      efi_firmware_code: "/usr/share/OVMF/x64/OVMF_CODE.4m.fd"
+      efi_firmware_vars: "/usr/share/OVMF/x64/OVMF_VARS.4m.fd"
       communicator: "ssh"
       boot_key_interval: "10ms"
       boot_keygroup_interval: "10ms"
@@ -24,8 +26,8 @@ build:
   - name: step1
     source:
       "source.qemu.arch":
-        iso_url: "https://archmirror.it/repos/iso/2024.07.01/archlinux-x86_64.iso"
-        iso_checksum: "sha256:398dceea2d04767fbb8b61a9e824f2c8f5eacf62b2cb5006fd63321d978d48bc"
+        iso_url: "https://geo.mirror.pkgbuild.com/iso/2025.01.01/archlinux-2025.01.01-x86_64.iso"
+        iso_checksum: "sha256:74b109b4b36d20bef8f4203e30b8d223e0ab297a09d1a1213a02894472aa530a"
         output_directory: "build"
         ssh_username: "root"
         boot_wait: "1s"
@@ -55,6 +57,7 @@ build:
         ssh_username: "riky"
         boot_wait: "5s"
         boot_command:
+          # - "changeme<return><wait30>riky<return>q<return>echo '{{ .SSHPublicKey }}' > .ssh/authorized_keys<return>"
           - "riky<return>q<return>echo '{{ .SSHPublicKey }}' > .ssh/authorized_keys<return>"
     provisioner:
       - file:
