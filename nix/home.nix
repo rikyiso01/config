@@ -267,7 +267,7 @@ let
         neofetch = "fastfetch";
         vim = "$VISUAL";
         flake-init = "nix flake init -t github:nix-community/nix-direnv";
-        music-update = "nix run github:rikyiso01/musicmanager auto Test2 Bardify 'Watch Later'";
+        music-update = "nix run github:rikyiso01/musicmanager auto Music Music2 Music3 Bardify Clownpierce Dream FlameFrags Halloween";
         timg = "timg -pk";
         assistant = "nix run -- nixpkgs#llama-cpp -m ~/backup/llama-2-7b-chat.Q4_K_M.gguf -p 'You are a helpful assistant' -cnv --chat-template deepseek 2> /dev/null";
         search = "sh -c \"xdg-open https://search.brave.com/search?q=$1\"";
@@ -331,7 +331,7 @@ let
         require'lspconfig'.solargraph.setup{capabilities=lsp_capabilities,cmd={"${pkgs.rubyPackages.solargraph}/bin/solargraph","stdio"}}
 
         require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
-        require("feline").setup()
+        require("lualine").setup()
         require("autoclose").setup({
            options = {
               disabled_filetypes = { "text", "markdown" },
@@ -466,7 +466,7 @@ let
         nvim-lspconfig
         trouble-nvim
         toggleterm-nvim
-        feline-nvim
+        lualine-nvim
         telescope-nvim
         nvim-treesitter.withAllGrammars
         lazygit-nvim
@@ -1113,7 +1113,7 @@ let
     };
 
     home.file.".gdbinit".text = ''
-      source ${pkgs.pwndbg}/share/pwndbg/gdbinit.py
+      source ${pkgs.gef}/share/gef/gef.py
       set history filename ~/.local/state/gdb_history
     '';
 
@@ -1362,7 +1362,7 @@ let
         org.gnome.dspy
         org.gnome.Snapshot
         org.gnome.SoundRecorder
-        org.pitivi.Pitivi
+        org.shotcut.Shotcut
         org.keepassxc.KeePassXC
         org.gnome.FileRoller
         org.gnome.Evince
@@ -1381,7 +1381,9 @@ let
         com.github.IsmaelMartinez.teams_for_linux
         org.telegram.desktop
         org.ghidra_sre.Ghidra
-        com.rtosta.zapzap'';
+        com.rtosta.zapzap
+        org.chromium.Chromium
+        io.github.seadve.Kooha'';
       onChange = ''
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
         flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
