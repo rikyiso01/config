@@ -106,7 +106,7 @@ let
       terminal = "tmux-256color";
       mouse = true;
       prefix = "C-s";
-      plugins = with pkgs.tmuxPlugins; [ catppuccin ];
+      # plugins = with pkgs.tmuxPlugins; [ catppuccin ];
       extraConfig = ''
         bind-key -T copy-mode-vi 'v' send -X begin-selection
         bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
@@ -126,7 +126,19 @@ let
         set-window-option -g mode-keys vi
         set-option -sa terminal-features ',foot:RGB'
         set-option -sg escape-time 10
-        set -g @catppuccin_flavour 'mocha' # latte,frappe, macchiato or mocha
+
+        set -g @catppuccin_flavor 'mocha' # latte, frappe, macchiato or mocha
+        set -g @catppuccin_window_status_style "rounded"
+        set -g status-left ""
+        set -g status-right ""
+        set -ogq @catppuccin_window_text " #{pane_current_command}"
+        set -ogq @catppuccin_window_current_text " #{pane_current_command}"
+        run ${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
+
+# Ensure that everything on the right side of the status line
+# is included.
+        set -g status-right-length 100
+
         set -g allow-passthrough on
 
         bind-key -T copy-mode-vi "o" send-keys -X copy-pipe-and-cancel "sed s/##/####/g | xargs -I {} tmux run-shell -b 'cd #{pane_current_path}; xdg-open \"{}\" > /dev/null'"
@@ -367,7 +379,7 @@ let
             }
         }
         vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
-        require("Comment").setup{}
+        -- require("Comment").setup{}
         require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
         require("trouble").setup{icons={},warn_no_results = false,open_no_results = true,preview={type="main",size={width=0.8}}}
         vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
@@ -479,7 +491,8 @@ let
         vim-vsnip
         formatter-nvim
         rnvimr
-        pkgs.vimExtraPlugins.Comment-nvim
+        vim-commentary
+        # pkgs.vimExtraPlugins.Comment-nvim
         mini-nvim
         vim-abolish
         dhall-vim
@@ -1383,7 +1396,8 @@ let
         org.ghidra_sre.Ghidra
         com.rtosta.zapzap
         org.chromium.Chromium
-        io.github.seadve.Kooha'';
+        io.github.seadve.Kooha
+        com.mattermost.Desktop'';
       onChange = ''
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
         flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))

@@ -27,7 +27,7 @@
                 flake = nixpkgs;
             };
           }
-          ({pkgs, ...}: { nixpkgs.overlays = [nixneovimplugins.overlays.default]; })
+          # ({pkgs, ...}: { nixpkgs.overlays = [nixneovimplugins.overlays.default]; })
         ];
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
       };
