@@ -173,7 +173,7 @@ let
     };
     home.file.".config/ranger/rifle.conf".text = ''
       mime application/zip, flag f = /bin/unzip "$1"
-      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext tsx,!ext rs,!ext dart,!ext tex, flag f = xdg-open "$1"
+      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext tsx,!ext rs,!ext dart,!ext tex,!ext mmd, flag f = xdg-open "$1"
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
@@ -1000,7 +1000,7 @@ let
     services.mpd-mpris.enable = true;
     programs.ncmpcpp.enable = true;
 
-    services.vdirsyncer.enable = true;
+    # services.vdirsyncer.enable = true;
     home.file.".config/vdirsyncer/config".text = ''
       [general]
       status_path = "~/.vdirsyncer/status/"
@@ -1058,6 +1058,20 @@ let
         Service = {
           ExecStartPre = "/bin/sleep 5";
           ExecStart = "bash ${./startup.sh}";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
+      battery = {
+        Unit = { Description = "Battery low"; };
+        Service = {
+          ExecStart = "bash ${./battery.sh} 30 'Battery low'";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
+      battery2 = {
+        Unit = { Description = "Battery very low"; };
+        Service = {
+          ExecStart = "bash ${./battery.sh} 15 'Battery very low'";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -1612,7 +1626,7 @@ let
         ln -sfT "$HOME/backup/Flatpaks/obs-studio" "$HOME/.var/app/com.obsproject.Studio/config/obs-studio"
 
         mkdir -p "$HOME/.var/app/com.usebottles.bottles/data"
-        ln -sfT "$HOME/backup/Flatpaks/bottles" "$HOME/.var/app/com.usebottles.bottles/data/bottles"
+        # ln -sfT "$HOME/backup/Flatpaks/bottles" "$HOME/.var/app/com.usebottles.bottles/data/bottles"
 
         mkdir -p "$HOME/.var/app/eu.betterbird.Betterbird"
         # ln -sfT "$HOME/backup/Flatpaks/.thunderbird" "$HOME/.var/app/eu.betterbird.Betterbird/.thunderbird"
