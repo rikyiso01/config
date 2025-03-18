@@ -10,4 +10,4 @@ fi
 cp "$(dirname "$0")/restore.sh" "$(dirname "$1")"/restore.sh
 cp "$(dirname "$0")/backup-sync.sh" "$(dirname "$1")"/backup-sync.sh
 
-tar -C ~ -c backup | tqdm --unit-scale --bytes --total "$(du -sb ~/backup | awk '{print $1}')" | openssl aes-256-cbc -pbkdf2 -kfile ~/backup/backup-pw -out "$1"
+tar -C ~ -c backup | tqdm --unit-scale --bytes --total "$(du -sb ~/backup | awk '{print $1}')" | openssl aes-256-cbc -pbkdf2 -k "$(password show -a password "Backup decryption pw")" -out "$1"
