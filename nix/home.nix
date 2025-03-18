@@ -980,8 +980,8 @@ let
     '';
     home.file.".config/swaylock/config".text = "color=333333";
     home.file.".config/hypr/hyprpaper.conf".text = ''
-      preload = ${./wallpapers/wallpaper2.png}
-      wallpaper = ,${./wallpapers/wallpaper2.png}
+      preload = ${./wallpapers/solo.jpg}
+      wallpaper = ,${./wallpapers/solo.jpg}
     '';
 
     services.syncthing.enable = true;
