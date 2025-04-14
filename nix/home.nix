@@ -13,6 +13,8 @@ let
     home.homeDirectory = "/home/riky";
     targets.genericLinux.enable = true;
 
+    services.home-manager.autoExpire.enable = true;
+
     # Packages that should be installed to the user profile.
     home.packages = with pkgs; [
       perl
@@ -66,12 +68,38 @@ let
       yq
       libnotify
       timg
-      yewtube
       ffmpeg
       asciinema
-      khal
+      # khal
+      # todoman
+      # vdirsyncer
       python3Packages.tqdm
     ];
+
+    services.getmail.enable = true;
+    home.file.".getmail/getmailrc".text = ''
+      [retriever]
+      type = SimplePOP3SSLRetriever
+      server = disroot.org
+      username = rikyiso01
+      port = 995
+      password_command = ("${home.homeDirectory}/.local/bin/password","show","-a","password","Disroot")
+
+      [destination]
+      type = Maildir
+      path = ~/backup/Mail/
+
+      [options]
+      delete = True
+    '';
+
+    programs.neomutt.enable = true;
+    home.file.".neomuttrc".text = ''
+      set mbox_type=Maildir
+      set folder=~/backup/Mail
+      set spoolfile=+/
+      set header_cache=~/.cache/mutt
+    '';
 
     programs.git = {
       enable = true;
@@ -108,40 +136,42 @@ let
       prefix = "C-s";
       # plugins = with pkgs.tmuxPlugins; [ catppuccin ];
       extraConfig = ''
-        bind-key -T copy-mode-vi 'v' send -X begin-selection
-        bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
-        bind '"' split-window -c "#{pane_current_path}"
-        bind % split-window -h -c "#{pane_current_path}"
-        bind c new-window -c "#{pane_current_path}"
-        bind-key @ choose-tree "join-pane -h -s '%%'"
-        bind-key C-@ choose-tree "join-pane -s '%%'"
-        bind-key ! break-pane -d
-        bind-key C-! break-pane
-        bind-key -n Pageup send-keys left
-        bind-key -n Pagedown send-keys right
-        bind h select-pane -L
-        bind j select-pane -D
-        bind k select-pane -U
-        bind l select-pane -R
-        set-window-option -g mode-keys vi
-        set-option -sa terminal-features ',foot:RGB'
-        set-option -sg escape-time 10
+                bind-key -T copy-mode-vi 'v' send -X begin-selection
+                bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel\; run "tmux save -|wl-copy"
+                bind '"' split-window -c "#{pane_current_path}"
+                bind % split-window -h -c "#{pane_current_path}"
+                bind c new-window -c "#{pane_current_path}"
+                bind-key @ choose-tree "join-pane -h -s '%%'"
+                bind-key C-@ choose-tree "join-pane -s '%%'"
+                bind-key ! break-pane -d
+                bind-key C-! break-pane
+                bind-key -n Pageup send-keys left
+                bind-key -n Pagedown send-keys right
+                bind h select-pane -L
+                bind j select-pane -D
+                bind k select-pane -U
+                bind l select-pane -R
+                set-window-option -g mode-keys vi
+                set-option -sa terminal-features ',foot:RGB'
+                set-option -sg escape-time 10
 
-        set -g @catppuccin_flavor 'mocha' # latte, frappe, macchiato or mocha
-        set -g @catppuccin_window_status_style "rounded"
-        set -g status-left ""
-        set -g status-right ""
-        set -ogq @catppuccin_window_text " #{pane_current_command}"
-        set -ogq @catppuccin_window_current_text " #{pane_current_command}"
-        run ${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
+                set -g @catppuccin_flavor 'mocha' # latte, frappe, macchiato or mocha
+                set -g @catppuccin_window_status_style "rounded"
+                set -g status-left ""
+                set -g status-right ""
+                set -ogq @catppuccin_window_text " #{pane_current_command}"
+                set -ogq @catppuccin_window_current_text " #{pane_current_command}"
+                run ${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
 
-# Ensure that everything on the right side of the status line
-# is included.
-        set -g status-right-length 100
+        # Ensure that everything on the right side of the status line
+        # is included.
+                set -g status-right-length 100
 
-        set -g allow-passthrough on
+                set -g allow-passthrough on
 
-        bind-key -T copy-mode-vi "o" send-keys -X copy-pipe-and-cancel "sed s/##/####/g | xargs -I {} tmux run-shell -b 'cd #{pane_current_path}; xdg-open \"{}\" > /dev/null'"
+                set -g copy-command '${pkgs.wl-clipboard}/bin/wl-copy'
+
+                bind-key -T copy-mode-vi "o" send-keys -X copy-pipe-and-cancel "sed s/##/####/g | xargs -I {} tmux run-shell -b 'cd #{pane_current_path}; xdg-open \"{}\" > /dev/null'"
       '';
     };
     programs.htop.enable = true;
@@ -173,7 +203,7 @@ let
     };
     home.file.".config/ranger/rifle.conf".text = ''
       mime application/zip, flag f = /bin/unzip "$1"
-      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext tsx,!ext rs,!ext dart,!ext tex,!ext mmd, flag f = xdg-open "$1"
+      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext tsx,!ext rs,!ext dart,!ext tex,!ext mmd,!ext jsonl, flag f = xdg-open "$1"
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
     '';
@@ -214,6 +244,7 @@ let
       SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/gcr/ssh";
       XCURSOR_THEME = "Bibata-Modern-Amber";
       XCURSOR_SIZE = "36";
+      MPD_HOST = "/run/user/1000/mpd/socket";
     };
 
     programs.vim.enable = true;
@@ -286,6 +317,7 @@ let
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh";
         rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone --config ${home.homeDirectory}/backup/rclone.conf";
         record = ''sleep 1 && /bin/kitty sh -c 'asciinema rec "$HOME/Videos/asciinema/recording-$(date "+%Y-%m-%d-%H-%M-%S").cast" -c "tmux new-session \"exec ranger\""' >/dev/null 2>/dev/null &!'';
+        yt=''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -366,8 +398,7 @@ let
                 nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
                 bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
                 dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
-                php={function()return {exe="${pkgs.phpPackages.php-cs-fixer}/bin/php-cs-fixer",args={"--rules=@Symfony","--using-cache=no","--no-interaction","fix"},stdin=false} end},
-                toml={function()return {exe="prettier",args={"--stdin-filepath=test.toml"},stdin=true} end},
+                -- toml={function()return {exe="prettier",args={"--stdin-filepath=test.toml"},stdin=true} end},
                 arduino={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                 c={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                 cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
@@ -501,7 +532,7 @@ let
       ];
       extraPackages = with pkgs; [
         haskell-language-server
-        nodePackages.prettier-plugin-toml
+        # nodePackages.prettier-plugin-toml
         nodePackages.prettier
         ripgrep
         lazygit
@@ -996,6 +1027,9 @@ let
         }
         auto_update "yes"
       '';
+      network = {
+        startWhenNeeded = true;
+      };
     };
     services.mpd-mpris.enable = true;
     programs.ncmpcpp.enable = true;
@@ -1010,16 +1044,23 @@ let
       b = "my_calendar_remote"
       collections = ["from a", "from b"]
 
+      [pair my_calendar2]
+      a = "my_calendar_local2"
+      b = "my_calendar_remote"
+      collections = ["from a", "from b"]
+
       [storage my_calendar_local]
       type = "filesystem"
       path = "~/.calendar/"
       fileext = ".ics"
 
+      [storage my_calendar_local2]
+      type = "singlefile"
+      path = "~/.calendar2/%s.ics"
+
       [storage my_calendar_remote]
       type = "caldav"
-
-      # We can simplify this URL here as well. In theory it shouldn't matter.
-      url = "http://127.0.0.1:5232"
+      url = "http://127.0.0.1:5232/"
       username = "t"
       password = "t"
     '';
@@ -1051,6 +1092,7 @@ let
           color = dark green
           priority = 20
     '';
+    home.file.".config/todoman/config.py".text="path='~/.calendar/*'";
 
     systemd.user.services = {
       startup = {
@@ -1128,12 +1170,21 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
-      radicale = {
+      # radicale = {
+      #   Unit = {
+      #     Description = "Radicale server";
+      #   };
+      #   Service = {
+      #     ExecStart = "sh -c 'podman build -t radicale ${./docker} -f radicale.dockerfile && podman run --name radicale --rm -p 127.0.0.1:5232:5232 -v ${home.homeDirectory}/backup/phone/Drive/DecSync:/decsync -v ${home.homeDirectory}/.local/share/radicale/collections:/collections --read-only radicale'";
+      #   };
+      #   Install = { WantedBy = [ "default.target" ]; };
+      # };
+      searxng = {
         Unit = {
-          Description = "Radicale server";
+          Description = "Searxng server";
         };
         Service = {
-          ExecStart = "sh -c 'podman build -t radicale ${./docker} -f radicale.dockerfile && podman run --name radicale --rm -p 127.0.0.1:5232:5232 -v ${home.homeDirectory}/backup/phone/Drive/DecSync:/decsync -v ${home.homeDirectory}/.local/share/radicale/collections:/collections --read-only radicale'";
+          ExecStart = "podman run --name searxng --init --rm --read-only -p 5233:8080 docker.io/searxng/searxng:latest";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -1244,16 +1295,6 @@ let
       [Context]
       filesystems=!xdg-download;~/backup/Flatpaks/bottles
     '';
-    home.file.".local/share/flatpak/overrides/io.dbeaver.DBeaverCommunity".text = ''
-      [Context]
-      sockets=!ssh-auth
-      filesystems=!home
-      persistent=.local/share/DBeaverData
-    '';
-    home.file.".local/share/flatpak/overrides/net.ankiweb.Anki".text = ''
-      [Environment]
-      ANKI_WAYLAND=1
-    '';
     home.file.".local/share/flatpak/overrides/io.gitlab.librewolf-community".text = ''
       [Context]
       devices=all
@@ -1261,19 +1302,6 @@ let
 
       [Environment]
       PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-    '';
-    home.file.".local/share/flatpak/overrides/org.qutebrowser.qutebrowser".text = ''
-      [Context]
-      devices=all
-      filesystems=xdg-documents;/nix/store:ro
-
-      [Environment]
-      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-    '';
-    home.file.".local/share/flatpak/overrides/org.ghidra_sre.Ghidra".text = ''
-      [Context]
-      filesystems=xdg-documents;xdg-downloads;!home;/nix/store:ro
-      persistent=.ghidra
     '';
     home.file.".local/share/flatpak/overrides/org.gimp.GIMP".text = ''
       [Context]
@@ -1291,10 +1319,6 @@ let
       [Context]
       filesystems=!home
     '';
-    home.file.".local/share/flatpak/overrides/net.werwolv.ImHex".text = ''
-      [Context]
-      filesystems=!host
-    '';
     home.file.".local/share/flatpak/overrides/org.gnome.TextEditor".text = ''
       [Context]
       filesystems=!xdg-run/gvfsd;!host
@@ -1304,29 +1328,9 @@ let
       devices=!all;dri
       filesystems=!xdg-config/kdeglobals;/nix/store:ro;!host
     '';
-    home.file.".local/share/flatpak/overrides/org.pitivi.Pitivi".text = ''
-      [Context]
-      filesystems=xdg-videos;xdg-music;xdg-download;!host
-    '';
-    home.file.".local/share/flatpak/overrides/org.remmina.Remmina".text = ''
-      [Context]
-      filesystems=!xdg-run/gvfsd;~/.ssh;!home;xdg-documents
-      devices=!all;dri
-    '';
-    home.file.".local/share/flatpak/overrides/org.wireshark.Wireshark".text = ''
-      [Context]
-      filesystems=!xdg-config/kdeglobals;!xdg-public-share;xdg-download;!home
-    '';
     home.file.".local/share/flatpak/overrides/org.prismlauncher.PrismLauncher".text = ''
       [Context]
       filesystems=~/backup/Games/Minecraft
-    '';
-    home.file.".local/share/flatpak/overrides/com.github.IsmaelMartinez.teams_for_linux".text = ''
-      [Context]
-      sockets=!x11
-
-      [Environment]
-      ELECTRON_OZONE_PLATFORM_HINT=wayland
     '';
     home.file.".local/share/flatpak/overrides/com.calibre_ebook.calibre".text = ''
       [Context]
@@ -1387,14 +1391,11 @@ let
         com.usebottles.bottles
         org.localsend.localsend_app
         org.gnome.dspy
-        org.gnome.Snapshot
-        org.gnome.SoundRecorder
         org.shotcut.Shotcut
         org.keepassxc.KeePassXC
         org.gnome.FileRoller
         org.gnome.Evince
         org.gnome.Loupe
-        org.remmina.Remmina
         org.gnome.SimpleScan
         io.github.flattool.Warehouse
         io.freetubeapp.FreeTube
@@ -1405,13 +1406,8 @@ let
         eu.betterbird.Betterbird
         io.mpv.Mpv
         com.calibre_ebook.calibre
-        com.github.IsmaelMartinez.teams_for_linux
-        org.telegram.desktop
-        org.ghidra_sre.Ghidra
-        com.rtosta.zapzap
         org.chromium.Chromium
-        io.github.seadve.Kooha
-        com.mattermost.Desktop'';
+        io.github.ungoogled_software.ungoogled_chromium'';
       onChange = ''
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
         flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
