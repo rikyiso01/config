@@ -62,44 +62,151 @@ let
       rclone
       rsync
       mpc-cli
-      termdown
+      clock-rs
       yt-dlp
       jq
       yq
       libnotify
       timg
       ffmpeg
-      asciinema
-      # khal
-      # todoman
-      # vdirsyncer
-      python3Packages.tqdm
+      restic
     ];
 
-    services.getmail.enable = true;
-    home.file.".getmail/getmailrc".text = ''
-      [retriever]
-      type = SimplePOP3SSLRetriever
-      server = disroot.org
-      username = rikyiso01
-      port = 995
-      password_command = ("${home.homeDirectory}/.local/bin/password","show","-a","password","Disroot")
+    accounts = {
+      calendar = {
+        basePath = "${home.homeDirectory}/backup/Calendar";
+        accounts = builtins.mapAttrs
+          (name: value: {
+            remote = {
+              type = "caldav";
+              url = "http://127.0.0.1:5232";
+              userName = "t";
+              passwordCommand = [ "echo" "t" ];
+            };
+            vdirsyncer = {
+              enable = true;
+              collections = [ value.collection ];
+            };
+            khal = {
+              enable = true;
+              readOnly = true;
+              type = "discover";
+              color = value.color;
+            };
+          })
+          {
+            creativity = { collection = "calendars-51ebc243-e08c-4cfb-b3c5-9e58c6c33dc0"; color = "yellow"; };
+            friends = { collection = "calendars-85c59956-f652-4410-89e4-57cf8d55b17f"; color = "light cyan"; };
+            survival = { collection = "calendars-88424f24-751c-49b2-8783-2218dc5d2dcd"; color = "light blue"; };
+            health = { collection = "calendars-53019f4a-8f2a-4809-aeba-d22c4c393fc5"; color = "light magenta"; };
+            tasks = { collection = "calendars-d87a7978-7196-4208-a861-fcaeb09d39a7"; color = "light red"; };
+            transports = { collection = "calendars-c97798c1-8ec6-484e-8a28-52e41109b474"; color = "dark magenta"; };
+            work = { collection = "calendars-fad4fc34-12ee-4f75-98ed-2f77eb2a6419"; color = "light green"; };
+          };
+      };
+      email = {
+        # maildirBasePath = "${home.homeDirectory}/backup/Mail";
+        accounts = {
+          disroot = {
+            address = "rikyiso01@disroot.org";
+            userName = "rikyiso01";
+            # getmail = {
+            #   enable = true;
+            #   readAll = true;
+            #   mailboxes = [ "INBOX" ];
+            # };
+            imap = {
+              host = "disroot.org";
+              port = 993;
+              tls.enable = true;
+            };
+            neomutt = {
+              enable = true;
+              mailboxType = "imap";
+              extraConfig = ''set imap_pass="`${home.homeDirectory}/.local/bin/password show -a password Disroot`"'';
+            };
+            passwordCommand = [ "${home.homeDirectory}/.local/bin/password" "show" "-a" "password" "Disroot" ];
+            realName = "Riccardo";
+            smtp = {
+              host = "disroot.org";
+              port = 465;
+              tls.enable = true;
+            };
+          };
+          gmail = {
+            primary = true;
+            address = "riky.isola@gmail.com";
+            userName = "riky.isola";
+            # getmail = {
+            #   enable = true;
+            #   readAll = true;
+            #   mailboxes = [ "ALL" ];
+            # };
+            neomutt = {
+              enable = true;
+              mailboxType = "imap";
+              extraConfig = ''set imap_pass="`${home.homeDirectory}/.local/bin/password show -a 'getmail password' Google`"'';
+            };
+            passwordCommand = [ "${home.homeDirectory}/.local/bin/password" "show" "-a" "'getmail password'" "Google" ];
+            realName = "Riccardo";
+            flavor = "gmail.com";
+          };
+        };
+      };
+    };
 
-      [destination]
-      type = Maildir
-      path = ~/backup/Mail/
+    # services.getmail.enable = true;
+    # home.file.".getmail/getmailrc".text = ''
+    #   [retriever]
+    #   type = SimplePOP3SSLRetriever
+    #   server = disroot.org
+    #   username = rikyiso01
+    #   port = 995
+    #   password_command = ("${home.homeDirectory}/.local/bin/password","show","-a","password","Disroot")
 
-      [options]
-      delete = True
-    '';
+    #   [destination]
+    #   type = Maildir
+    #   path = ~/backup/Mail/
 
-    programs.neomutt.enable = true;
-    home.file.".neomuttrc".text = ''
-      set mbox_type=Maildir
-      set folder=~/backup/Mail
-      set spoolfile=+/
-      set header_cache=~/.cache/mutt
-    '';
+    #   [options]
+    #   delete = True
+    # '';
+
+    programs.neomutt = {
+      enable = true;
+      macros = [{
+        key = "V";
+        map = [ "attach" ];
+        action = "<pipe-entry>iconv -c --to-code=UTF8 > ~/.cache/neomutt/mail.html<enter><shell-escape>xdg-open ~/.cache/neomutt/mail.html<enter>";
+      }];
+    };
+    programs.vdirsyncer.enable = true;
+    services.vdirsyncer.enable = true;
+    programs.khal = {
+      enable = true;
+      settings = {
+        default = {
+          highlight_event_days = true;
+          timedelta = "1d";
+        };
+        view = {
+          dynamic_days = false;
+        };
+      };
+      locale = {
+        dateformat = "%d/%m/%y";
+        datetimeformat = "%d/%m/%y %H:%M";
+        longdateformat = "%d/%m/%y";
+        longdatetimeformat = "%d/%m/%y %H:%M";
+        timeformat = "%H:%M";
+      };
+    };
+    # home.file.".neomuttrc".text = ''
+    #   set mbox_type=Maildir
+    #   set folder=~/backup/Mail
+    #   set spoolfile=+/
+    #   set header_cache=~/.cache/mutt
+    # '';
 
     programs.git = {
       enable = true;
@@ -245,6 +352,8 @@ let
       XCURSOR_THEME = "Bibata-Modern-Amber";
       XCURSOR_SIZE = "36";
       MPD_HOST = "/run/user/1000/mpd/socket";
+      RESTIC_PASSWORD_COMMAND = "password show -a password 'Backup decryption pw'";
+      RESTIC_REPOSITORY = "/run/media/riky/90304ff6-a81a-4307-be0f-ab65846845ea/backup";
     };
 
     programs.vim.enable = true;
@@ -272,7 +381,7 @@ let
     programs.zsh = {
       enable = true;
       autosuggestion.enable = true;
-      initExtra = ''
+      initContent = ''
         bindkey -e
         if [[ -r "$\{XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-$\{(%):-%n}.zsh" ]]; then
             source "$\{XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-$\{(%):-%n}.zsh"
@@ -312,12 +421,9 @@ let
         flake-init = "nix flake init -t github:nix-community/nix-direnv";
         music-update = "nix run github:rikyiso01/musicmanager auto Music Music2 Music3 Bardify Clownpierce Dream FlameFrags Halloween";
         timg = "timg -pk";
-        assistant = "nix run -- nixpkgs#llama-cpp -m ~/backup/llama-2-7b-chat.Q4_K_M.gguf -p 'You are a helpful assistant' -cnv --chat-template deepseek 2> /dev/null";
-        search = "sh -c \"xdg-open https://search.brave.com/search?q=$1\"";
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh";
         rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone --config ${home.homeDirectory}/backup/rclone.conf";
-        record = ''sleep 1 && /bin/kitty sh -c 'asciinema rec "$HOME/Videos/asciinema/recording-$(date "+%Y-%m-%d-%H-%M-%S").cast" -c "tmux new-session \"exec ranger\""' >/dev/null 2>/dev/null &!'';
-        yt=''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
+        yt = ''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -1034,65 +1140,64 @@ let
     services.mpd-mpris.enable = true;
     programs.ncmpcpp.enable = true;
 
-    # services.vdirsyncer.enable = true;
-    home.file.".config/vdirsyncer/config".text = ''
-      [general]
-      status_path = "~/.vdirsyncer/status/"
+    # home.file.".config/vdirsyncer/config".text = ''
+    #   [general]
+    #   status_path = "~/.vdirsyncer/status/"
 
-      [pair my_calendar]
-      a = "my_calendar_local"
-      b = "my_calendar_remote"
-      collections = ["from a", "from b"]
+    #   [pair my_calendar]
+    #   a = "my_calendar_local"
+    #   b = "my_calendar_remote"
+    #   collections = ["from a", "from b"]
 
-      [pair my_calendar2]
-      a = "my_calendar_local2"
-      b = "my_calendar_remote"
-      collections = ["from a", "from b"]
+    #   [pair my_calendar2]
+    #   a = "my_calendar_local2"
+    #   b = "my_calendar_remote"
+    #   collections = ["from a", "from b"]
 
-      [storage my_calendar_local]
-      type = "filesystem"
-      path = "~/.calendar/"
-      fileext = ".ics"
+    #   [storage my_calendar_local]
+    #   type = "filesystem"
+    #   path = "~/.calendar/"
+    #   fileext = ".ics"
 
-      [storage my_calendar_local2]
-      type = "singlefile"
-      path = "~/.calendar2/%s.ics"
+    #   [storage my_calendar_local2]
+    #   type = "singlefile"
+    #   path = "~/.calendar2/%s.ics"
 
-      [storage my_calendar_remote]
-      type = "caldav"
-      url = "http://127.0.0.1:5232/"
-      username = "t"
-      password = "t"
-    '';
-    home.file.".config/khal/config".text = ''
-      [calendars]
+    #   [storage my_calendar_remote]
+    #   type = "caldav"
+    #   url = "http://127.0.0.1:5232/"
+    #   username = "t"
+    #   password = "t"
+    # '';
+    # home.file.".config/khal/config".text = ''
+    #   [calendars]
 
-        [[lessons]]
-          path = ~/.calendar/calendars-fad4fc34-12ee-4f75-98ed-2f77eb2a6419
-          color = dark green
-          priority = 20
-        [[events]]
-          path = ~/.calendar/calendars-88424f24-751c-49b2-8783-2218dc5d2dcd
-          color = dark green
-          priority = 20
-        [[events2]]
-          path = ~/.calendar/calendars-85c59956-f652-4410-89e4-57cf8d55b17f
-          color = dark green
-          priority = 20
-        [[sport]]
-          path = ~/.calendar/calendars-53019f4a-8f2a-4809-aeba-d22c4c393fc5
-          color = dark green
-          priority = 20
-        [[tasks]]
-          path = ~/.calendar/calendars-d87a7978-7196-4208-a861-fcaeb09d39a7
-          color = dark green
-          priority = 20
-        [[transports]]
-          path = ~/.calendar/calendars-c97798c1-8ec6-484e-8a28-52e41109b474
-          color = dark green
-          priority = 20
-    '';
-    home.file.".config/todoman/config.py".text="path='~/.calendar/*'";
+    #     [[lessons]]
+    #       path = ~/.calendar/calendars-fad4fc34-12ee-4f75-98ed-2f77eb2a6419
+    #       color = dark green
+    #       priority = 20
+    #     [[events]]
+    #       path = ~/.calendar/calendars-88424f24-751c-49b2-8783-2218dc5d2dcd
+    #       color = dark green
+    #       priority = 20
+    #     [[events2]]
+    #       path = ~/.calendar/calendars-85c59956-f652-4410-89e4-57cf8d55b17f
+    #       color = dark green
+    #       priority = 20
+    #     [[sport]]
+    #       path = ~/.calendar/calendars-53019f4a-8f2a-4809-aeba-d22c4c393fc5
+    #       color = dark green
+    #       priority = 20
+    #     [[tasks]]
+    #       path = ~/.calendar/calendars-d87a7978-7196-4208-a861-fcaeb09d39a7
+    #       color = dark green
+    #       priority = 20
+    #     [[transports]]
+    #       path = ~/.calendar/calendars-c97798c1-8ec6-484e-8a28-52e41109b474
+    #       color = dark green
+    #       priority = 20
+    # '';
+    # home.file.".config/todoman/config.py".text = "path='~/.calendar/*'";
 
     systemd.user.services = {
       startup = {
@@ -1170,15 +1275,15 @@ let
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
-      # radicale = {
-      #   Unit = {
-      #     Description = "Radicale server";
-      #   };
-      #   Service = {
-      #     ExecStart = "sh -c 'podman build -t radicale ${./docker} -f radicale.dockerfile && podman run --name radicale --rm -p 127.0.0.1:5232:5232 -v ${home.homeDirectory}/backup/phone/Drive/DecSync:/decsync -v ${home.homeDirectory}/.local/share/radicale/collections:/collections --read-only radicale'";
-      #   };
-      #   Install = { WantedBy = [ "default.target" ]; };
-      # };
+      radicale = {
+        Unit = {
+          Description = "Radicale server";
+        };
+        Service = {
+          ExecStart = "sh -c 'podman build -t radicale ${./docker} -f radicale.dockerfile && podman run --name radicale --rm -p 127.0.0.1:5232:5232 -v ${home.homeDirectory}/backup/phone/Drive/DecSync:/decsync -v ${home.homeDirectory}/.local/share/radicale/collections:/collections --read-only radicale'";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
       searxng = {
         Unit = {
           Description = "Searxng server";
@@ -1273,6 +1378,10 @@ let
       text = "#!/usr/bin/env bash\nln -sfT $XDG_RUNTIME_DIR/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer $XDG_RUNTIME_DIR/kpxc_server && exec /app/bin/librewolf \"$@\"";
       executable = true;
     };
+    home.file.".local/flatpak/cobalt" = {
+      text = "#!/usr/bin/env bash\n exec /app/bin/cobalt --webrtc-ip-handling-policy=default --ozone-platform=wayland \"$@\"";
+      executable = true;
+    };
 
     home.file.".local/share/flatpak/overrides/ca.desrt.dconf-editor".text = ''
       [Context]
@@ -1339,6 +1448,13 @@ let
     home.file.".local/share/flatpak/overrides/eu.betterbird.Betterbird".text = ''
       [Context]
       filesystems=~/backup/Flatpaks/.thunderbird
+    '';
+    home.file.".local/share/flatpak/overrides/io.github.ungoogled_software.ungoogled_chromium".text = ''
+      [Context]
+      filesystems=!xdg-desktop;!xdg-run/pipewire-0;!~/.local/share/icons;!xdg-run/dconf;!xdg-download;!~/.config/dconf;!/run/.heim_org.h5l.kcm-socket;!~/.local/share/applications;!/tmp;!~/.config/kioslaverc;~/.local/flatpak:ro;/nix/store:ro
+
+      [Environment]
+      PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
     '';
 
 
@@ -1611,6 +1727,8 @@ let
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
         ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
+        mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.github.ungoogled_software.ungoogled_chromium/current/active/files/chromium/policies/policies/managed"
+        ln -sfT "${./chromium.jsonc}" "${home.homeDirectory}/.local/share/flatpak/app/io.github.ungoogled_software.ungoogled_chromium/current/active/files/chromium/policies/policies/managed/policies.json"
 
         mkdir -p "$HOME/.var/app/org.prismlauncher.PrismLauncher/data"
         ln -sfT "$HOME/backup/Games/Minecraft" "$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"

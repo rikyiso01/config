@@ -1,0 +1,16 @@
+{
+  "BookmarkBarEnabled": false,
+  "EditBookmarksEnabled": false,
+  "HomepageIsNewTabPage": false,
+  "PasswordManagerEnabled": false,
+  "RestoreOnStartup": 4,
+  "RestoreOnStartupURLs": [
+    "https://mail.google.com/mail/u/0/#inbox",
+    "https://web.whatsapp.com/",
+    "https://web.telegram.org/a/",
+    "https://mm.s3.eurecom.fr/s3/channels/llms4androidappscanning",
+    "https://teams.microsoft.com/v2/",
+    "https://meet.google.com/landing",
+    "https://discord.com/channels/@me",
+  ],
+}

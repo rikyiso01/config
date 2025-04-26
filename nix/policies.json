@@ -48,16 +48,16 @@
       "PreventInstalls": false,
       "Add": [
         {
-          "Name": "Brave",
-          "URLTemplate": "https://search.brave.com/search?q={searchTerms}",
+          "Name": "Searxng",
+          "URLTemplate": "http://127.0.0.1:5233/?preferences=eJx1WMuS67gN_Zp4o5qumdxUUll4lZrkB2avgkhIwhVFqPmwrf76gHqSVt-F1S2QBAEQODiUgoAdO0J_79CiA3MzYLsIHd4hBr4ZVmDwjvaWXhWPk8GA91sLD1Jsa4eezQPd_UajLKonx6_5_l8wHm8jhp71_X9__nXz0KJHcKq__34LPY5495R03URBNMHXosvisw7QbKs106mdQV4_2HW3dVntw2w2ExXagK4GQ50d5f9tPegHWIW63vZdpZ8R3VyTrQMFUfCXi3gj25KlIEqVY2O2meuyZJdagzSLJoMqrIt6DgPO_q6xBXHgFp2pW3YjhEC2u08OQ5hvmjw0RoxA25GVKP_45--b4noL-N_-_p9DWD1II_u6Xv_K0L876OrasyIw1YiaQISg2mizSRKcBisv5zPU9XIOb9JV7_crKoiaZGyMnlQaMvgCqx1BbiKYSeyvDNn4qiZQQ9pENgtpzFrwVbKfHljXLZl1_2moRnKOXS6Tw6vkmfZ2-WQLkk4aNpWWXuyrJw207-GH3JwGSMeLoFp9z2KwigegdtfckKH0y4LRyIEVuuT9G1UUVB8lS_KFoYlqwLDrnppCT9DUdaePy_F9KKU-dK5Fwibx40rSX_ZjqQ6XSXc73uV7phxyw1G3BhwC5UaoSVKxRYdSC5uZkuXei1DySlGSr7KnfpBUYLZ2xunt9RqWJFwtT8-kSSqBMF-nEb-kQI8M0-gDBMqM17qrpJBSFRJbny8W-2bx7Vo0KBaTznTISaRfx8Xeh_RqejZ2qbtsrPAukz8R0tanBWtyjzDJdHkmG0f-SVM69nOWwAPORXz-eGVGtdpxcmtPGgmKDj2EUTAzn-ZQ6pfb8JQTrzQ5AaYEUesJt47sQKDyBfOcBatD-uoF5jKJ4CE0e4awxgZdt73KGEri8ri_M2vJM50vZ-5M4dUqqSYDcyp4f7qUj4wsSZcHXgAUXQK71F7y0-qhcZAemxG9gBC69XBWAb6OBBcl_iOh2vJOpprYh-MQadTNaTqNXXTZRlJfmT1k5V_i6L-X7Tktp-wke-dczyfNOcz8JN_zua3AkAM3VylinrLwpAEMDqw3EIqQGm58wA-3eywNFtQEdn_lr76o_fE5NiYX2BRU-WVW2Wk_VTsDnFawnj3mMCWdEcYdRXlCuzlwepSEYhJyKXI4cebe2jzI76Ap8HQt7kN4rdpzaC_a75YVRTvFRiD3sW34GcEVzWQRXDf6fIINV7FDrSlcerKjrg-VhgJ9HIcgjIQlqTkH8dXIcfZUHrDnjuNFcLVhFV9AaxU_UQlenIhFXkXvP6ZZ2NieKgq0nlNFj3HL2uUo6LeeDV7kq7kJFKr0OKSjBIhU5ZWsApe3EwF4F6ZECDNnAg8zB5YqGFLO7gkRklOiAwrPc-nmSSjKdoaei2A_qZnL94Ea5sG_Cz8jl2FPQs_Rqat0QrXg0y_Ep8dJLEzVL1ErZz94fovEk03rpJrM1Bcs648fP_71OiOjo0abZ82XhbEocP6JOFwl14zZ5EVZLNg7keFw7mHhkVpalsKxmTscd8iZEF2ITQ4MSwXI8iHRhyc22dAMqohGev-moqLAVK7RSCS94EQue_KLBrZSx5WfLds5tcMzMji40rlVdK2cRXytHMFbFYrKe3QJuLKlD-nLC__dQpGOdhTKUjgYx9FkkCgI-cCPixUCnSeKr5kn1PLsrgWmDd1Hxzt-3dCWF4oF7VZantNlJ4WZ3wXcix55ujZC8RWM09nB0uqNqrxR4SKui-QSv4TzKftziqJ6bAdOuH5w1OgSDy1SQvwigRExOGdmnHp71ccmi7WGUNiGYR5ZupDNEqE1pIa8mct0yvt0l-B45wXCa84tNlZyOatNXgRhk13CsMm_AcR-40fLVoMYCT5v-TiOc7XD7oosZXtZZ0SP7ldjieH8aixpFsevw1-_HV08px-Jl3Ary6wUgS8z13aP4hhGkKucZvsL447hHnwvoP7NDH0QGHot15jzuKTDDIQ75UtZBkJ1UyZ4DAX-7mPS6yUHYLtHlONS5YhBqPnOzyedkOycNMmtPvXIbZTShwX0eWZOqUayE1_ePxZzT6snSgS0gSyqE0u5eeH-OrHUPV1XYystBIHsmnrnPfrcMzZj2jSzc572Sl9YSsFmFtpSpOsqumSrAyGxVSP3KJ9fzxzKLdflSDoR7BQt4xpREKQ8Len6amDBgdbw87y4xybaEHe0i8KUoz_O9GAKb_B9iL8hP4a0XHbcmtF7hKP1cqPwfX43TRSh1DtzfGtfh-S4ngIZQZaUQdm0B43FF5SESIVmEaQlBSNOk1LtSS5em0A-eDmbfPDtA00-tDifEQZS4YttwTVG6ZSjXA2r40qhSyritKUhu58yh3TpTCf0VqlPMKaXhmZzL0JwH2TfWl7RQ5YeePFwFZe9Jfxj_1xyfjmbTJRO5-8M9fpJ8OmENS-Gulp6jBqOnrhPTc1c-kedvsk5cf6xdh8wKor_vDIG09ZkW14yR_i8YJ1MC8vMBFWbspuQVgGO-_8BUvL5kQ==&q={searchTerms}",
           "Method": "GET",
-          "IconURL": "https://brave.com/leo-icons/social-brave-release-favicon-fullheight-color.svg",
-          "Alias": "Brave",
-          "Description": "Brave"
+          "IconURL": "http://127.0.0.1:5233/static/themes/simple/img/favicon.png",
+          "Alias": "searxng",
+          "Description": "Searxng"
         }
       ],
       "Remove": ["Google", "Bing", "Amazon.com", "eBay", "Twitter"],
-      "Default": "Brave"
+      "Default": "Searxng"
     },
     "SupportMenu": {
       "Title": "LibreWolf Issue Tracker",

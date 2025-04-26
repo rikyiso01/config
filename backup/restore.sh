@@ -2,9 +2,8 @@
 
 set -euo pipefail
 
-if [[ -d ~/backup ]]
-then
-    mv ~/backup ~/backup-old
-fi
+target="$1"
+shift
 
-openssl aes-256-cbc -pbkdf2 -d -in "$1" | tqdm --unit-scale --bytes --total "$(du -sb "$1" | awk '{print $1}')" | tar -C ~ -x
+restic -r "$(dirname "$0")" "$@" restore latest --target "$target"
+
