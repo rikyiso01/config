@@ -17,7 +17,6 @@ let
 
     # Packages that should be installed to the user profile.
     home.packages = with pkgs; [
-      perl
       less
       tldr
       man-pages
@@ -33,7 +32,6 @@ let
       fira-code
       nerd-fonts.fira-code
       nerd-fonts.fira-mono
-      php
       powertop
       android-tools
       nmap
@@ -42,8 +40,7 @@ let
       brightnessctl
       traceroute
       xdg-ninja
-      python312Packages.ipython
-      devbox
+      python313Packages.ipython
       pre-commit
       git-ignore
       ascii
@@ -55,7 +52,6 @@ let
       brightnessctl
       playerctl
       trash-cli
-      python312Packages.pipx
       distrobox
       wl-clipboard
       nixVersions.latest
@@ -105,16 +101,17 @@ let
           };
       };
       email = {
-        # maildirBasePath = "${home.homeDirectory}/backup/Mail";
+        maildirBasePath = "${home.homeDirectory}/backup/Mail";
         accounts = {
           disroot = {
             address = "rikyiso01@disroot.org";
             userName = "rikyiso01";
-            # getmail = {
-            #   enable = true;
-            #   readAll = true;
-            #   mailboxes = [ "INBOX" ];
-            # };
+            getmail = {
+              enable = true;
+              readAll = false;
+              delete = false;
+              mailboxes = [ "Archive" ];
+            };
             imap = {
               host = "disroot.org";
               port = 993;
@@ -155,23 +152,6 @@ let
       };
     };
 
-    # services.getmail.enable = true;
-    # home.file.".getmail/getmailrc".text = ''
-    #   [retriever]
-    #   type = SimplePOP3SSLRetriever
-    #   server = disroot.org
-    #   username = rikyiso01
-    #   port = 995
-    #   password_command = ("${home.homeDirectory}/.local/bin/password","show","-a","password","Disroot")
-
-    #   [destination]
-    #   type = Maildir
-    #   path = ~/backup/Mail/
-
-    #   [options]
-    #   delete = True
-    # '';
-
     programs.neomutt = {
       enable = true;
       macros = [{
@@ -201,12 +181,7 @@ let
         timeformat = "%H:%M";
       };
     };
-    # home.file.".neomuttrc".text = ''
-    #   set mbox_type=Maildir
-    #   set folder=~/backup/Mail
-    #   set spoolfile=+/
-    #   set header_cache=~/.cache/mutt
-    # '';
+    programs.todoman.enable = true;
 
     programs.git = {
       enable = true;
@@ -235,12 +210,47 @@ let
       ];
     };
 
+    programs.zellij = {
+      enable = true;
+      settings = {
+        default_shell = "fish";
+        show_startup_tips = false;
+        copy_command = "wl-copy";
+        pane_frames = false;
+        default_layout = "default";
+        session_serialization = false;
+        ui.pane_frames.hide_session_name = true;
+        keybinds = {
+          "normal clear-defaults=true" = {
+            "bind \"Ctrl s\"" = { SwitchToMode = "Tmux"; };
+          };
+          tmux = builtins.listToAttrs (builtins.map (x: { name = "bind \"${toString x}\""; value = { GoToTab = x; SwitchToMode = "Normal"; }; }) [ 1 2 3 4 5 6 7 8 9 ]);
+        };
+      };
+    };
+    xdg.configFile."zellij/layouts/startup.kdl".text = ''
+      layout {
+          new_tab_template {
+              pane
+              pane size=1 borderless=true {
+                    plugin location="tab-bar"
+                }
+          }
+          tab {
+              pane command="yazi" close_on_exit=true
+              pane size=1 borderless=true {
+                    plugin location="compact-bar"
+                }
+          }
+      }
+    '';
     programs.tmux = {
       enable = true;
       keyMode = "vi";
       terminal = "tmux-256color";
       mouse = true;
       prefix = "C-s";
+      shell = "${pkgs.fish}/bin/fish";
       # plugins = with pkgs.tmuxPlugins; [ catppuccin ];
       extraConfig = ''
                 bind-key -T copy-mode-vi 'v' send -X begin-selection
@@ -254,6 +264,7 @@ let
                 bind-key C-! break-pane
                 bind-key -n Pageup send-keys left
                 bind-key -n Pagedown send-keys right
+                bind-key C-V run "wl-paste -n | tmux load-buffer - ; tmux paste-buffer"
                 bind h select-pane -L
                 bind j select-pane -D
                 bind k select-pane -U
@@ -297,6 +308,29 @@ let
         });
       })
     ];
+    programs.yazi = {
+      enable = true;
+      plugins = { smart-enter = pkgs.yaziPlugins.smart-enter; };
+      keymap = {
+        manager.prepend_keymap = [
+          {
+            on = "l";
+            run = "plugin smart-enter";
+            desc = "Enter the child directory, or open the file";
+          }
+          {
+            on = "<Right>";
+            run = "plugin smart-enter";
+            desc = "Enter the child directory, or open the file";
+          }
+          {
+            on = "<Backspace>";
+            run = "hidden toggle";
+            desc = "Show hidden files";
+          }
+        ];
+      };
+    };
     programs.ranger = {
       enable = true;
       extraConfig = ''
@@ -310,9 +344,23 @@ let
     };
     home.file.".config/ranger/rifle.conf".text = ''
       mime application/zip, flag f = /bin/unzip "$1"
-      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext tsx,!ext rs,!ext dart,!ext tex,!ext mmd,!ext jsonl, flag f = xdg-open "$1"
+      !mime ^application/json|^text|^inode,!ext sh,!ext sql,!ext pl,!ext js,!ext tsx,!ext rs,!ext dart,!ext tex,!ext mmd,!ext jsonl,!ext astro, flag f = xdg-open "$1"
       label editor = "$EDITOR" -- "$@"
       label pager  = "$PAGER" -- "$@"
+    '';
+    xdg.configFile."wezterm/wezterm.lua".text = ''
+      local wezterm = require 'wezterm'
+      return {
+        disable_default_key_bindings = true,
+        font = wezterm.font 'FiraMono Nerd Font Mono',
+        font_size = 16,
+        window_padding={left=0,right=0,top=0,bottom=0,},
+        hide_tab_bar_if_only_one_tab = true,
+        audible_bell = "Disabled",
+        default_cwd = "${home.homeDirectory}/backup/Documents",
+        window_close_confirmation = "NeverPrompt",
+        default_prog = { '${pkgs.tmux}/bin/tmux', 'new-session', '-As', 'default', 'exec ${pkgs.yazi}/bin/yazi', },
+      }
     '';
     programs.kitty = {
       enable = true;
@@ -323,7 +371,7 @@ let
       font.size = 16;
       settings = { enable_audio_bell = false; startup_session = "${home.homeDirectory}/.config/kitty/session.conf"; };
     };
-    home.file.".config/kitty/session.conf".text = "cd ${home.homeDirectory}/backup/Documents\nlaunch zsh -c \"${pkgs.tmux}/bin/tmux new-session -As default 'exec ${pkgs.ranger}/bin/ranger'\"";
+    home.file.".config/kitty/session.conf".text = "cd ${home.homeDirectory}/backup/Documents\nlaunch /bin/sh -c \"${pkgs.tmux}/bin/tmux new-session -As default 'exec ${pkgs.yazi}/bin/yazi'\"";
     programs.lazygit.enable = true;
 
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
@@ -359,7 +407,12 @@ let
     programs.vim.enable = true;
     fonts.fontconfig.enable = true;
     programs.bat.enable = true;
-    programs.eza.enable = true;
+    programs.eza = {
+      enable = true;
+      git = true;
+      icons = "auto";
+    };
+    programs.fzf.enable = true;
     programs.gh = {
       enable = true;
       settings = {
@@ -378,6 +431,43 @@ let
       container_name_default="test"
     '';
 
+    programs.fish = {
+      enable = true;
+      generateCompletions = true;
+      shellAliases = {
+        cat = "bat -p";
+        du = "dust";
+        find = "fd";
+        ps = "procs";
+        curl = "curlie";
+        wget = "wget --hsts-file=$XDG_DATA_HOME/wget-hsts";
+        zip = "7z a";
+        unzip = "7z x";
+        nix = "LD_LIBRARY_PATH='' nix=(which nix) $nix";
+        top = "htop";
+        neofetch = "fastfetch";
+        vim = "$VISUAL";
+        flake-init = "nix flake init -t github:nix-community/nix-direnv";
+        music-update = "nix run github:rikyiso01/musicmanager auto Music Music2 Music3 Bardify Clownpierce Dream FlameFrags Halloween";
+        timg = "timg -pk";
+        gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh";
+        rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone --config ${home.homeDirectory}/backup/rclone.conf";
+        gg = "lazygit";
+        # yt = ''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
+      };
+      interactiveShellInit = ''set fish_greeting'';
+    };
+    programs.starship = {
+      enable = true;
+      enableZshIntegration = false;
+      settings = {
+        add_newline = false;
+        line_break = {
+          disabled = true;
+        };
+      };
+      enableTransience = true;
+    };
     programs.zsh = {
       enable = true;
       autosuggestion.enable = true;
@@ -414,7 +504,6 @@ let
         zip = "7z a";
         unzip = "7z x";
         nix = "LD_LIBRARY_PATH='' nix";
-        devbox = "LD_LIBRARY_PATH='' devbox";
         top = "htop";
         neofetch = "fastfetch";
         vim = "$VISUAL";
@@ -424,6 +513,7 @@ let
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh";
         rclone = "RCLONE_PASSWORD_COMMAND='password show -a Password rclone' rclone --config ${home.homeDirectory}/backup/rclone.conf";
         yt = ''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
+        gg = "lazygit";
       };
       history.path = "${home.homeDirectory}/backup/zsh_history";
       dotDir = ".config/zsh";
@@ -441,12 +531,6 @@ let
         plugins = [ "git" ];
       };
     };
-
-    programs.fzf = {
-      enable = true;
-      enableZshIntegration = true;
-    };
-
 
     programs.neovim = {
       enable = true;
@@ -479,6 +563,8 @@ let
         require'lspconfig'.clangd.setup{capabilities=lsp_capabilities,cmd={"${pkgs.clang-tools}/bin/clangd"}}
         -- require'lspconfig'.solc.setup{capabilities=lsp_capabilities,cmd={"${pkgs.solc}/bin/solc","--lsp"}}
         require'lspconfig'.solargraph.setup{capabilities=lsp_capabilities,cmd={"${pkgs.rubyPackages.solargraph}/bin/solargraph","stdio"}}
+        require'lspconfig'.csharp_ls.setup{capabilities=lsp_capabilities,cmd={"${pkgs.csharp-ls}/bin/csharp-ls"}}
+        require'lspconfig'.astro.setup{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"}}
 
         require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
         require("lualine").setup()
@@ -494,6 +580,7 @@ let
                 java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
                 javascript={function()return {exe="prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
                 typescript={function()return {exe="prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
+                typescriptreact={function()return {exe="prettier",args={"--stdin-filepath=test.tsx"},stdin=true} end},
                 css={function()return {exe="prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
                 json={function()return {exe="prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
                 jsonc={function()return {exe="prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
@@ -567,6 +654,7 @@ let
             message_when_not_committed = ""
         }
         require('gitsigns').setup()
+        require('yazi').setup({open_for_directories = true})
 
         vim.opt.expandtab = true
         vim.opt.smartindent = true
@@ -577,7 +665,8 @@ let
         vim.opt.shortmess:remove({ 'S' })
         vim.opt.colorcolumn = "90"
         vim.opt.list = true
-        vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
+        -- vim.keymap.set('n', '<Leader>e', '<cmd>RnvimrToggle<cr>')
+        vim.keymap.set('n', '<Leader>e', '<cmd>Yazi<cr>')
         vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
         vim.keymap.set('n', '<Leader>m', '<cmd>Trouble diagnostics toggle focus=true<cr>')
         vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
@@ -595,9 +684,9 @@ let
         end
         vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
         vim.env.NVIM_SERVER=vim.v.servername
-        vim.g.rnvimr_enable_picker = 1
-        vim.g.rnvimr_enable_ex = 1
-        vim.g.rnvimr_ranger_cmd = {'ranger', '--cmd=set preview_images false'}
+        -- vim.g.rnvimr_enable_picker = 1
+        -- vim.g.rnvimr_enable_ex = 1
+        -- vim.g.rnvimr_ranger_cmd = {'ranger', '--cmd=set preview_images false'}
         vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
         vim.cmd [[colorscheme torte]]
         vim.o.splitright=true
@@ -627,7 +716,8 @@ let
         ansible-vim
         vim-vsnip
         formatter-nvim
-        rnvimr
+        # rnvimr
+        yazi-nvim
         vim-commentary
         # pkgs.vimExtraPlugins.Comment-nvim
         mini-nvim
@@ -723,6 +813,9 @@ let
       monitor=,preferred,auto,1,mirror,eDP-1
 
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
+      # $terminal = /usr/bin/kitty
+      $terminal = /usr/bin/flatpak run org.wezfurlong.wezterm
+      $fileManager = /usr/bin/flatpak run org.gnome.NautilusDevel
 
       # Execute your favorite apps at launch
       # exec-once = waybar & hyprpaper & firefox
@@ -731,10 +824,12 @@ let
       exec-once = ${pkgs.waybar}/bin/waybar
       exec-once = ${pkgs.hypridle}/bin/hypridle
       exec-once = dbus-update-activation-environment --systemd --all
-      exec-once=[workspace 1 silent; maximize] /bin/kitty
+      exec-once= $fileManager
+      exec-once=[workspace 1 silent; maximize] sleep 1 && $terminal
+      exec-once=sleep 2 && /usr/bin/flatpak kill org.gnome.NautilusDevel
       exec-once=[workspace 1 silent; noinitialfocus] sleep 5 && flatpak run io.gitlab.librewolf-community
       exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@
-      exec-once=sleep 1 && hyprctl dispatch focuswindow kitty
+      # exec-once=sleep 1 && hyprctl dispatch focuswindow kitty
       exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
       exec-once=${pkgs.hyprpaper}/bin/hyprpaper
 
@@ -742,9 +837,7 @@ let
       # source = ~/.config/hypr/myColors.conf
 
       # Set programs that you use
-      $terminal = /usr/bin/kitty
-      $fileManager = /usr/bin/nautilus
-      $menu = /usr/bin/wofi
+      $menu = ${pkgs.wofi}/bin/wofi
 
       # Some default env vars.
       env = XCURSOR_SIZE,36
@@ -852,6 +945,8 @@ let
       # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
       # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
       windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
+      windowrulev2 = float,class:^(org.wezfurlong.wezterm)$
+      windowrulev2 = tile,class:^(org.wezfurlong.wezterm)$
 
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
       $mainMod = SUPER
@@ -1085,28 +1180,31 @@ let
         }
       '';
     };
-    home.file.".config/wofi/config".text = ''
-      hide_scroll=true
-      show=drun
-      width=30%
-      lines=8
-      line_wrap=word
-      term=kitty
-      allow_markup=true
-      always_parse_args=false
-      show_all=true
-      print_command=true
-      layer=overlay
-      allow_images=true
-      sort_order=alphabetical
-      gtk_dark=true
-      prompt=
-      image_size=20
-      display_generic=false
-      location=center
-      key_expand=Tab
-      insensitive=true
-    '';
+    programs.wofi = {
+      enable = true;
+      settings = {
+        hide_scroll = true;
+        show = "drun";
+        width = "30%";
+        lines = 8;
+        line_wrap = "word";
+        term = "kitty";
+        allow_markup = true;
+        always_parse_args = false;
+        show_all = true;
+        print_command = true;
+        layer = "overlay";
+        allow_images = true;
+        sort_order = "alphabetical";
+        gtk_dark = true;
+        prompt = "";
+        image_size = 20;
+        display_generic = false;
+        location = "center";
+        key_expand = "Tab";
+        insensitive = true;
+      };
+    };
     home.file.".config/wofi/style.css".source = ./wofi.css;
     home.file.".config/hypr/hypridle.conf".text = ''
       general {
@@ -1139,65 +1237,6 @@ let
     };
     services.mpd-mpris.enable = true;
     programs.ncmpcpp.enable = true;
-
-    # home.file.".config/vdirsyncer/config".text = ''
-    #   [general]
-    #   status_path = "~/.vdirsyncer/status/"
-
-    #   [pair my_calendar]
-    #   a = "my_calendar_local"
-    #   b = "my_calendar_remote"
-    #   collections = ["from a", "from b"]
-
-    #   [pair my_calendar2]
-    #   a = "my_calendar_local2"
-    #   b = "my_calendar_remote"
-    #   collections = ["from a", "from b"]
-
-    #   [storage my_calendar_local]
-    #   type = "filesystem"
-    #   path = "~/.calendar/"
-    #   fileext = ".ics"
-
-    #   [storage my_calendar_local2]
-    #   type = "singlefile"
-    #   path = "~/.calendar2/%s.ics"
-
-    #   [storage my_calendar_remote]
-    #   type = "caldav"
-    #   url = "http://127.0.0.1:5232/"
-    #   username = "t"
-    #   password = "t"
-    # '';
-    # home.file.".config/khal/config".text = ''
-    #   [calendars]
-
-    #     [[lessons]]
-    #       path = ~/.calendar/calendars-fad4fc34-12ee-4f75-98ed-2f77eb2a6419
-    #       color = dark green
-    #       priority = 20
-    #     [[events]]
-    #       path = ~/.calendar/calendars-88424f24-751c-49b2-8783-2218dc5d2dcd
-    #       color = dark green
-    #       priority = 20
-    #     [[events2]]
-    #       path = ~/.calendar/calendars-85c59956-f652-4410-89e4-57cf8d55b17f
-    #       color = dark green
-    #       priority = 20
-    #     [[sport]]
-    #       path = ~/.calendar/calendars-53019f4a-8f2a-4809-aeba-d22c4c393fc5
-    #       color = dark green
-    #       priority = 20
-    #     [[tasks]]
-    #       path = ~/.calendar/calendars-d87a7978-7196-4208-a861-fcaeb09d39a7
-    #       color = dark green
-    #       priority = 20
-    #     [[transports]]
-    #       path = ~/.calendar/calendars-c97798c1-8ec6-484e-8a28-52e41109b474
-    #       color = dark green
-    #       priority = 20
-    # '';
-    # home.file.".config/todoman/config.py".text = "path='~/.calendar/*'";
 
     systemd.user.services = {
       startup = {
@@ -1289,7 +1328,8 @@ let
           Description = "Searxng server";
         };
         Service = {
-          ExecStart = "podman run --name searxng --init --rm --read-only -p 5233:8080 docker.io/searxng/searxng:latest";
+          ExecStart = "podman run --name searxng --rm --read-only -p 127.0.0.1:5233:8080 docker.io/searxng/searxng:latest";
+          ExecStop = "nohup podman stop -t0 searxng";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -1318,9 +1358,6 @@ let
       };
       "org/gtk/gtk4/settings" = {
         "show-hidden" = true;
-      };
-      "org/gnome/nautilus/preferences" = {
-        "default-folder-viewer" = "list-view";
       };
     };
 
@@ -1523,10 +1560,13 @@ let
         io.mpv.Mpv
         com.calibre_ebook.calibre
         org.chromium.Chromium
-        io.github.ungoogled_software.ungoogled_chromium'';
+        io.github.ungoogled_software.ungoogled_chromium
+        org.virt_manager.virt-manager
+        org.gnome.NautilusDevel'';
       onChange = ''
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-        flatpak install --user -y flathub $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort))
+        flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
+        flatpak install --user -y $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
         flatpak remove --user -y $(comm -13 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
       '';
     };
@@ -1557,7 +1597,6 @@ let
         sof-firmware
         networkmanager
         networkmanager-openvpn
-        zsh
         sudo
         nix
         greetd
@@ -1577,7 +1616,6 @@ let
         pipewire
         wireplumber
         podman
-        wofi
         pipewire-jack
         pipewire-alsa
         pipewire-pulse
@@ -1587,10 +1625,9 @@ let
         gnome-keyring
         power-profiles-daemon
         libvirt
-        virt-manager
         bluez
         bluez-utils
-        nautilus
+        udisks2
         pacman-contrib";
       onChange = "
             sudo pacman -S --noconfirm --needed $(cat $HOME/.local/nix-sources/packages)
@@ -1747,6 +1784,8 @@ let
 
         mkdir -p "$HOME/.local/share"
         ln -sfT "$HOME/backup/keyrings" "$HOME/.local/share/keyrings"
+
+        ln -sfT "$HOME/backup/fish_history" "$HOME/.local/share/fish/fish_history"
       '';
     };
   };

@@ -2,7 +2,12 @@
 
 set -euo pipefail
 
-rsync -gloptruv --info=progress2 "$1" "$2"
+from="$1"
+to="$2"
+shift
+shift
 
-restic -r "$2" "$@" forget --keep-last 20 --prune
-restic -r "$2" "$@" check
+rsync -gloptruv --info=progress2 "$from" "$to"
+
+restic -r "$from" "$@" forget --keep-last 20 --prune
+restic -r "$to" "$@" check
