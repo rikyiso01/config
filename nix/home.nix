@@ -1373,10 +1373,10 @@ let
       };
     };
 
-    # home.file.".gdbinit".text = ''
-    #   source ${pkgs.gef}/share/gef/gef.py
-    #   set history filename ~/.local/state/gdb_history
-    # '';
+    home.file.".gdbinit".text = ''
+      source ${pkgs.gef}/share/gef/gef.py
+      set history filename ~/.local/state/gdb_history
+    '';
 
     home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
       { }

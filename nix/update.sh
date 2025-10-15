@@ -17,3 +17,6 @@ sudo -E pacdiff
 sudo pacman -Syu
 
 sudo -E pacdiff
+
+git commit -am 'update'
+git push
