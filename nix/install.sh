@@ -4,7 +4,7 @@ set -eou pipefail
 
 cd "$(dirname "$0")"
 
-sudo pacman -S --noconfirm --needed base linux linux-firmware sof-firmware networkmanager networkmanager-openvpn zsh sudo nix greetd greetd-tuigreet hyprland kitty swaylock intel-ucode reflector intel-media-driver util-linux flatpak xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland polkit-gnome pipewire wireplumber podman wofi pipewire-jack pipewire-alsa pipewire-pulse pipewire-audio qemu-desktop vulkan-intel gnome-keyring power-profiles-daemon libvirt virt-manager bluez bluez-utils nautilus pacman-contrib
+sudo pacman -S --noconfirm --needed base linux linux-firmware sof-firmware networkmanager networkmanager-openvpn sudo nix greetd greetd-tuigreet hyprland swaylock intel-ucode reflector intel-media-driver util-linux flatpak xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-hyprland polkit-gnome pipewire wireplumber podman pipewire-jack pipewire-alsa pipewire-pulse pipewire-audio qemu-desktop vulkan-intel gnome-keyring power-profiles-daemon libvirt bluez bluez-utils udisks2 pacman-contrib
 
 sudo systemctl enable --now nix-daemon
 sudo systemctl enable --now systemd-resolved
@@ -12,7 +12,7 @@ sudo systemctl enable --now systemd-timesyncd
 
 sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-sudo usermod -aG nix-users "$USER"
+sudo usermod -aG nix-users "$USER" || true
 
 
 mkdir -p "$HOME/.config/nix"

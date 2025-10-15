@@ -10,24 +10,26 @@
     };
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
-    nixneovimplugins.url = "github:jooooscha/nixpkgs-vim-extra-plugins";
+    nixgl.url = "github:nix-community/nixGL";
+    pwndbg.url = "github:pwndbg/pwndbg";
   };
 
-  outputs = { self, nixpkgs, homeManager, nix-index-database, nixneovimplugins }: {
+  outputs = { self, nixpkgs, homeManager, nix-index-database, nixgl, pwndbg }: {
     homeConfigurations = {
       "riky" = homeManager.lib.homeManagerConfiguration {
+        extraSpecialArgs = { pwndbg = pwndbg; };
         modules = [
           ./home.nix
-          nix-index-database.hmModules.nix-index
+          nix-index-database.homeModules.nix-index
           {
             programs.nix-index-database.comma.enable = true;
             home.sessionVariables.NIX_PATH = nixpkgs.outPath;
-            nix.registry.local={
-                from = {type="indirect"; id="nixpkgs"; };
-                flake = nixpkgs;
+            nix.registry.local = {
+              from = { type = "indirect"; id = "nixpkgs"; };
+              flake = nixpkgs;
             };
           }
-          # ({pkgs, ...}: { nixpkgs.overlays = [nixneovimplugins.overlays.default]; })
+          ({ pkgs, ... }: { nixpkgs.overlays = [ nixgl.overlay ]; })
         ];
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
       };

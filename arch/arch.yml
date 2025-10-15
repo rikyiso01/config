@@ -26,8 +26,8 @@ build:
   - name: step1
     source:
       "source.qemu.arch":
-        iso_url: "https://geo.mirror.pkgbuild.com/iso/2025.01.01/archlinux-2025.01.01-x86_64.iso"
-        iso_checksum: "sha256:74b109b4b36d20bef8f4203e30b8d223e0ab297a09d1a1213a02894472aa530a"
+        iso_url: "https://geo.mirror.pkgbuild.com/iso/2025.08.01/archlinux-2025.08.01-x86_64.iso"
+        iso_checksum: "sha256:4b1af44dbeed97acec0204a95f6393818bb8fd903b423a20b7ea141f80b27e59"
         output_directory: "build"
         ssh_username: "root"
         boot_wait: "1s"
@@ -57,8 +57,8 @@ build:
         ssh_username: "riky"
         boot_wait: "5s"
         boot_command:
-          # - "changeme<return><wait30>riky<return>q<return>echo '{{ .SSHPublicKey }}' > .ssh/authorized_keys<return>"
-          - "riky<return>q<return>echo '{{ .SSHPublicKey }}' > .ssh/authorized_keys<return>"
+          - "changeme<return><wait30>riky<return>q<return>echo '{{ .SSHPublicKey }}' > .ssh/authorized_keys<return>"
+          # - "riky<return>q<return>echo '{{ .SSHPublicKey }}' > .ssh/authorized_keys<return>"
     provisioner:
       - file:
           source: "../nix"

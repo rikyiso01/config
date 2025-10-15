@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 systemctl --failed
 systemctl --user --failed
 
+podman pull docker.io/dovecot/dovecot:latest
 flatpak update -y
 
 nix flake update

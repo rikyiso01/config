@@ -1,0 +1,41 @@
+{
+  "BookmarkBarEnabled": false,
+  "EditBookmarksEnabled": false,
+  "HomepageIsNewTabPage": false,
+  "PasswordManagerEnabled": false,
+  "RestoreOnStartup": 4,
+  "DownloadDirectory": "/home/${user_name}/Downloads",
+  "RestoreOnStartupURLs": [
+    "https://web.whatsapp.com/",
+    "https://web.telegram.org/k/",
+  ],
+  "ManagedBookmarks": [
+    {
+      "toplevel_name": "Bookmarks",
+    },
+    {
+      "name": "Gmail",
+      "url": "https://mail.google.com/mail/u/0/#inbox",
+    },
+    {
+      "name": "WhatsApp",
+      "url": "https://web.whatsapp.com/",
+    },
+    {
+      "name": "Telegram",
+      "url": "https://web.telegram.org/k/",
+    },
+    {
+      "name": "Mattermost",
+      "url": "https://mm.s3.eurecom.fr/s3/channels/llms4androidappscanning",
+    },
+    {
+      "name": "Teams",
+      "url": "https://teams.microsoft.com/v2/",
+    },
+    {
+      "name": "Meet",
+      "url": "https://meet.google.com/landing",
+    },
+  ],
+}
