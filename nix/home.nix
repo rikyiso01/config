@@ -774,10 +774,6 @@ let
     xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; android_sdk.accept_license = true; }";
     home.enableNixpkgsReleaseCheck = false;
 
-    # home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
-    #   [preferred]
-    #   default=hyprland;gtk
-    # '';
 
     news.display = "show";
 
@@ -819,13 +815,15 @@ let
         documents = "${home.homeDirectory}/backup/Documents";
         music = "${home.homeDirectory}/backup/phone/Music";
       };
-      portal = {
-        # enable = true;
-        # extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-hyprland ];
-        config.common.default = "hyprland;gtk";
-      };
+      # portal = {
+      #   config.common.default = "hyprland;gtk";
+      # };
 
     };
+    home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
+      [preferred]
+      default=hyprland;gtk
+    '';
 
 
     home.file.".config/hypr/hyprland.conf".text = ''
