@@ -300,12 +300,20 @@ let
     programs.htop.enable = true;
     programs.yazi = {
       enable = true;
+      flavors = {
+        catppuccin-mocha = ./catppuccin-mocha.yazi;
+      };
+      theme = {
+        flavor = {
+          dark = "catppuccin-mocha";
+        };
+      };
       plugins = {
         smart-enter = pkgs.yaziPlugins.smart-enter;
         folder-rules = ./yazi;
       };
       keymap = {
-        manager.prepend_keymap = [
+        mgr.prepend_keymap = [
           {
             on = "l";
             run = "plugin smart-enter";
@@ -364,6 +372,38 @@ let
       settings = {
         main = {
           font = "FiraMono Nerd Font Mono:size=16";
+        };
+        cursor = {
+          cursor = "11111b f5e0dc";
+        };
+
+        colors = {
+          foreground = "c0caf5";
+          background = "1a1b26";
+          selection-foreground = "c0caf5";
+          selection-background = "283457";
+          urls = "73daca";
+
+          regular0 = "15161e";
+          regular1 = "f7768e";
+          regular2 = "9ece6a";
+          regular3 = "e0af68";
+          regular4 = "7aa2f7";
+          regular5 = "bb9af7";
+          regular6 = "7dcfff";
+          regular7 = "a9b1d6";
+
+          bright0 = "414868";
+          bright1 = "f7768e";
+          bright2 = "9ece6a";
+          bright3 = "e0af68";
+          bright4 = "7aa2f7";
+          bright5 = "bb9af7";
+          bright6 = "7dcfff";
+          bright7 = "c0caf5";
+
+          "16" = "ff9e64";
+          "17" = "db4b4b";
         };
       };
     };
@@ -475,7 +515,6 @@ let
       enableTransience = true;
     };
 
-    # TODO: vimdiff and nix refactoring
     programs.neovim = {
       enable = true;
       viAlias = true;
@@ -671,7 +710,7 @@ let
         -- vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
         -- vim.env.NVIM_SERVER=vim.v.servername
         vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-        vim.cmd [[colorscheme tokyonight]]
+        vim.cmd [[colorscheme tokyonight-night]]
         vim.o.splitright=true
         vim.o.splitbelow=true
         -- vim.api.nvim_create_autocmd('TermOpen', {
@@ -766,19 +805,11 @@ let
 
     news.display = "show";
 
-    # qt = {
-    #   enable = true;
-    #   platformTheme.name = "adwaita";
-    #   style = {
-    #     name = "adwaita-dark";
-    #     package = pkgs.adwaita-qt;
-    #   };
-    # };
     gtk = {
       enable = true;
       cursorTheme = {
-        name = "Bibata-Modern-Amber";
-        package = pkgs.bibata-cursors;
+        name = "";
+        package = pkgs.catppuccin-cursors.mochaBlue;
       };
       iconTheme = {
         name = "Adwaita";
@@ -789,12 +820,6 @@ let
         package = pkgs.gnome-themes-extra;
       };
       gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
-      #   gtk3.extraConfig = {
-      #     gtk-application-prefer-dark-theme = 1;
-      #   };
-      #   # gtk4.extraConfig = {
-      #   #   gtk-application-prefer-dark-theme = 1;
-      #   # };
     };
     xdg = {
       enable = true;
@@ -848,14 +873,11 @@ let
           gaps_in = 0;
           gaps_out = 0;
           border_size = 2;
-          # col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
-          # col.inactive_border = rgba(595959aa)
-          "col.active_border" = "rgba(ff0000ee) rgba(ff3333ee) 45deg";
-          "col.inactive_border" = "rgba(930000aa)";
+          "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
+          "col.inactive_border" = "rgba(595959aa)";
 
           layout = "master";
 
-          # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
           allow_tearing = false;
 
         };
@@ -874,7 +896,6 @@ let
         animations = {
           enabled = true;
 
-          # Some default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
 
           bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
 
@@ -908,7 +929,7 @@ let
           "$mainMod SHIFT, W, exec, pkill hyprpaper"
           "$mainMod SHIFT, B, exec, rfkill toggle bluetooth"
           "$mainMod SHIFT, R, exec, nmcli d wifi rescan"
-          "$mainMod SHIFT, G, exec, swaylock"
+          "$mainMod SHIFT, G, exec, /usr/bin/hyprlock"
           "$mainMod, E, exec, $fileManager"
           "$mainMod, V, togglefloating,"
           "$mainMod, R, exec, $menu"
@@ -997,26 +1018,21 @@ let
         mainBar = {
           layer = "top";
           position = "top";
-          margin = "0 13 0 18";
-          spacing = 8;
           modules-left = [ "hyprland/workspaces" ];
           modules-center = [ "custom/clock" ];
-          modules-right = [ "pulseaudio" "cpu" "memory" "network" "bluetooth" "power-profiles-daemon" "backlight" "battery" "tray" ];
+          modules-right = [ "pulseaudio" "cpu" "memory" "backlight" "battery" "network" "power-profiles-daemon" "bluetooth" "tray" ];
           "custom/clock" = {
-            format = "{}";
+            format = " {}";
             exec = "date +'%a, %d %b, %R'";
             interval = 1;
           };
-          clock = {
-            format = "{:%a, %d %b, %I:%M %p}";
-          };
           pulseaudio = {
             reverse-scrolling = 1;
-            format = "{volume}% {icon} {format_source}";
-            format-bluetooth = "{volume}%  {format_source}";
+            format = "{icon} {volume}% {format_source}";
+            format-bluetooth = " {volume}% {format_source}";
             format-bluetooth-muted = " {format_source}";
             format-muted = "󰸈 {format_source}";
-            format-source = "{volume}% ";
+            format-source = " {volume}%";
             format-source-muted = "";
             format-icons = {
               default = [ "" "" "" ];
@@ -1025,16 +1041,16 @@ let
           };
           cpu = {
             interval = 2;
-            format = "{usage}% ";
+            format = " {usage}%";
           };
           memory = {
             interval = 2;
-            format = "{percentage}% 󰍛 {swapPercentage}% ";
+            format = " {percentage}%  {swapPercentage}%";
           };
           network = {
-            format-wifi = "{essid} 󰖩";
+            format-wifi = "󰤨 {essid}";
             format-ethernet = "󰈀";
-            format-disconnected = "󰖪";
+            format-disconnected = "󰤭";
             on-click = "${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
           };
           bluetooth = {
@@ -1051,7 +1067,7 @@ let
           };
           backlight = {
             device = "intel_backlight";
-            format = "{percent}% {icon}";
+            format = "{icon} {percent}%";
             format-icons = [ "" ];
           };
 
@@ -1060,10 +1076,10 @@ let
               warning = 30;
               critical = 15;
             };
-            format = "{capacity}% {icon}?";
-            format-plugged = "{capacity}% ";
-            format-charging = "{capacity}% ";
-            format-discharging = "{capacity}% {icon}";
+            format = "{icon}? {capacity}%";
+            format-plugged = " {capacity}%";
+            format-charging = " {capacity}%";
+            format-discharging = "{icon} {capacity}%";
             format-icons = [ "" "" "" "" "" ];
           };
 
@@ -1074,57 +1090,236 @@ let
         };
       };
       style = ''
+        @define-color base   #1e1e2e;
+        @define-color mantle #181825;
+        @define-color crust  #11111b;
+
+        @define-color text     #cdd6f4;
+        @define-color subtext0 #a6adc8;
+        @define-color subtext1 #bac2de;
+
+        @define-color surface0 #313244;
+        @define-color surface1 #45475a;
+        @define-color surface2 #585b70;
+
+        @define-color overlay0 #6c7086;
+        @define-color overlay1 #7f849c;
+        @define-color overlay2 #9399b2;
+
+        @define-color blue      #89b4fa;
+        @define-color lavender  #b4befe;
+        @define-color sapphire  #74c7ec;
+        @define-color sky       #89dceb;
+        @define-color teal      #94e2d5;
+        @define-color green     #a6e3a1;
+        @define-color yellow    #f9e2af;
+        @define-color peach     #fab387;
+        @define-color maroon    #eba0ac;
+        @define-color red       #f38ba8;
+        @define-color mauve     #cba6f7;
+        @define-color pink      #f5c2e7;
+        @define-color flamingo  #f2cdcd;
+        @define-color rosewater #f5e0dc;
+
         *{
-            border: none;
             font-family: 'FiraMono Nerd Font Mono';
             /*font-family: 'FiraCode Nerd Font Mono';*/
             font-size: 1em;
             background: transparent;
-            color: #ffffff;
+            /* color: #ffffff; */
         }
+
         .module{
-            background: #383c4a;
-            border-radius: 10px;
-            padding: 0 16px 0 16px;
+            background-color: @surface0;
+            padding: 0 1rem;
+            color: @text;
         }
+
         #workspaces{
             padding: 0;
+            margin-left: 1rem;
+            border-radius: 1rem;
         }
+
+        #workspaces button{
+            color: @lavender;
+            border-radius: inherit;
+            border: none;
+        }
+
         #workspaces button.active{
-            border-radius: inherit;
-            background: #4e5263;
+            color: @sky;
         }
+
         #workspaces button:hover{
-            transition: none;
-            box-shadow: none;
-            text-shadow: none;
-            border-radius: inherit;
-            background: #7c818c;
+            color: @sapphire;
         }
-        #battery.plugged{
-            color: #ffffff;
-            background-color: #26A65B;
+
+        #pulseaudio{
+          color: @maroon;
+          border-radius: 1rem 0 0 1rem;
+          margin-left: 1rem;
         }
-        #battery.charging{
-            color: #ffffff;
-            background-color: #26A65B;
+
+        #battery.plugged,
+        #battery.charging,
+        #battery{
+            color: @green;
+            border-radius: 0 1rem 1rem 0;
+            margin-right: 1rem;
         }
+
         #battery.warning:not(.charging) {
-            background-color: #ffbe61;
-            color: black;
+            color: @yellow;
         }
 
         #battery.critical:not(.charging) {
-            background-color: #f53c3c;
-            color: black;
+            color: @red;
+        }
+
+        #custom-clock {
+            color: @mauve;
+        }
+
+        #cpu,
+        #memory
+        {
+            color: @peach;
+        }
+
+        #backlight{
+            color: @yellow;
+        }
+
+        #tray,
+        #custom-clock
+        {
+            border-radius: 1rem;
+        }
+
+        #tray{
+            margin-right: 1rem;
+        }
+
+        #bluetooth{
+            border-radius: 0 1rem 1rem 0;
+            margin-right: 1rem;
+        }
+
+        #network{
+            border-radius: 1rem 0 0 1rem;
         }
       '';
     };
 
-    services.swaync.enable = true;
-    programs.swaylock = {
+    services.dunst = {
+      enable = true;
+      settings = {
+        global = {
+          frame_color = "#89b4fa";
+          separator_color = "frame";
+          highlight = "#89b4fa";
+        };
+
+        urgency_low = {
+          background = "#1e1e2e";
+          foreground = "#cdd6f4";
+        };
+
+        urgency_normal = {
+          background = "#1e1e2e";
+          foreground = "#cdd6f4";
+        };
+
+        urgency_critical = {
+          background = "#1e1e2e";
+          foreground = "#cdd6f4";
+          frame_color = "#fab387";
+        };
+      };
+    };
+    programs.hyprlock = {
+      enable = true;
       package = null;
-      settings = { color = "333333"; };
+      settings = {
+        source = "${./mocha.conf}";
+        "$accent" = "$mauve";
+        "$accentAlpha" = "$mauveAlpha";
+        "$font" = "JetBrainsMono Nerd Font";
+        general = {
+          hide_cursor = true;
+        };
+        animations = {
+          animation = "fadeOut, 0, 0, linear";
+        };
+        label = [
+          # LAYOUT
+          {
+            monitor = "";
+            text = "Layout: $LAYOUT";
+            color = "$text";
+            font_size = 25;
+            font_family = "$font";
+            position = "30, -30";
+            halign = "left";
+            valign = "top";
+          }
+          # TIME
+          {
+            monitor = "";
+            text = "$TIME";
+            color = "$text";
+            font_size = 90;
+            font_family = "$font";
+            position = "-30, 0";
+            halign = "right";
+            valign = "top";
+          }
+          # DATE
+          {
+            monitor = "";
+            text = "cmd[update:43200000] date +\"%A, %d %B %Y\"";
+            color = "$text";
+            font_size = 25;
+            font_family = "$font";
+            position = "-30, -150";
+            halign = "right";
+            valign = "top";
+          }
+        ];
+
+        input-field = {
+          monitor = "";
+          size = "300, 60";
+          outline_thickness = 4;
+          dots_size = 0.2;
+          dots_spacing = 0.2;
+          dots_center = true;
+          outer_color = "$accent";
+          inner_color = "$surface0";
+          font_color = "$text";
+          fade_on_empty = false;
+          placeholder_text = "<span foreground=\"##$textAlpha\"><i>󰌾 Logged in as </i><span foreground=\"##$accentAlpha\">$USER</span></span>";
+          hide_input = false;
+          check_color = "$accent";
+          fail_color = "$red";
+          fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
+          capslock_color = "$yellow";
+          position = "0, -47";
+          halign = "center";
+          valign = "center";
+        };
+      };
+      extraConfig = ''
+
+
+        # GENERAL
+
+
+        # BACKGROUND
+
+
+      '';
     };
     services.hyprpaper = {
       enable = true;
@@ -1581,7 +1776,7 @@ let
         greetd
         greetd-tuigreet
         hyprland
-        swaylock
+        hyprlock
         intel-ucode
         reflector
         intel-media-driver
