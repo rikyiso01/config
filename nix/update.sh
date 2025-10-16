@@ -3,6 +3,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+git diff --quiet
+
 systemctl --failed
 systemctl --user --failed
 
