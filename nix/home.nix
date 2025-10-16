@@ -73,6 +73,8 @@ let
       uutils-coreutils-noprefix
       mprocs
       wev
+      zip
+      unzip
       # pwndbg.packages.x86_64-linux.pwndbg
       # (builtins.trace pwndbg.packages.x86_64-linux.pwndbg mprocs)
     ];
@@ -423,6 +425,7 @@ let
     };
     programs.direnv.enable = true;
 
+    # TODO: distrobox nix
     home.file.".config/distrobox/distrobox.conf".text = ''
       container_generate_entry=0
       container_manager="podman"
@@ -444,17 +447,13 @@ let
         ps = "procs";
         curl = "curlie";
         wget = "wget --hsts-file=$XDG_DATA_HOME/wget-hsts";
-        zip = "7z a";
-        unzip = "7z x";
         nix = "LD_LIBRARY_PATH='' nix=(which nix) $nix";
-        top = "htop";
         neofetch = "fastfetch";
         vim = "$VISUAL";
         flake-init = "nix flake init -t github:nix-community/nix-direnv";
         music-update = "nix run ${home.homeDirectory}/backup/Documents/Projects/Python/musicmanager auto Music Music2 Music3 Music4 Bardify Clownpierce Dream FlameFrags Halloween";
         timg = "timg -ps";
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh=(which gh) $gh";
-        gg = "lazygit";
         # yt = ''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
       };
       functions = {
@@ -479,6 +478,7 @@ let
       enableTransience = true;
     };
 
+    # TODO: vimdiff and nix refactoring
     programs.neovim = {
       enable = true;
       extraLuaConfig = ''
@@ -701,22 +701,16 @@ let
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
         trouble-nvim
-        # toggleterm-nvim
         lualine-nvim
         telescope-nvim
         nvim-treesitter.withAllGrammars
-        # lazygit-nvim
         nvim-cmp
         cmp-nvim-lsp
-        # markdown-preview-nvim
         vim-illuminate
-        # ansible-vim
         vim-vsnip
         formatter-nvim
-        # rnvimr
         yazi-nvim
         vim-commentary
-        # pkgs.vimExtraPlugins.Comment-nvim
         mini-nvim
         vim-abolish
         dhall-vim
@@ -724,10 +718,8 @@ let
         gitsigns-nvim
         nvim-ts-autotag
         nvim-surround
-        # leap-nvim
         vim-repeat
         twilight-nvim
-        # nvim_context_vt
         hardtime-nvim
         nvim-notify
         nvim-autopairs
@@ -736,15 +728,12 @@ let
         rainbow-delimiters-nvim
         vim-matchup
         flash-nvim
-        # indent-blankline-nvim
         tokyonight-nvim
       ];
       extraPackages = with pkgs; [
         haskell-language-server
-        # nodePackages.prettier-plugin-toml
         nodePackages.prettier
         ripgrep
-        # lazygit
         nodePackages.diagnostic-languageserver
         wl-clipboard
         gcc
@@ -815,263 +804,202 @@ let
         documents = "${home.homeDirectory}/backup/Documents";
         music = "${home.homeDirectory}/backup/phone/Music";
       };
-      # portal = {
-      #   config.common.default = "hyprland;gtk";
-      # };
+      portal = {
+        config.common.default = "hyprland;gtk";
+      };
 
     };
-    home.file.".config/xdg-desktop-portal/hyprland-portals.conf".text = ''
-      [preferred]
-      default=hyprland;gtk
-    '';
 
 
-    home.file.".config/hypr/hyprland.conf".text = ''
-      # See https://wiki.hyprland.org/Configuring/Monitors/
-      monitor=eDP-1,1920x1080@60,auto,1
-      monitor=,preferred,auto,1,mirror,eDP-1
+    wayland.windowManager.hyprland = {
+      enable = true;
+      package = null;
+      systemd.enable = true;
+      settings = {
+        monitor = [ "eDP-1,1920x1080@60,auto,1" ",preferred,auto,1,mirror,eDP-1" ];
+        "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
+        "$fileManager" = "/usr/bin/flatpak run org.gnome.Nautilus.Devel";
+        exec-once = [
+          "/usr/libexec/hyprpolkitagent"
+          "[workspace 1 silent; maximize] $terminal"
+          "[workspace 1 silent; noinitialfocus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community"
+          "secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@"
+        ];
+        "$menu" = "XDG_DATA_DIRS=${home.homeDirectory}/.local/share/flatpak/exports/share ${pkgs.fuzzel}/bin/fuzzel";
+        env = [ "XCURSOR_SIZE,36" "XCURSOR_THEME,Bibata-Modern-Amber" ];
+        input = {
+          kb_layout = "us";
+          kb_variant = "";
+          kb_model = "";
+          kb_options = "ctrl:nocaps, compose:paus";
+          kb_rules = "";
+          follow_mouse = 1;
 
-      # See https://wiki.hyprland.org/Configuring/Keywords/ for more
-      # $terminal = /usr/bin/kitty
-      $terminal = /usr/bin/flatpak run page.codeberg.dnkl.foot
-      # $terminal = /usr/bin/flatpak run org.wezfurlong.wezterm
-      $fileManager = /usr/bin/flatpak run org.gnome.Nautilus.Devel
+          touchpad = {
+            natural_scroll = true;
+          };
 
+          sensitivity = 1.0;
+          repeat_rate = 50;
+          repeat_delay = 300;
 
-      # Execute your favorite apps at launch
-      # exec-once = waybar & hyprpaper & firefox
-      exec-once = ${pkgs.swaynotificationcenter}/bin/swaync
-      exec-once = /usr/libexec/hyprpolkitagent
-      exec-once = ${pkgs.waybar}/bin/waybar
-      exec-once = ${pkgs.hypridle}/bin/hypridle
-      exec-once = /usr/bin/dbus-update-activation-environment --systemd --all
-      # exec-once= $fileManager
-      # exec-once=[workspace 1 silent; maximize] sleep 1 && $terminal
-      # exec-once=sleep 2 && /usr/bin/flatpak kill org.gnome.NautilusDevel
-      exec-once=[workspace 1 silent; maximize] $terminal
-      exec-once=[workspace 1 silent; noinitialfocus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community
-      exec-once=secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@
-      exec-once=${pkgs.gammastep}/bin/gammastep -O 4000
-      exec-once=${pkgs.hyprpaper}/bin/hyprpaper
-
-      # Source a file (multi-file configs)
-      # source = ~/.config/hypr/myColors.conf
-
-      # Set programs that you use
-      # $menu = XDG_DATA_DIRS=${home.homeDirectory}/.local/share/flatpak/exports/share ${pkgs.wofi}/bin/wofi
-      $menu = XDG_DATA_DIRS=${home.homeDirectory}/.local/share/flatpak/exports/share ${pkgs.fuzzel}/bin/fuzzel
-
-      # Some default env vars.
-      env = XCURSOR_SIZE,36
-      env = XCURSOR_THEME,Bibata-Modern-Amber
-      # env = QT_QPA_PLATFORMTHEME,qt5ct # change to qt6ct if you have that
-
-      # For all categories, see https://wiki.hyprland.org/Configuring/Variables/
-      input {
-          kb_layout = us,it
-          kb_variant =
-          kb_model =
-          kb_options = ctrl:nocaps, compose:paus
-          kb_rules =
-          follow_mouse = 1
-
-          touchpad {
-              natural_scroll = yes
-          }
-
-          sensitivity = 1.0 # -1.0 to 1.0, 0 means no modification.
-          repeat_rate=50
-          repeat_delay=300
-      }
-
-      general {
-          # See https://wiki.hyprland.org/Configuring/Variables/ for more
-
-          gaps_in = 0
-          gaps_out = 0
-          border_size = 2
+        };
+        general = {
+          gaps_in = 0;
+          gaps_out = 0;
+          border_size = 2;
           # col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
           # col.inactive_border = rgba(595959aa)
-          col.active_border = rgba(ff0000ee) rgba(ff3333ee) 45deg
-          col.inactive_border = rgba(930000aa)
+          "col.active_border" = "rgba(ff0000ee) rgba(ff3333ee) 45deg";
+          "col.inactive_border" = "rgba(930000aa)";
 
-          layout = master
+          layout = "master";
 
           # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
-          allow_tearing = false
-      }
+          allow_tearing = false;
 
-      decoration {
-          # See https://wiki.hyprland.org/Configuring/Variables/ for more
+        };
+        decoration = {
+          rounding = 10;
 
-          rounding = 10
-
-          blur {
-              enabled = false
-              size = 3
-              passes = 1
-          }
-          shadow {
-              enabled = false
-          }
-
-          # drop_shadow = false
-          # shadow_range = 4
-          # shadow_render_power = 3
-          # col.shadow = rgba(1a1a1aee)
-      }
-
-      animations {
-          enabled = yes
+          blur = {
+            enabled = false;
+            size = 3;
+            passes = 1;
+          };
+          shadow = {
+            enabled = false;
+          };
+        };
+        animations = {
+          enabled = true;
 
           # Some default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
 
-          bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+          bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
 
-          animation = windows, 1, 7, myBezier
-          animation = windowsOut, 1, 7, default, popin 80%
-          animation = border, 1, 10, default
-          # animation = borderangle, 1, 8, default
-          animation = fade, 1, 7, default
-          animation = workspaces, 1, 6, default
-      }
+          animation = [
+            "windows, 1, 7, myBezier"
+            "windowsOut, 1, 7, default, popin 80%"
+            "border, 1, 10, default"
+            "fade, 1, 7, default"
+            "workspaces, 1, 6, default"
+          ];
+        };
+        dwindle = {
+          pseudotile = true; # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
+          preserve_split = true; # you probably want this
+        };
+        misc = {
+          force_default_wallpaper = 0; # Set to 0 or 1 to disable the anime mascot wallpapers
+          vfr = true;
+        };
+        device = {
+          name = "epic-mouse-v1";
+          sensitivity = -0.5;
+        };
+        windowrulev2 = "suppressevent maximize, class:.*";
+        "$mainMod" = "SUPER";
+        bind = [
+          "$mainMod, RETURN, exec, $terminal"
+          "$mainMod, Q, killactive,"
+          "$mainMod SHIFT, P, exec, poweroff"
+          "$mainMod SHIFT, F, exec, if [[ $(powerprofilesctl get) = 'power-saver' ]]; then powerprofilesctl set balanced; else powerprofilesctl set power-saver; fi"
+          "$mainMod SHIFT, W, exec, pkill hyprpaper"
+          "$mainMod SHIFT, B, exec, rfkill toggle bluetooth"
+          "$mainMod SHIFT, R, exec, nmcli d wifi rescan"
+          "$mainMod SHIFT, G, exec, swaylock"
+          "$mainMod, E, exec, $fileManager"
+          "$mainMod, V, togglefloating,"
+          "$mainMod, R, exec, $menu"
+          "$mainMod, P, pseudo,"
+          "$mainMod, J, togglesplit,"
 
-      dwindle {
-          # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
-          pseudotile = yes # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
-          preserve_split = yes # you probably want this
-      }
 
-      master {
-          # See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
-          # new_is_master = true
-      }
+          # Move focus with mainMod + arrow keys
+          "$mainMod, H, layoutmsg, cycleprev"
+          "$mainMod, L, layoutmsg, cyclenext"
+          "$mainMod, K, layoutmsg, cycleprev"
+          "$mainMod, J, layoutmsg, cyclenext"
 
-      misc {
-          # See https://wiki.hyprland.org/Configuring/Variables/ for more
-          force_default_wallpaper = 0 # Set to 0 or 1 to disable the anime mascot wallpapers
-          vfr=true
-      }
+          # Move window mainMod + arrow keys
+          "$mainMod SHIFT, H, layoutmsg, swapprev"
+          "$mainMod SHIFT, L, layoutmsg, swapnext"
+          "$mainMod SHIFT, K, layoutmsg, swapprev"
+          "$mainMod SHIFT, J, layoutmsg, swapnext"
 
-      # Example per-device config
-      # See https://wiki.hyprland.org/Configuring/Keywords/#per-device-input-configs for more
-      device {
-          name = epic-mouse-v1
-          sensitivity = -0.5
-      }
+          # Switch workspaces with mainMod + [0-9]
+          "$mainMod, 1, workspace, 1"
+          "$mainMod, 2, workspace, 2"
+          "$mainMod, 3, workspace, 3"
+          "$mainMod, 4, workspace, 4"
+          "$mainMod, 5, workspace, 5"
+          "$mainMod, 6, workspace, 6"
+          "$mainMod, 7, workspace, 7"
+          "$mainMod, 8, workspace, 8"
+          "$mainMod, 9, workspace, 9"
+          "$mainMod, 0, workspace, 10"
 
-      # Example windowrule v1
-      # windowrule = float, ^(kitty)$
-      # Example windowrule v2
-      # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
-      # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
-      windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
+          # Move active window to a workspace with mainMod + SHIFT + [0-9]
+          "$mainMod SHIFT, 1, movetoworkspace, 1"
+          "$mainMod SHIFT, 2, movetoworkspace, 2"
+          "$mainMod SHIFT, 3, movetoworkspace, 3"
+          "$mainMod SHIFT, 4, movetoworkspace, 4"
+          "$mainMod SHIFT, 5, movetoworkspace, 5"
+          "$mainMod SHIFT, 6, movetoworkspace, 6"
+          "$mainMod SHIFT, 7, movetoworkspace, 7"
+          "$mainMod SHIFT, 8, movetoworkspace, 8"
+          "$mainMod SHIFT, 9, movetoworkspace, 9"
+          "$mainMod SHIFT, 0, movetoworkspace, 10"
 
-      # See https://wiki.hyprland.org/Configuring/Keywords/ for more
-      $mainMod = SUPER
+          # Example special workspace (scratchpad)
+          "$mainMod, S, togglespecialworkspace, magic"
+          "$mainMod SHIFT, S, movetoworkspace, special:magic"
 
-      # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-      bind = $mainMod, RETURN, exec, $terminal
-      bind = $mainMod, Q, killactive,
-      bind = $mainMod SHIFT, P, exec, poweroff
-      bind = $mainMod SHIFT, F, exec, if [[ $(powerprofilesctl get) = 'power-saver' ]]; then powerprofilesctl set balanced; else powerprofilesctl set power-saver; fi
-      bind = $mainMod SHIFT, W, exec, pkill hyprpaper
-      bind = $mainMod SHIFT, B, exec, rfkill toggle bluetooth
-      bind = $mainMod SHIFT, R, exec, nmcli d wifi rescan
-      bind = $mainMod SHIFT, G, exec, swaylock
-      bind = $mainMod, E, exec, $fileManager
-      bind = $mainMod, V, togglefloating,
-      bind = $mainMod, R, exec, $menu
-      bind = $mainMod, P, pseudo, # dwindle
-      bind = $mainMod, J, togglesplit, # dwindle
+          # Scroll through existing workspaces with mainMod + scroll
+          "$mainMod, mouse_down, workspace, e+1"
+          "$mainMod, mouse_up, workspace, e-1"
 
-      # Move focus with mainMod + arrow keys
-      # bind = $mainMod, left, layoutmsg, cycleprev
-      # bind = $mainMod, right, layoutmsg, cyclenext
-      # bind = $mainMod, up, layoutmsg, cycleprev
-      # bind = $mainMod, down, layoutmsg, cyclenext
-      bind = $mainMod, H, layoutmsg, cycleprev
-      bind = $mainMod, L, layoutmsg, cyclenext
-      bind = $mainMod, K, layoutmsg, cycleprev
-      bind = $mainMod, J, layoutmsg, cyclenext
 
-      # Move window mainMod + arrow keys
-      # bind = $mainMod SHIFT, left, layoutmsg, swapprev
-      # bind = $mainMod SHIFT, right, layoutmsg, swapnext
-      # bind = $mainMod SHIFT, up, layoutmsg, swapprev
-      # bind = $mainMod SHIFT, down, layoutmsg, swapnext
-      bind = $mainMod SHIFT, H, layoutmsg, swapprev
-      bind = $mainMod SHIFT, L, layoutmsg, swapnext
-      bind = $mainMod SHIFT, K, layoutmsg, swapprev
-      bind = $mainMod SHIFT, J, layoutmsg, swapnext
+          ", XF86AudioRaiseVolume, exec, ${pkgs.pamixer}/bin/pamixer -i 5"
+          ", XF86AudioLowerVolume, exec, ${pkgs.pamixer}/bin/pamixer -d 5"
+          ", XF86AudioMicMute, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t"
+          ", XF86AudioMute, exec, ${pkgs.pamixer}/bin/pamixer -t"
+          ", XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause"
+          ", XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause"
+          ", XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl -a next"
+          ", XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl -a previous"
+          ", XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-"
+          ", XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+"
+          ", Print, exec, ${pkgs.grim}/bin/grim \"$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir PICTURES)/$(date +'%s_grim.png')\""
 
-      # Switch workspaces with mainMod + [0-9]
-      bind = $mainMod, 1, workspace, 1
-      bind = $mainMod, 2, workspace, 2
-      bind = $mainMod, 3, workspace, 3
-      bind = $mainMod, 4, workspace, 4
-      bind = $mainMod, 5, workspace, 5
-      bind = $mainMod, 6, workspace, 6
-      bind = $mainMod, 7, workspace, 7
-      bind = $mainMod, 8, workspace, 8
-      bind = $mainMod, 9, workspace, 9
-      bind = $mainMod, 0, workspace, 10
+          ", XF86HomePage, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-"
+          ", XF86Mail, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+"
 
-      # Move active window to a workspace with mainMod + SHIFT + [0-9]
-      bind = $mainMod SHIFT, 1, movetoworkspace, 1
-      bind = $mainMod SHIFT, 2, movetoworkspace, 2
-      bind = $mainMod SHIFT, 3, movetoworkspace, 3
-      bind = $mainMod SHIFT, 4, movetoworkspace, 4
-      bind = $mainMod SHIFT, 5, movetoworkspace, 5
-      bind = $mainMod SHIFT, 6, movetoworkspace, 6
-      bind = $mainMod SHIFT, 7, movetoworkspace, 7
-      bind = $mainMod SHIFT, 8, movetoworkspace, 8
-      bind = $mainMod SHIFT, 9, movetoworkspace, 9
-      bind = $mainMod SHIFT, 0, movetoworkspace, 10
+          "$mainMod SHIFT, SPACE, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next"
 
-      # Example special workspace (scratchpad)
-      bind = $mainMod, S, togglespecialworkspace, magic
-      bind = $mainMod SHIFT, S, movetoworkspace, special:magic
-
-      # Scroll through existing workspaces with mainMod + scroll
-      bind = $mainMod, mouse_down, workspace, e+1
-      bind = $mainMod, mouse_up, workspace, e-1
-
-      # Move/resize windows with mainMod + LMB/RMB and dragging
-      bindm = $mainMod, mouse:272, movewindow
-      bindm = $mainMod, mouse:273, resizewindow
-
-      bind = , XF86AudioRaiseVolume, exec, ${pkgs.pamixer}/bin/pamixer -i 5
-      bind = , XF86AudioLowerVolume, exec, ${pkgs.pamixer}/bin/pamixer -d 5
-      bind = , XF86AudioMicMute, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t
-      bind = , XF86AudioMute, exec, ${pkgs.pamixer}/bin/pamixer -t
-      bind = , XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause
-      bind = , XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause
-      bind = , XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl -a next
-      bind = , XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl -a previous
-      bind = , XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
-      bind = , XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
-      bind = , Print, exec, ${pkgs.grim}/bin/grim "$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir PICTURES)/$(date +'%s_grim.png')"
-
-      bind = , XF86HomePage, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
-      bind = , XF86Mail, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+
-
-      bind = $mainMod SHIFT, SPACE, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next
-
-      bind = $mainMod, F, fullscreen, 0
-      bind = $mainMod, M, fullscreen, 1
-      bind = $mainMod SHIFT, M, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t
-    '';
+          "$mainMod, F, fullscreen, 0"
+          "$mainMod, M, fullscreen, 1"
+          "$mainMod SHIFT, M, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t"
+        ];
+        bindm = [
+          # Move/resize windows with mainMod + LMB/RMB and dragging
+          "$mainMod, mouse:272, movewindow"
+          "$mainMod, mouse:273, resizewindow"
+        ];
+      };
+    };
 
     programs.waybar = {
       enable = true;
+      systemd.enable = true;
       settings = {
         mainBar = {
           layer = "top";
           position = "top";
           margin = "0 13 0 18";
           spacing = 8;
-          modules-left = [ "hyprland/language" "hyprland/workspaces" ];
+          modules-left = [ "hyprland/workspaces" ];
           modules-center = [ "custom/clock" ];
           modules-right = [ "pulseaudio" "cpu" "memory" "network" "bluetooth" "power-profiles-daemon" "backlight" "battery" "tray" ];
           "custom/clock" = {
@@ -1139,13 +1067,6 @@ let
             format-icons = [ "" "" "" "" "" ];
           };
 
-          "hyprland/language" = {
-            format = "{}";
-            format-en = "EN";
-            format-it = "IT";
-            keyboard = "at-translated-set-2-keyboard";
-          };
-
           tray = {
             icon-size = 16;
             spacing = 0;
@@ -1199,44 +1120,28 @@ let
         }
       '';
     };
-    programs.wofi = {
+
+    services.swaync.enable = true;
+    programs.swaylock = {
+      package = null;
+      settings = { color = "333333"; };
+    };
+    services.hyprpaper = {
       enable = true;
       settings = {
-        hide_scroll = true;
-        show = "drun";
-        width = "30%";
-        lines = 8;
-        line_wrap = "word";
-        term = "foot";
-        allow_markup = true;
-        always_parse_args = false;
-        show_all = true;
-        print_command = true;
-        layer = "overlay";
-        allow_images = true;
-        sort_order = "alphabetical";
-        gtk_dark = true;
-        prompt = "";
-        image_size = 20;
-        display_generic = false;
-        location = "center";
-        key_expand = "Tab";
-        insensitive = true;
+        preload = [ "${./wallpapers/moon.jpg}" ];
+        wallpaper = [ ",${./wallpapers/moon.jpg}" ];
       };
     };
-    home.file.".config/wofi/style.css".source = ./wofi.css;
-    home.file.".config/hypr/hypridle.conf".text = ''
-      general {
-          lock_cmd = pidof swaylock || swaylock       # avoid starting multiple hyprlock instances.
-          before_sleep_cmd = loginctl lock-session    # lock before suspend.
-          after_sleep_cmd = hyprctl dispatch dpms on  # to avoid having to press a key twice to turn on the display.
-      }
-    '';
-    home.file.".config/swaylock/config".text = "color=333333";
-    home.file.".config/hypr/hyprpaper.conf".text = ''
-      preload = ${./wallpapers/flame.jpg}
-      wallpaper = ,${./wallpapers/flame.jpg}
-    '';
+    services.gammastep = {
+      enable = true;
+      temperature = rec{
+        day = 3700;
+        night = day;
+      };
+      dawnTime = "6:00-7:45";
+      duskTime = "18:35-20:15";
+    };
     programs.fuzzel = {
       enable = true;
       settings = {
@@ -1256,8 +1161,10 @@ let
       };
     };
 
-    services.syncthing.enable = true;
-    services.syncthing.extraOptions = [ "--config=${home.homeDirectory}/backup/syncthing" "--data=${home.homeDirectory}/.local/state/syncthing" ];
+    services.syncthing = {
+      enable = true;
+      extraOptions = [ "--config=${home.homeDirectory}/backup/syncthing" "--data=${home.homeDirectory}/.local/state/syncthing" ];
+    };
     services.mpd = {
       enable = true;
       musicDirectory = "${config.xdg.userDirs.music}";
@@ -1376,13 +1283,13 @@ let
       set history filename ~/.local/state/gdb_history
     '';
 
-    home.file.".config/pypoetry/config.toml".text = lib.generators.toINI
-      { }
-      {
-        virtualenvs = {
-          in-project = true;
-        };
+    programs.poetry = {
+      enable = true;
+      package = null;
+      settings = {
+        virtualenvs.in-project = true;
       };
+    };
 
     dconf.settings = {
       "org/gnome/desktop/interface" = {
@@ -1478,90 +1385,92 @@ let
       executable = true;
     };
 
-    home.file.".local/share/flatpak/overrides/ca.desrt.dconf-editor".text = ''
-      [Context]
-      filesystems=~/.config/dconf/user:ro
-      [Session Bus Policy]
-      org.freedesktop.Flatpak=none
-    '';
-    home.file.".local/share/flatpak/overrides/com.github.tchx84.Flatseal".text = ''
-      [Context]
-      filesystems=/nix/store:ro
-    '';
-    home.file.".local/share/flatpak/overrides/com.obsproject.Studio".text = ''
-      [Context]
-      filesystems=!xdg-config/kdeglobals;xdg-videos;!host;~/backup/Flatpaks/obs-studio
+    xdg.dataFile = {
+      "flatpak/overrides/ca.desrt.dconf-editor".text = ''
+        [Context]
+        filesystems=~/.config/dconf/user:ro
+        [Session Bus Policy]
+        org.freedesktop.Flatpak=none
+      '';
+      "flatpak/overrides/com.github.tchx84.Flatseal".text = ''
+        [Context]
+        filesystems=/nix/store:ro
+      '';
+      "flatpak/overrides/com.obsproject.Studio".text = ''
+        [Context]
+        filesystems=!xdg-config/kdeglobals;xdg-videos;!host;~/backup/Flatpaks/obs-studio
 
-      [Session Bus Policy]
-      org.freedesktop.Flatpak=none
-    '';
-    home.file.".local/share/flatpak/overrides/com.userbottles.bottles".text = ''
-      [Context]
-      filesystems=!xdg-download;~/backup/Flatpaks/bottles
-    '';
-    home.file.".local/share/flatpak/overrides/io.gitlab.librewolf-community".text = ''
-      [Context]
-      devices=all
-      filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro
+        [Session Bus Policy]
+        org.freedesktop.Flatpak=none
+      '';
+      "flatpak/overrides/com.userbottles.bottles".text = ''
+        [Context]
+        filesystems=!xdg-download;~/backup/Flatpaks/bottles
+      '';
+      "flatpak/overrides/io.gitlab.librewolf-community".text = ''
+        [Context]
+        devices=all
+        filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro
 
-      [Environment]
-      PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-    '';
-    home.file.".local/share/flatpak/overrides/org.gimp.GIMP".text = ''
-      [Context]
-      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/tmp;!xdg-config/gtk-3.0;!xdg-config/GIMP;xdg-pictures;!host
-    '';
-    home.file.".local/share/flatpak/overrides/org.gnome.Loupe".text = ''
-      [Context]
-      filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!host
-    '';
-    home.file.".local/share/flatpak/overrides/org.gnome.Evince".text = ''
-      [Context]
-      filesystems=!/run/media;!xdg-run/gvfsd;!/media;!home
-    '';
-    home.file.".local/share/flatpak/overrides/org.gnome.FileRoller".text = ''
-      [Context]
-      filesystems=!home
-    '';
-    home.file.".local/share/flatpak/overrides/org.gnome.TextEditor".text = ''
-      [Context]
-      filesystems=!xdg-run/gvfsd;!host
-    '';
-    home.file.".local/share/flatpak/overrides/org.keepassxc.KeePassXC".text = ''
-      [Context]
-      devices=!all;dri
-      filesystems=!xdg-config/kdeglobals;/nix/store:ro;!host
-    '';
-    home.file.".local/share/flatpak/overrides/org.prismlauncher.PrismLauncher".text = ''
-      [Context]
-      filesystems=~/backup/Games/Minecraft
-    '';
-    home.file.".local/share/flatpak/overrides/com.calibre_ebook.calibre".text = ''
-      [Context]
-      filesystems=~/backup/Flatpaks/calibre;~/backup/Books;!host
-    '';
-    home.file.".local/share/flatpak/overrides/eu.betterbird.Betterbird".text = ''
-      [Context]
-      filesystems=~/backup/Flatpaks/.thunderbird
-    '';
-    home.file.".local/share/flatpak/overrides/io.github.ungoogled_software.ungoogled_chromium".text = ''
-      [Context]
-      filesystems=!xdg-desktop;!xdg-run/pipewire-0;!~/.local/share/icons;!xdg-run/dconf;!xdg-download;!~/.config/dconf;!/run/.heim_org.h5l.kcm-socket;!~/.local/share/applications;!/tmp;!~/.config/kioslaverc;~/Downloads;/nix/store:ro;~/.local/flatpak:ro
+        [Environment]
+        PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
+      '';
+      "flatpak/overrides/org.gimp.GIMP".text = ''
+        [Context]
+        filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/tmp;!xdg-config/gtk-3.0;!xdg-config/GIMP;xdg-pictures;!host
+      '';
+      "flatpak/overrides/org.gnome.Loupe".text = ''
+        [Context]
+        filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!host
+      '';
+      "flatpak/overrides/org.gnome.Evince".text = ''
+        [Context]
+        filesystems=!/run/media;!xdg-run/gvfsd;!/media;!home
+      '';
+      "flatpak/overrides/org.gnome.FileRoller".text = ''
+        [Context]
+        filesystems=!home
+      '';
+      "flatpak/overrides/org.gnome.TextEditor".text = ''
+        [Context]
+        filesystems=!xdg-run/gvfsd;!host
+      '';
+      "flatpak/overrides/org.keepassxc.KeePassXC".text = ''
+        [Context]
+        devices=!all;dri
+        filesystems=!xdg-config/kdeglobals;/nix/store:ro;!host
+      '';
+      "flatpak/overrides/org.prismlauncher.PrismLauncher".text = ''
+        [Context]
+        filesystems=~/backup/Games/Minecraft
+      '';
+      "flatpak/overrides/com.calibre_ebook.calibre".text = ''
+        [Context]
+        filesystems=~/backup/Flatpaks/calibre;~/backup/Books;!host
+      '';
+      "flatpak/overrides/eu.betterbird.Betterbird".text = ''
+        [Context]
+        filesystems=~/backup/Flatpaks/.thunderbird
+      '';
+      "flatpak/overrides/io.github.ungoogled_software.ungoogled_chromium".text = ''
+        [Context]
+        filesystems=!xdg-desktop;!xdg-run/pipewire-0;!~/.local/share/icons;!xdg-run/dconf;!xdg-download;!~/.config/dconf;!/run/.heim_org.h5l.kcm-socket;!~/.local/share/applications;!/tmp;!~/.config/kioslaverc;~/Downloads;/nix/store:ro;~/.local/flatpak:ro
 
-      [Environment]
-      PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
-    '';
-    home.file.".local/share/flatpak/overrides/org.virt_manager.virt-manager".text = ''
-      [Environment]
-      LIBVIRT_DEFAULT_URI=qemu:///system
-    '';
-    home.file.".local/share/flatpak/overrides/page.codeberg.dnkl.foot".text = ''
-      [Context]
-      filesystems=xdg-config/foot:ro;~/.local/flatpak:ro;/nix/store:ro
+        [Environment]
+        PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
+      '';
+      "flatpak/overrides/org.virt_manager.virt-manager".text = ''
+        [Environment]
+        LIBVIRT_DEFAULT_URI=qemu:///system
+      '';
+      "flatpak/overrides/page.codeberg.dnkl.foot".text = ''
+        [Context]
+        filesystems=xdg-config/foot:ro;~/.local/flatpak:ro;/nix/store:ro
 
-      [Environment]
-      PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
-    '';
+        [Environment]
+        PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
+      '';
+    };
 
 
     home.file.".var/app/org.keepassxc.KeePassXC/config/keepassxc/keepassxc.ini".text = ''
