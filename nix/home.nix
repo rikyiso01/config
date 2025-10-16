@@ -54,7 +54,6 @@ let
       brightnessctl
       playerctl
       trash-cli
-      distrobox
       wl-clipboard
       nixVersions.latest
       rclone
@@ -375,8 +374,8 @@ let
       PAGER = "less";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
+      DIFFPROG = "${home.homeDirectory}/.nix-profile/bin/vimdiff";
       EDITOR = "${home.homeDirectory}/.nix-profile/bin/nvim";
-      DIFFPROG = "${pkgs.vim}/bin/vimdiff";
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
@@ -403,7 +402,6 @@ let
       RCLONE_PASSWORD_COMMAND = "password show -a Password rclone";
     };
 
-    programs.vim.enable = true;
     fonts.fontconfig.enable = true;
     programs.bat.enable = true;
     programs.ripgrep.enable = true;
@@ -425,7 +423,7 @@ let
     };
     programs.direnv.enable = true;
 
-    # TODO: distrobox nix
+    programs.distrobox.enable = true;
     home.file.".config/distrobox/distrobox.conf".text = ''
       container_generate_entry=0
       container_manager="podman"
@@ -449,7 +447,6 @@ let
         wget = "wget --hsts-file=$XDG_DATA_HOME/wget-hsts";
         nix = "LD_LIBRARY_PATH='' nix=(which nix) $nix";
         neofetch = "fastfetch";
-        vim = "$VISUAL";
         flake-init = "nix flake init -t github:nix-community/nix-direnv";
         music-update = "nix run ${home.homeDirectory}/backup/Documents/Projects/Python/musicmanager auto Music Music2 Music3 Music4 Bardify Clownpierce Dream FlameFrags Halloween";
         timg = "timg -ps";
@@ -481,6 +478,9 @@ let
     # TODO: vimdiff and nix refactoring
     programs.neovim = {
       enable = true;
+      viAlias = true;
+      vimAlias = true;
+      vimdiffAlias = true;
       extraLuaConfig = ''
         vim.opt.termguicolors = true
         local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
