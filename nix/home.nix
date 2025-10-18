@@ -1365,8 +1365,8 @@ let
       };
     };
     services.mpd-mpris.enable = true;
-    programs.ncmpcpp.enable = true;
     services.wl-clip-persist.enable = true;
+    programs.ncmpcpp.enable = true;
 
     systemd.user.services = {
       startup = {
@@ -1764,7 +1764,6 @@ let
         networkmanager-openvpn
         sudo
         nix
-        plymouth
         greetd
         greetd-tuigreet
         hyprland

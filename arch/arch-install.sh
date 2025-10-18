@@ -31,7 +31,7 @@ mount /dev/mapper/root /mnt
 
 mkfs.fat -F32 "${part}${name}1"
 mount --mkdir "${part}${name}1" /mnt/boot
-pacstrap -K /mnt base linux linux-firmware sof-firmware networkmanager zsh sudo plymouth
+pacstrap -K /mnt base linux linux-firmware sof-firmware networkmanager zsh sudo
 genfstab -U /mnt > /mnt/etc/fstab
 
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime
@@ -42,7 +42,7 @@ echo 'LANG=en_US.UTF-8' > /mnt/etc/locale.conf
 echo 'KEYMAP=us' > /mnt/etc/vconsole.conf
 echo 'arch' > /mnt/etc/hostname
 cat > /mnt/etc/mkinitcpio.conf.d/encryption.conf <<EOF
-HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth sd-encrypt filesystems fsck)
+HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck)
 EOF
 arch-chroot /mnt mkinitcpio -P
 arch-chroot /mnt useradd -m -G wheel -s /bin/zsh riky
