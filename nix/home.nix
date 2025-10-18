@@ -1773,6 +1773,7 @@ let
         networkmanager-openvpn
         sudo
         nix
+        plymouth
         greetd
         greetd-tuigreet
         hyprland
@@ -1849,7 +1850,8 @@ let
       onChange = "sudo cp ${./pam_fde_boot_pw.so} /lib/security/pam_fde_boot_pw.so";
     };
     home.file.".local/nix-sources/greetd" = {
-      text = ''[terminal]
+      text = ''
+        [terminal]
         vt = 1
         [default_session]
         command = "/usr/bin/tuigreet --remember --cmd /usr/bin/Hyprland"
@@ -1857,7 +1859,7 @@ let
         [initial_session]
         command = "/usr/bin/Hyprland"
         user = "riky"
-        '';
+      '';
       onChange = "sudo mkdir -p /etc/greetd && sudo tee /etc/greetd/config.toml < $HOME/.local/nix-sources/greetd";
     };
     home.file.".local/nix-sources/nix.conf" = {
