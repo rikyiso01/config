@@ -414,7 +414,7 @@ let
       PAGER = "less";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      DIFFPROG = "${home.homeDirectory}/.nix-profile/bin/vimdiff";
+      DIFFPROG = "${home.homeDirectory}/.nix-profile/bin/nvim -d";
       EDITOR = "${home.homeDirectory}/.nix-profile/bin/nvim";
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
@@ -1310,16 +1310,6 @@ let
           valign = "center";
         };
       };
-      extraConfig = ''
-
-
-        # GENERAL
-
-
-        # BACKGROUND
-
-
-      '';
     };
     services.hyprpaper = {
       enable = true;
