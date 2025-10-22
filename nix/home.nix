@@ -1161,20 +1161,26 @@ let
           margin-left: 1rem;
         }
 
-        #battery.plugged,
-        #battery.charging,
         #battery{
             color: @green;
             border-radius: 0 1rem 1rem 0;
             margin-right: 1rem;
         }
 
+        #battery.plugged,
+        #battery.charging{
+            background-color: #26A65B;
+            color: @text;
+        }
+
         #battery.warning:not(.charging) {
-            color: @yellow;
+            background-color: #FFBE61;
+            color: @text;
         }
 
         #battery.critical:not(.charging) {
-            color: @red;
+            background-color: #F53C3C;
+            color: @text;
         }
 
         #custom-clock {
