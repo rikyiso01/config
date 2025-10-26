@@ -216,16 +216,16 @@ let
 
     programs.git = {
       enable = true;
-      userName = "rikyiso01";
-      userEmail = "31405152+rikyiso01@users.noreply.github.com";
-      signing = {
-        key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
-        signByDefault = true;
-      };
-      extraConfig = {
+      settings = {
+        user.name = "rikyiso01";
+        user.email = "31405152+rikyiso01@users.noreply.github.com";
         init.defaultBranch = "main";
         gpg.format = "ssh";
         credential.helper = "${pkgs.git-credential-keepassxc}/bin/git-credential-keepassxc --git-groups";
+      };
+      signing = {
+        key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
+        signByDefault = true;
       };
       includes = [
         {
@@ -239,7 +239,10 @@ let
           };
         }
       ];
-      delta.enable = true;
+    };
+    programs.delta = {
+      enable = true;
+      enableGitIntegration = true;
     };
     programs.lazygit.enable = true;
 
@@ -1755,7 +1758,7 @@ let
       onChange = ''
         sudo bash -c 'cp ${./udev.rules} /etc/udev/rules.d/40-custom.rules'
         sudo bash -c 'cp ${pkgs.qflipper}/etc/udev/rules.d/42-flipperzero.rules /etc/udev/rules.d/42-flipperzero.rules'
-        sudo bash -c 'cp ${pkgs.android-udev-rules}/lib/udev/rules.d/51-android.rules /etc/udev/rules.d/51-android.rules'
+        sudo bash -c 'cp ${./51-android.rules} /etc/udev/rules.d/51-android.rules'
         sudo udevadm control --reload-rules
         sudo udevadm trigger
       '';
