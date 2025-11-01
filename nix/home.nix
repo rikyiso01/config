@@ -21,7 +21,7 @@ let
       tldr
       man-pages
       man-pages-posix
-      du-dust
+      dust
       dua
       fd
       procs
@@ -58,7 +58,7 @@ let
       nixVersions.latest
       rclone
       rsync
-      mpc-cli
+      mpc
       clock-rs
       yt-dlp
       jq
@@ -1434,7 +1434,7 @@ let
         Service = {
           Type = "oneshot";
           ExecStartPre = "sleep 1";
-          ExecStart = "${pkgs.mpc-cli}/bin/mpc clear";
+          ExecStart = "${pkgs.mpc}/bin/mpc clear";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -1757,7 +1757,7 @@ let
       source = ./udev.rules;
       onChange = ''
         sudo bash -c 'cp ${./udev.rules} /etc/udev/rules.d/40-custom.rules'
-        sudo bash -c 'cp ${pkgs.qflipper}/etc/udev/rules.d/42-flipperzero.rules /etc/udev/rules.d/42-flipperzero.rules'
+        sudo bash -c 'cp ${pkgs.qFlipper}/etc/udev/rules.d/42-flipperzero.rules /etc/udev/rules.d/42-flipperzero.rules'
         sudo bash -c 'cp ${./51-android.rules} /etc/udev/rules.d/51-android.rules'
         sudo udevadm control --reload-rules
         sudo udevadm trigger
