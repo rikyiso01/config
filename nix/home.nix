@@ -1938,7 +1938,7 @@ let
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
         ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.github.ungoogled_software.ungoogled_chromium/current/active/files/chromium/policies/policies/managed"
-        ln -sfT "${./ungoogled_chromium.jsonc}" "${home.homeDirectory}/.local/share/flatpak/app/io.github.ungoogled_software.ungoogled_chromium/current/active/files/chromium/policies/policies/managed/policies.json"
+        # ln -sfT "${./ungoogled_chromium.jsonc}" "${home.homeDirectory}/.local/share/flatpak/app/io.github.ungoogled_software.ungoogled_chromium/current/active/files/chromium/policies/policies/managed/policies.json"
 
         mkdir -p "$HOME/.var/app/org.prismlauncher.PrismLauncher/data"
         ln -sfT "$HOME/backup/Games/Minecraft" "$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
