@@ -1,0 +1,8 @@
+procs:
+  update:
+    cmd: ["bash", "../nix/update.sh"]
+  backup:
+    cmd: ["bash", "./backup.sh"]
+  backup-homeassistant:
+    cmd: ["bash", "/home/riky/backup/Documents/Projects/nix/servers/backup.sh"]
+
