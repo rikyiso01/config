@@ -4,5 +4,10 @@ procs:
   backup:
     cmd: ["bash", "./backup.sh"]
   backup-homeassistant:
-    cmd: ["bash", "/home/riky/backup/Documents/Projects/nix/servers/backup.sh"]
-
+    cmd:
+      [
+        "just",
+        "-f",
+        "/home/riky/backup/Documents/Projects/nix/servers/justfile",
+        "backup",
+      ]

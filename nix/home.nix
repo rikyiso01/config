@@ -66,16 +66,13 @@ let
       libnotify
       timg
       ffmpeg
-      restic
       nixgl.nixGLIntel
       nixgl.nixVulkanIntel
       uutils-coreutils-noprefix
-      mprocs
       wev
       zip
       unzip
       # pwndbg.packages.x86_64-linux.pwndbg
-      # (builtins.trace pwndbg.packages.x86_64-linux.pwndbg mprocs)
     ];
 
     accounts = {
