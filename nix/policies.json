@@ -14,7 +14,7 @@
     "DisableDeveloperTools": false,
     "DNSOverHTTPS": {
       "Enabled": true,
-      "ProviderURL": "https://freedns.controld.com/uncensored",
+      "ProviderURL": "https://dns.nextdns.io",
       "Locked": false,
       "Fallback": false
     },
