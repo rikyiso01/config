@@ -47,7 +47,6 @@ let
       git-ignore
       ascii
       w3m
-      bluetuith
       fastfetch
       pamixer
       pavucontrol
@@ -1373,6 +1372,7 @@ let
     services.mpd-mpris.enable = true;
     services.wl-clip-persist.enable = true;
     programs.ncmpcpp.enable = true;
+    programs.bluetuith.enable = true;
 
     systemd.user.services = {
       startup = {
