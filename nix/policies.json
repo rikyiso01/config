@@ -15,7 +15,7 @@
     "DNSOverHTTPS": {
       "Enabled": true,
       "ProviderURL": "https://freedns.controld.com/uncensored",
-      "Locked": true,
+      "Locked": false,
       "Fallback": false
     },
     "NoDefaultBookmarks": true,
