@@ -498,6 +498,13 @@ let
           fish_default_key_bindings -M insert
           fish_vi_key_bindings --no-erase insert
         '';
+        envsource = ''
+          for line in (cat $argv | grep -v '^#')
+              set item (string split -m 1 '=' $line)
+              set -gx $item[1] ( echo $item[2] | tr -d '"' )
+              echo "Exported key $item[1]"
+          end
+        '';
       };
     };
     programs.starship = {
