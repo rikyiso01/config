@@ -281,8 +281,8 @@ let
                 set -g @catppuccin_window_status_style "rounded"
                 set -g status-left ""
                 set -g status-right ""
-                set -ogq @catppuccin_window_text " #{pane_current_command}"
-                set -ogq @catppuccin_window_current_text " #{pane_current_command}"
+                set -ogq @catppuccin_window_text " #{b:pane_current_path}"
+                set -ogq @catppuccin_window_current_text " #{b:pane_current_path}"
                 run ${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux
 
         # Ensure that everything on the right side of the status line
@@ -579,12 +579,11 @@ let
         vim.lsp.enable("solargraph")
         vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.csharp-ls}/bin/csharp-ls"}})
         vim.lsp.enable("csharp_ls")
-        vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"}})
+        vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"},init_options={typescript={tsdk="${pkgs.nodePackages.typescript}/lib/node_modules/typescript/lib"}}})
         vim.lsp.enable("astro")
         vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.csharp-ls}/bin/csharp-ls"}})
         vim.lsp.enable("csharp_ls")
 
-        -- require("toggleterm").setup{open_mapping=[[<Leader>t]],direction="float"}
         require("lualine").setup()
         require('nvim-autopairs').setup{}
         require("formatter").setup{
@@ -593,20 +592,20 @@ let
                 haskell={function()return {exe="${pkgs.haskellPackages.fourmolu}/bin/fourmolu",args={"--no-cabal","-"},stdin=true} end},
                 java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
                 kotlin={function()return {exe="${pkgs.ktfmt}/bin/ktfmt",args={"-"},stdin=true} end},
-                javascript={function()return {exe="prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
-                typescript={function()return {exe="prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
-                typescriptreact={function()return {exe="prettier",args={"--stdin-filepath=test.tsx"},stdin=true} end},
-                css={function()return {exe="prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
-                json={function()return {exe="prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
-                jsonc={function()return {exe="prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
-                yaml={function()return {exe="prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
-                markdown={function()return {exe="prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
+                javascript={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
+                typescript={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
+                typescriptreact={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.tsx"},stdin=true} end},
+                css={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
+                json={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
+                jsonc={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
+                yaml={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
+                markdown={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
                 xml={function()return {exe="${pkgs.html-tidy}/bin/tidy",args={"-i","-xml"},stdin=true} end},
                 html={function()return {exe="${pkgs.html-tidy}/bin/tidy",args={"-i"},stdin=true} end},
                 nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
                 bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
-                dockerfile={function()return {exe="${pkgs.dockfmt}/bin/dockfmt",args={"fmt"},stdin=true} end},
-                -- toml={function()return {exe="prettier",args={"--stdin-filepath=test.toml"},stdin=true} end},
+                dockerfile={function()return {exe="${pkgs.dockerfmt}/bin/dockerfmt",stdin=true} end},
+                toml={function()return {exe="${pkgs.taplo}/bin/taplo",args={"fmt","-"},stdin=true} end},
                 arduino={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                 c={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
                 cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
@@ -616,10 +615,10 @@ let
                 just={function()return {exe="${pkgs.just}/bin/just",args={"--dump"},stdin=true} end},
                 ruby={function()return {exe="${pkgs.rufo}/bin/rufo",args={"--simple-exit"},stdin=true} end},
                 cs={function()return {exe="${pkgs.csharpier}/bin/dotnet-csharpier",stdin=true} end},
+                astro={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--plugin=${pkgs.vscode-extensions.astro-build.astro-vscode}/share/vscode/extensions/astro-build.astro-vscode/node_modules/prettier-plugin-astro/dist/index.js","--stdin-filepath=test.astro"},stdin=true} end},
             }
         }
         vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
-        -- require("Comment").setup{}
         require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
         require("trouble").setup{icons={},warn_no_results = false,open_no_results = true,preview={type="main",size={width=0.8}}}
         vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
@@ -777,7 +776,6 @@ let
       ];
       extraPackages = with pkgs; [
         haskell-language-server
-        nodePackages.prettier
         ripgrep
         nodePackages.diagnostic-languageserver
         wl-clipboard
