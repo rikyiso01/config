@@ -490,6 +490,7 @@ let
         music-update = "nix run ${home.homeDirectory}/backup/Documents/Projects/Python/musicmanager auto Music Music2 Music3 Music4 Bardify Clownpierce Dream FlameFrags Halloween Wemmbu";
         timg = "timg -ps";
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh=(which gh) $gh";
+        cb = "${pkgs.forgejo-cli}/bin/fj -H codeberg.org";
         # yt = ''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
       };
       functions = {
@@ -1706,6 +1707,7 @@ let
       ClearClipboard=false
       IconDownloadFallback=true
       LockDatabaseScreenLock=false
+      LockDatabaseIdle=false
     '';
 
     home.file.".local/nix-sources/flatpak" = {
