@@ -65,8 +65,6 @@ let
       libnotify
       timg
       ffmpeg
-      nixgl.nixGLIntel
-      nixgl.nixVulkanIntel
       uutils-coreutils-noprefix
       wev
       zip

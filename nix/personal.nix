@@ -3,6 +3,12 @@
 let
   homeManager = rec {
     home.homeDirectory = "/home/riky";
+
+    home.packages = with pkgs; [
+      nixgl.nixGLIntel
+      nixgl.nixVulkanIntel
+    ];
+
     accounts = {
       calendar = {
         basePath = "${home.homeDirectory}/backup/Calendar";
