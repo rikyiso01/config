@@ -8,6 +8,7 @@ let
       nixgl.nixGLIntel
       nixgl.nixVulkanIntel
     ];
+    nixpkgs.config.allowUnfreePredicate = (pkg: true);
 
     accounts = {
       calendar = {

@@ -599,7 +599,6 @@ let
 
     programs.home-manager.enable = true;
     home.stateVersion = "22.05";
-    nixpkgs.config.allowUnfreePredicate = (pkg: true);
     xdg.configFile."nixpkgs/config.nix".text = "{ allowUnfree = true; android_sdk.accept_license = true; }";
     home.enableNixpkgsReleaseCheck = false;
 
