@@ -13,9 +13,9 @@
       riky = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          nix-index-database.homeModules.nix-index
           nixos-wsl.nixosModules.default
           home-manager.nixosModules.home-manager
+          nix-index-database.nixosModules.nix-index
           ./configuration.nix
           {
             home-manager.useGlobalPkgs = true;
