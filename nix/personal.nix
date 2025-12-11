@@ -1279,6 +1279,11 @@ let
     };
 
 
+    nix = {
+      package = pkgs.nix;
+    };
+
+
     home.activation = {
       setup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         rmdir "$HOME/Documents" > /dev/null 2> /dev/null || true
