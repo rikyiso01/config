@@ -20,6 +20,7 @@
         extraSpecialArgs = { pwndbg = pwndbg; };
         modules = [
           ./home.nix
+          ./personal.nix
           nix-index-database.homeModules.nix-index
           {
             programs.nix-index-database.comma.enable = true;
