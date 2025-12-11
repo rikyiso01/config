@@ -17,7 +17,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.riky = ../../home.nix;
+            home-manager.users.riky = ../nix/home.nix;
           }
         ];
       };
