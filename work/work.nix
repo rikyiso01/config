@@ -20,8 +20,8 @@
     ];
   };
   home.sessionVariables = {
-    DIFFPROG = "${pkgs.neovim}/bin/nvim -d";
-    EDITOR = "${pkgs.neovim}/bin/nvim";
+    DIFFPROG = "/etc/profiles/per-user/riky/bin/nvim -d";
+    EDITOR = "/etc/profiles/per-user/riky/bin/nvim";
     VISUAL = "$EDITOR";
     SUDO_EDITOR = "$VISUAL";
   };
