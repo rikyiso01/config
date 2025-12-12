@@ -19,4 +19,10 @@
       }
     ];
   };
+  home.sessionVariables = {
+    DIFFPROG = "${pkgs.neovim}/bin/nvim -d";
+    EDITOR = "${pkgs.neovim}/bin/nvim";
+    VISUAL = "$EDITOR";
+    SUDO_EDITOR = "$VISUAL";
+  };
 }

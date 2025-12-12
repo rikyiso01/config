@@ -10,6 +10,13 @@ let
     ];
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
 
+    home.sessionVariables = {
+      DIFFPROG = "${home.homeDirectory}/.nix-profile/bin/nvim -d";
+      EDITOR = "${home.homeDirectory}/.nix-profile/bin/nvim";
+      VISUAL = "$EDITOR";
+      SUDO_EDITOR = "$VISUAL";
+    };
+
     accounts = {
       calendar = {
         basePath = "${home.homeDirectory}/backup/Calendar";
