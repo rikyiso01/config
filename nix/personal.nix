@@ -147,11 +147,9 @@ let
     };
 
     programs.git = {
-      enable = true;
       settings = {
         user.name = "rikyiso01";
-        user.email = "31405152+rikyiso01@users.noreply.github.com";
-        init.defaultBranch = "main";
+        user.email = "rikyiso01@noreply.codeberg.org";
         gpg.format = "ssh";
         credential.helper = "${pkgs.git-credential-keepassxc}/bin/git-credential-keepassxc --git-groups";
       };

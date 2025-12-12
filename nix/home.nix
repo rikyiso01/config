@@ -72,6 +72,12 @@ let
       # pwndbg.packages.x86_64-linux.pwndbg
     ];
 
+    programs.git = {
+      enable = true;
+      settings = {
+        init.defaultBranch = "main";
+      };
+    };
     programs.delta = {
       enable = true;
       enableGitIntegration = true;

@@ -3,11 +3,20 @@
 {
   imports = [ ../nix/home.nix ];
   programs.git = {
-    enable = true;
     settings = {
-      user.name = "rikyiso01";
-      user.email = "rikyiso01@noreply.codeberg.org";
-      init.defaultBranch = "main";
+      user.name = "r.isola";
+      user.email = "r.isola@reply.it";
     };
+    includes = [
+      {
+        condition = "gitdir:/mnt/c/Users/r.isola/Documents/config/";
+        contents = {
+          user = {
+            name = "rikyiso01";
+            email = "rikyiso01@noreply.codeberg.org";
+          };
+        };
+      }
+    ];
   };
 }
