@@ -146,6 +146,16 @@ let
       glob = "*/*";
     };
 
+    programs.fish = {
+      shellAliases = {
+        music-update = "nix run ${home.homeDirectory}/backup/Documents/Projects/Python/musicmanager auto Music Music2 Music3 Music4 Bardify Clownpierce Dream FlameFrags Halloween Wemmbu";
+        timg = "timg -ps";
+        gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh=(which gh) $gh";
+        cb = "${pkgs.forgejo-cli}/bin/fj -H codeberg.org";
+        # yt = ''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
+      };
+    };
+
     programs.git = {
       settings = {
         user.name = "rikyiso01";
