@@ -215,10 +215,6 @@ let
       PAGER = "less";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       MANROFFOPT = "-c";
-      DIFFPROG = "${home.homeDirectory}/.nix-profile/bin/nvim -d";
-      EDITOR = "${home.homeDirectory}/.nix-profile/bin/nvim";
-      VISUAL = "$EDITOR";
-      SUDO_EDITOR = "$VISUAL";
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
       NIXPKGS_ACCEPT_ANDROID_SDK_LICENSE = "1";
       ANDROID_HOME = "${config.xdg.dataHome}/android";
