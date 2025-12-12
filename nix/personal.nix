@@ -238,6 +238,18 @@ let
       };
       gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
     };
+    xdg = {
+      enable = true;
+      userDirs = {
+        createDirectories = true;
+        enable = true;
+        documents = "${home.homeDirectory}/backup/Documents";
+        music = "${home.homeDirectory}/backup/phone/Music";
+      };
+      portal = {
+        config.common.default = "hyprland;gtk";
+      };
+    };
 
     wayland.windowManager.hyprland = {
       enable = true;

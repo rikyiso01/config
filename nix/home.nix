@@ -606,19 +606,6 @@ let
 
     news.display = "show";
 
-    xdg = {
-      enable = true;
-      userDirs = {
-        createDirectories = true;
-        enable = true;
-        documents = "${home.homeDirectory}/backup/Documents";
-        music = "${home.homeDirectory}/backup/phone/Music";
-      };
-      portal = {
-        config.common.default = "hyprland;gtk";
-      };
-
-    };
 
     home.file.".gdbinit".text = ''
       source ${pkgs.gef}/share/gef/gef.py
