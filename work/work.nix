@@ -5,7 +5,7 @@
   programs.git = {
     settings = {
       user.name = "r.isola";
-      user.email = "r.isola@reply.it";
+      user.email = "249273394+r-isola@users.noreply.github.com";
     };
     includes = [
       {
