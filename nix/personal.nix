@@ -11,6 +11,7 @@ let
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
 
     home.sessionVariables = {
+      DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
       DIFFPROG = "${home.homeDirectory}/.nix-profile/bin/nvim -d";
       EDITOR = "${home.homeDirectory}/.nix-profile/bin/nvim";
       VISUAL = "$EDITOR";
