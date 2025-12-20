@@ -1144,7 +1144,8 @@ let
         page.codeberg.dnkl.foot
         org.kde.kdenlive
         org.gnome.Nautilus.Devel
-        org.remmina.Remmina'';
+        org.remmina.Remmina
+        com.sejda.Sejda'';
       onChange = ''
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
         flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
