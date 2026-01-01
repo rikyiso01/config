@@ -28,7 +28,7 @@ let
       p7zip
       curlie
       xh
-      netcat-openbsd
+      netcat
       iputils
       binutils
       fira-code
