@@ -270,7 +270,7 @@ let
         exec-once = [
           "/usr/libexec/hyprpolkitagent"
           "[workspace 1 silent; maximize] $terminal"
-          "[workspace 1 silent; noinitialfocus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community"
+          "[workspace 1 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community"
           "secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@"
         ];
         "$menu" = "XDG_DATA_DIRS=${home.homeDirectory}/.local/share/flatpak/exports/share ${pkgs.fuzzel}/bin/fuzzel";
@@ -336,13 +336,14 @@ let
         };
         misc = {
           force_default_wallpaper = 0; # Set to 0 or 1 to disable the anime mascot wallpapers
+          disable_watchdog_warning = true;
           vfr = true;
         };
         device = {
           name = "epic-mouse-v1";
           sensitivity = -0.5;
         };
-        windowrulev2 = "suppressevent maximize, class:.*";
+        windowrule = "suppress_event maximize, match:class .*";
         "$mainMod" = "SUPER";
         bind = [
           "$mainMod, RETURN, exec, $terminal"
