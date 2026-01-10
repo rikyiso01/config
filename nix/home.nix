@@ -229,7 +229,6 @@ let
       SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/gcr/ssh";
       XCURSOR_THEME = "Bibata-Modern-Amber";
       XCURSOR_SIZE = "36";
-      # MPD_HOST = "/run/user/1000/mpd/socket";
       RESTIC_PASSWORD_COMMAND = "password show -a password 'Backup decryption pw'";
       RESTIC_REPOSITORY = "/run/media/riky/90304ff6-a81a-4307-be0f-ab65846845ea/backup";
       RESTIC_REPOSITORY2 = "/run/media/riky/Hard\ Disk/backup";
