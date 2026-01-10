@@ -17,6 +17,7 @@ home-manager switch --flake .
 sudo -E pacdiff
 
 sudo pacman -Syu
+echo "Server = https://archive.archlinux.org/repos/$(date '+%Y/%m/%d')/\$repo/os/\$arch" > ./mirrorlist
 
 sudo -E pacdiff
 
