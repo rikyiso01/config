@@ -264,7 +264,13 @@ let
       package = null;
       systemd.enable = true;
       settings = {
-        monitor = [ "eDP-1,1920x1080@60,auto,1" ",preferred,auto,1,mirror,eDP-1" ];
+        monitor = [
+          "eDP-1,1920x1080@60,auto,1"
+          ",preferred,auto,1,mirror,eDP-1"
+          "desc:Ancor Communications Inc VE228 FALMQS019252,1920x1080@60,-1920x0,1"
+          "desc:HannStar Display Corp HP227DCB 1234567890123,1920x1080@60,-1920x0,1"
+        ];
+        workspace = [ "2,monitor:HDMI-A-1" ];
         "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
         "$fileManager" = "/usr/bin/flatpak run org.gnome.Nautilus.Devel";
         exec-once = [
@@ -440,6 +446,7 @@ let
       systemd.enable = true;
       settings = {
         mainBar = {
+          output = "eDP-1";
           layer = "top";
           position = "top";
           modules-left = [ "hyprland/workspaces" ];

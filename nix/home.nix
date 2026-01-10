@@ -362,7 +362,7 @@ let
         vim.lsp.enable("rust_analyzer")
         vim.lsp.config("dartls",{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}})
         vim.lsp.enable("dartls")
-        vim.lsp.config("ltex_plus",{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls-plus}/bin/ltex-ls-plus"},settings={ltex={language="en-US"},additionalRules={languageModel="${home.homeDirectory}/.ngrams"}}})
+        vim.lsp.config("ltex_plus",{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls-plus}/bin/ltex-ls-plus"},settings={ltex={language="auto"},additionalRules={languageModel="${home.homeDirectory}/.ngrams"}}})
         vim.lsp.enable("ltex_plus")
         vim.lsp.config("dhall_lsp_server",{capabilities=lsp_capabilities,cmd={"${pkgs.dhall-lsp-server}/bin/dhall-lsp-server"}})
         vim.lsp.enable("dhall_lsp_server")
@@ -371,11 +371,13 @@ let
         vim.lsp.config("solargraph",{capabilities=lsp_capabilities,cmd={"${pkgs.rubyPackages.solargraph}/bin/solargraph","stdio"}})
         vim.lsp.enable("solargraph")
         vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.csharp-ls}/bin/csharp-ls"}})
-        vim.lsp.enable("csharp_ls")
+        -- vim.lsp.enable("csharp_ls")
+        vim.lsp.config("omnisharp",{capabilities=lsp_capabilities,cmd={"${pkgs.omnisharp-roslyn}/bin/OmniSharp", "-z", "--hostPID", "12345", "DotNet:enablePackageRestore=false", "--encoding", "utf-8", "--languageserver"}})
+        vim.lsp.enable("omnisharp")
         vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"},init_options={typescript={tsdk="${pkgs.nodePackages.typescript}/lib/node_modules/typescript/lib"}}})
         vim.lsp.enable("astro")
-        vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.csharp-ls}/bin/csharp-ls"}})
-        vim.lsp.enable("csharp_ls")
+        vim.lsp.config("elp",{capabilities=lsp_capabilities,cmd={"${pkgs.erlang-language-platform}/bin/elp","server"}})
+        vim.lsp.enable("elp")
 
         require("lualine").setup()
         require('nvim-autopairs').setup{}
@@ -409,6 +411,7 @@ let
                 ruby={function()return {exe="${pkgs.rufo}/bin/rufo",args={"--simple-exit"},stdin=true} end},
                 cs={function()return {exe="${pkgs.csharpier}/bin/dotnet-csharpier",stdin=true} end},
                 astro={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--plugin=${pkgs.vscode-extensions.astro-build.astro-vscode}/share/vscode/extensions/astro-build.astro-vscode/node_modules/prettier-plugin-astro/dist/index.js","--stdin-filepath=test.astro"},stdin=true} end},
+                erlang={function()return {exe="${pkgs.beamMinimal28Packages.erlfmt}/bin/erlfmt",args={"-"},stdin=true} end},
             }
         }
         vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
