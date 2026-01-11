@@ -186,6 +186,16 @@ let
             };
           };
         }
+        {
+          condition = "gitdir:~/Work/";
+          contents = {
+            user = {
+              name = "r-isola";
+              email = "249273394+r-isola@users.noreply.github.com";
+              signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKroTy1E/KG99Zx9TYtbBjJ5o9QXmvntSi16jiDczFmV";
+            };
+          };
+        }
       ];
     };
 
