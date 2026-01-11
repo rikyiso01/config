@@ -369,8 +369,6 @@ let
         vim.lsp.enable("clangd")
         vim.lsp.config("solargraph",{capabilities=lsp_capabilities,cmd={"${pkgs.rubyPackages.solargraph}/bin/solargraph","stdio"}})
         vim.lsp.enable("solargraph")
-        vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.csharp-ls}/bin/csharp-ls"}})
-        -- vim.lsp.enable("csharp_ls")
         vim.lsp.config("omnisharp",{capabilities=lsp_capabilities,cmd={"${pkgs.omnisharp-roslyn}/bin/OmniSharp", "-z", "--hostPID", "12345", "DotNet:enablePackageRestore=false", "--encoding", "utf-8", "--languageserver"}})
         vim.lsp.enable("omnisharp")
         vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"},init_options={typescript={tsdk="${pkgs.nodePackages.typescript}/lib/node_modules/typescript/lib"}}})
@@ -470,7 +468,7 @@ let
         require("nvim-surround").setup()
         -- require('leap').set_default_mappings()
         -- require('nvim_context_vt').setup()
-        require("hardtime").setup{restriction_mode="hint"}
+        -- require("hardtime").setup{restriction_mode="hint"}
         vim.notify = require("notify")
         require('flash').setup{}
         require('boole').setup{
@@ -479,6 +477,82 @@ let
               decrement = '<C-x>'
             },
         }
+        require("outline").setup({})
+        require"dap-view".setup({
+            winbar={
+                sections= { "watches", "scopes", "exceptions", "breakpoints", "threads", "repl", "console" },
+                controls={enabled=true},
+                default_section="threads",
+            },
+            auto_toggle=true,
+        })
+        local dap = require('dap')
+        dap.adapters.coreclr = {
+          type = 'executable',
+          command = '${pkgs.netcoredbg}/bin/netcoredbg',
+          args = {'--interpreter=vscode'}
+        }
+        dap.configurations.cs = {
+          {
+            type = "coreclr",
+            name = "launch - netcoredbg",
+            request = "launch",
+            program = function()
+                return vim.fn.input('Path to dll', vim.fn.getcwd() .. '/bin/Debug/', 'file')
+            end,
+          },
+        }
+        dap.adapters.python = function(cb, config)
+          if config.request == 'attach' then
+            ---@diagnostic disable-next-line: undefined-field
+            local port = (config.connect or config).port
+            ---@diagnostic disable-next-line: undefined-field
+            local host = (config.connect or config).host or '127.0.0.1'
+            cb({
+              type = 'server',
+              port = assert(port, '`connect.port` is required for a python `attach` configuration'),
+              host = host,
+              options = {
+                source_filetype = 'python',
+              },
+            })
+          else
+            cb({
+              type = 'executable',
+              command = '${pkgs.python3Packages.debugpy}/bin/debugpy-adapter',
+              options = {
+                source_filetype = 'python',
+              },
+            })
+          end
+        end
+        dap.configurations.python = {
+          {
+            -- The first three options are required by nvim-dap
+            type = 'python'; -- the type here established the link to the adapter definition: `dap.adapters.python`
+            request = 'launch';
+            name = "Launch file";
+
+            -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
+
+            program = "''${file}"; -- This configuration will launch the current file if used.
+            pythonPath = function()
+              -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
+              -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
+              -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
+              local cwd = vim.fn.getcwd()
+              if vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
+                return cwd .. '/venv/bin/python'
+              elseif vim.fn.executable(cwd .. '/.venv/bin/python') == 1 then
+                return cwd .. '/.venv/bin/python'
+              else
+                return '/usr/bin/python'
+              end
+            end;
+          },
+        }
+
+
 
         vim.opt.expandtab = true
         vim.opt.smartindent = true
@@ -496,11 +570,20 @@ let
         vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
         vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
         vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
+        vim.keymap.set('n', "<Leader>bb", '<cmd>DapToggleBreakpoint<cr>')
+        vim.keymap.set('n', "<Leader>br", '<cmd>DapNew<cr>')
+        vim.keymap.set('n', "<Leader>bc", '<cmd>DapContinue<cr>')
+        vim.keymap.set('n', "<Leader>bn", '<cmd>DapStepOver<cr>')
+        vim.keymap.set('n', "<Leader>bi", '<cmd>DapStepInto<cr>')
+        vim.keymap.set('n', "<Leader>bo", '<cmd>DapStepOut<cr>')
+        vim.keymap.set('n', "<Leader>bv", '<cmd>DapViewToggle<cr>')
+        vim.keymap.set('n', "<Leader>bt", '<cmd>DapTerminate<cr>')
         vim.keymap.set('n', "<esc>", '<cmd>nohlsearch<cr>')
         -- vim.keymap.set('n', "<Leader>i", vim.lsp.buf.hover)
         vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename)
         -- vim.keymap.set('n', '<Leader>d', vim.diagnostic.open_float)
-        vim.keymap.set('n', '<Leader>o', MiniMap.toggle)
+        vim.keymap.set('n', '<Leader>p', MiniMap.toggle)
+        vim.keymap.set('n', "<Leader>o", '<cmd>Outline<cr>')
         vim.keymap.set({'n','v'}, "<Leader>.", vim.lsp.buf.code_action)
         vim.keymap.set("n","s",function() require("flash").jump() end)
         -- function _G.set_terminal_keymaps()
@@ -535,6 +618,12 @@ let
         -- vim.keymap.set("i","<BS>","<nop>")
         -- vim.keymap.set("i","<Del>","<nop>")
         vim.keymap.set("i","jk","<Esc>")
+
+        vim.api.nvim_set_hl(0, "red",   { fg = "#ff0000" }) 
+        vim.api.nvim_set_hl(0, "green",  { fg = "#00ff00" }) 
+
+        vim.fn.sign_define('DapBreakpoint', { text='@', texthl='red',   linehl='DapBreakpoint', numhl='DapBreakpoint' })
+        vim.fn.sign_define('DapStopped', { text='>', texthl='green',  linehl='DapBreakpoint', numhl='DapBreakpoint' })
       '';
 
       plugins = with pkgs.vimPlugins; [
@@ -568,6 +657,9 @@ let
         vim-matchup
         flash-nvim
         tokyonight-nvim
+        outline-nvim
+        nvim-dap
+        nvim-dap-view
       ];
       extraPackages = with pkgs; [
         haskell-language-server
