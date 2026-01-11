@@ -8,6 +8,9 @@
   "RestoreOnStartupURLs": [
     "https://web.whatsapp.com/",
     "https://web.telegram.org/k/",
+    "https://mail.google.com/mail/u/0/#inbox",
+    "https://teams.microsoft.com/v2/",
+    "https://mm.s3.eurecom.fr/s3/channels/llms4androidappscanning",
   ],
   "ManagedBookmarks": [
     {
