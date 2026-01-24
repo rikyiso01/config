@@ -318,7 +318,7 @@ let
       viAlias = true;
       vimAlias = true;
       vimdiffAlias = true;
-      extraLuaConfig = ''
+      initLua = ''
         vim.opt.termguicolors = true
         local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
         vim.lsp.config("basedpyright",{capabilities=lsp_capabilities,cmd={"${pkgs.basedpyright}/bin/basedpyright-langserver","--stdio"},settings={basedpyright={analysis={typeCheckingMode="strict",stubPath="${home.homeDirectory}/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}})
