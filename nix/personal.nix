@@ -275,10 +275,12 @@ let
       systemd.enable = true;
       settings = {
         monitor = [
-          "eDP-1,1920x1080@60,auto,1"
+          "eDP-1,1920x1080@60,0x0,1"
           ",preferred,auto,1,mirror,eDP-1"
           "desc:Ancor Communications Inc VE228 FALMQS019252,1920x1080@60,-1920x0,1"
           "desc:HannStar Display Corp HP227DCB 1234567890123,1920x1080@60,-1920x0,1"
+          "desc:Philips Consumer Electronics Company PHL 244E5 UK31343010090,1920x1080@60,1920x0,1"
+          "desc:Dell Inc. DELL U2412M YPPY095P02WU,1920x1200@60,-1920x0,1"
         ];
         workspace = [ "2,monitor:HDMI-A-1" ];
         "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
@@ -355,10 +357,14 @@ let
           disable_watchdog_warning = true;
           vfr = true;
         };
-        device = {
+        device = [{
           name = "epic-mouse-v1";
           sensitivity = -0.5;
-        };
+        }
+        {
+            name="cx-trust-wireless-mouse-1";
+            sensitivity=-0.25;
+        }];
         windowrule = "suppress_event maximize, match:class .*";
         "$mainMod" = "SUPER";
         bind = [
