@@ -941,17 +941,6 @@ let
       defaultPref("media.autoplay.blocking_policy", 2);
     '';
 
-    home.file.".var/app/io.gitlab.librewolf-community/.librewolf/native-messaging-hosts/net.downloadhelper.coapp.json".text = ''
-      {
-      "name": "net.downloadhelper.coapp",
-      "description": "Video DownloadHelper companion app",
-      "path": "${pkgs.vdhcoapp}/bin/vdhcoapp",
-      "type": "stdio",
-      "allowed_extensions": [
-      "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}"
-      ]
-      }
-    '';
     home.file.".var/app/io.gitlab.librewolf-community/.librewolf/native-messaging-hosts/org.keepassxc.keepassxc_browser.json".text = ''
       {
       "allowed_extensions": [
