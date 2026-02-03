@@ -282,6 +282,7 @@ let
           "desc:Philips Consumer Electronics Company PHL 244E5 UK31343010090,1920x1080@60,1920x0,1"
           "desc:Dell Inc. DELL U2412M YPPY095P02WU,1920x1200@60,-1920x0,1"
           "desc:Ancor Communications Inc VE228 FALMQS019264,1920x1080@60,-1920x0,1"
+          "desc:LG Electronics LG ULTRAWIDE 0x000115B8,2560x1080@60,-1920x0,1"
         ];
         workspace = [ "2,monitor:HDMI-A-1" ];
         "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
