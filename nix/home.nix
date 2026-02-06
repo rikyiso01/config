@@ -191,7 +191,7 @@ let
             }
           ];
           open = [
-            { run = "xdg-open \"$1\""; desc = "Open"; }
+            { run = "xdg-open %s"; desc = "Open"; }
           ];
         };
         open = {
