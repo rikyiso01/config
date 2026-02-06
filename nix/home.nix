@@ -191,7 +191,7 @@ let
             }
           ];
           open = [
-            { run = "xdg-open %s"; desc = "Open"; }
+            { run = "xdg-open \"$1\""; desc = "Open"; orphan = true; }
           ];
         };
         open = {
@@ -201,7 +201,7 @@ let
             { mime = "application/{json,ndjson}"; use = "edit"; }
             { mime = "*/javascript"; use = "edit"; }
             { mime = "inode/empty"; use = "edit"; }
-            { name = "*"; use = "open"; }
+            { url = "*"; use = "open"; }
           ];
         };
       };
