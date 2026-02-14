@@ -278,7 +278,7 @@ let
           "eDP-1,1920x1080@60,0x0,1"
           ",preferred,auto,1,mirror,eDP-1"
           "desc:Ancor Communications Inc VE228 FALMQS019252,1920x1080@60,-1920x0,1"
-          "desc:HannStar Display Corp HP227DCB 1234567890123,1920x1080@60,-1920x0,1"
+          "desc:HannStar Display Corp HP227DCB 1234567890123,1920x1080@60,1920x0,1"
           "desc:Philips Consumer Electronics Company PHL 244E5 UK31343010090,1920x1080@60,1920x0,1"
           "desc:Dell Inc. DELL U2412M YPPY095P02WU,1920x1200@60,-1920x0,1"
           "desc:Ancor Communications Inc VE228 FALMQS019264,1920x1080@60,-1920x0,1"

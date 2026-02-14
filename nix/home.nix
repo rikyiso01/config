@@ -375,6 +375,8 @@ let
         vim.lsp.enable("astro")
         vim.lsp.config("elp",{capabilities=lsp_capabilities,cmd={"${pkgs.erlang-language-platform}/bin/elp","server"}})
         vim.lsp.enable("elp")
+        vim.lsp.config("postgres_lsp",{capabilities=lsp_capabilities,cmd={"${pkgs.postgres-language-server}/bin/postgres-language-server", "lsp-proxy"}})
+        vim.lsp.enable("postgres_lsp")
 
         require("lualine").setup()
         require('nvim-autopairs').setup{}
