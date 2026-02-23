@@ -59,7 +59,7 @@ let
       rsync
       mpc
       clock-rs
-      yt-dlp
+      # yt-dlp
       jq
       yq
       libnotify
@@ -141,6 +141,7 @@ let
     programs.htop.enable = true;
     programs.yazi = {
       enable = true;
+      shellWrapperName = "y";
       flavors = {
         catppuccin-mocha = ./catppuccin-mocha.yazi;
       };
