@@ -10,6 +10,7 @@
     "https://web.telegram.org/k/",
     "https://mail.google.com/mail/u/0/#inbox",
     "https://teams.microsoft.com/v2/",
+    "https://outlook.office.com/mail/0/?deeplink=mail%2F",
     "https://mm.s3.eurecom.fr/s3/channels/llms4androidappscanning",
   ],
   "ManagedBookmarks": [
@@ -40,5 +41,13 @@
       "name": "Meet",
       "url": "https://meet.google.com/landing",
     },
+    {
+        "name": "Outlook",
+        "url": "https://outlook.office.com/mail/0/?deeplink=mail%2F",
+    },
+    {
+        "name": "Figma",
+        "url": "https://www.figma.com/files/team/1461309240358020163/project/325429216?fuid=1606323824446894531",
+    }
   ],
 }
