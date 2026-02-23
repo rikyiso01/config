@@ -366,10 +366,10 @@ let
           name = "epic-mouse-v1";
           sensitivity = -0.5;
         }
-        {
-            name="cx-trust-wireless-mouse-1";
-            sensitivity=-0.25;
-        }];
+          {
+            name = "cx-trust-wireless-mouse-1";
+            sensitivity = -0.25;
+          }];
         windowrule = "suppress_event maximize, match:class .*";
         "$mainMod" = "SUPER";
         bind = [
@@ -769,13 +769,20 @@ let
         };
       };
     };
-    services.hyprpaper = {
-      enable = true;
-      settings = {
-        preload = [ "${./wallpapers/moon.jpg}" ];
-        wallpaper = [ ",${./wallpapers/moon.jpg}" ];
-      };
-    };
+    # services.hyprpaper = {
+    #   enable = true;
+    #   settings = {
+    #     preload = [ "${./wallpapers/moon.jpg}" ];
+    #     wallpaper = [{ monitor = ""; path = "${./wallpapers/moon.jpg}"; }];
+    #   };
+    # };
+    home.file.".config/hypr/hyprpaper.conf".text = ''
+      preload=${./wallpapers/moon.jpg}
+      wallpaper {
+        monitor =
+        path = ${./wallpapers/moon.jpg}
+      }
+    '';
     services.gammastep = {
       enable = true;
       temperature = rec{
@@ -1205,6 +1212,7 @@ let
         greetd-tuigreet
         hyprland
         hyprlock
+        hyprpaper
         intel-ucode
         reflector
         intel-media-driver
@@ -1350,6 +1358,7 @@ let
 
         systemctl enable --user gcr-ssh-agent.socket
         systemctl enable --user podman.socket
+        systemctl enable --user hyprpaper.service
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
         ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
