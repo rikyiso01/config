@@ -298,6 +298,9 @@ let
               echo "Exported key $item[1]"
           end
         '';
+        monitor = ''
+          hyprctl keyword monitor "HDMI-A-1,preferred,auto-$argv[1],1"
+        '';
       };
     };
     programs.starship = {
