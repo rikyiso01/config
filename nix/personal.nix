@@ -278,7 +278,6 @@ let
           "eDP-1,1920x1080@60,0x0,1"
           ",preferred,auto,1,mirror,eDP-1"
         ];
-        workspace = [ "2,monitor:HDMI-A-1" ];
         "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
         "$fileManager" = "/usr/bin/flatpak run org.gnome.Nautilus.Devel";
         exec-once = [
@@ -391,6 +390,10 @@ let
           "$mainMod SHIFT, L, layoutmsg, swapnext"
           "$mainMod SHIFT, K, layoutmsg, swapprev"
           "$mainMod SHIFT, J, layoutmsg, swapnext"
+
+          # Move workspace mainMod + arrow keys
+          "$mainMod SHIFT&CONTROL, H, movecurrentworkspacetomonitor, l"
+          "$mainMod SHIFT&CONTROL, L, movecurrentworkspacetomonitor, r"
 
           # Switch workspaces with mainMod + [0-9]
           "$mainMod, 1, workspace, 1"
