@@ -381,6 +381,8 @@ let
         vim.lsp.enable("elp")
         vim.lsp.config("postgres_lsp",{capabilities=lsp_capabilities,cmd={"${pkgs.postgres-language-server}/bin/postgres-language-server", "lsp-proxy"}})
         vim.lsp.enable("postgres_lsp")
+        vim.lsp.config("tinymist",{capabilities=lsp_capabilities,cmd={"${pkgs.tinymist}/bin/tinymist"}})
+        vim.lsp.enable("tinymist")
 
         require("lualine").setup()
         require('nvim-autopairs').setup{}
