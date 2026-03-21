@@ -277,6 +277,7 @@ let
         monitor = [
           "eDP-1,1920x1080@60,0x0,1"
           ",preferred,auto,1,mirror,eDP-1"
+          "desc:HP Inc. HP V22v G5 CNK4310DSG,1920x1080@60,1920x0,1"
         ];
         "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
         "$fileManager" = "/usr/bin/flatpak run org.gnome.Nautilus.Devel";
