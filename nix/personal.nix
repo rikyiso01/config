@@ -174,6 +174,7 @@ let
       signing = {
         key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRI8KdIpS8+g0IwxfzmrCBP4m7XWj0KECBz42WkgwsG";
         signByDefault = true;
+        format = "openpgp";
       };
       includes = [
         {
@@ -255,10 +256,12 @@ let
         package = pkgs.gnome-themes-extra;
       };
       gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+      gtk4.theme = config.gtk.theme;
     };
     xdg = {
       enable = true;
       userDirs = {
+        setSessionVariables = true;
         createDirectories = true;
         enable = true;
         documents = "${home.homeDirectory}/backup/Documents";
