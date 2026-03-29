@@ -76,6 +76,7 @@ let
       enable = true;
       settings = {
         init.defaultBranch = "main";
+        pull.rebase = false;
       };
     };
     programs.delta = {
