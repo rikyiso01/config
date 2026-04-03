@@ -332,7 +332,7 @@ let
         -- vim.lsp.enable("ruff")
         vim.lsp.config("nil_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}})
         vim.lsp.enable("nil_ls")
-        vim.lsp.config("bashls",{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.bash-language-server}/bin/bash-language-server","start"}})
+        vim.lsp.config("bashls",{capabilities=lsp_capabilities,cmd={"${pkgs.bash-language-server}/bin/bash-language-server","start"}})
         vim.lsp.enable("bashls")
         vim.lsp.config("hls",{capabilities=lsp_capabilities,cmd={"haskell-language-server-wrapper","--lsp"}})
         vim.lsp.enable("hls")
@@ -344,13 +344,13 @@ let
         vim.lsp.enable("jdtls")
         vim.lsp.config("kotlin_language_server",{capabilities=lsp_capabilities,cmd={"${pkgs.kotlin-language-server}/bin/kotlin-language-server"}})
         vim.lsp.enable("kotlin_language_server")
-        vim.lsp.config("ts_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server","--stdio"}})
+        vim.lsp.config("ts_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.typescript-language-server}/bin/typescript-language-server","--stdio"}})
         vim.lsp.enable("ts_ls")
         vim.lsp.config("eslint",{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-eslint-language-server","--stdio"}})
         vim.lsp.enable("eslint")
         local capabilities = vim.lsp.protocol.make_client_capabilities()
         capabilities.textDocument.completion.completionItem.snippetSupport = true
-        vim.lsp.config("jsonls",{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities})
+        vim.lsp.config("jsonls",{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities})
         vim.lsp.enable("jsonls")
         vim.lsp.config("taplo",{capabilities=lsp_capabilities,cmd={"${pkgs.taplo}/bin/taplo","lsp","stdio"}})
         vim.lsp.enable("taplo")
@@ -358,7 +358,7 @@ let
         vim.lsp.enable("lemminx")
         vim.lsp.config("psalm",{capabilities=lsp_capabilities,cmd={"${pkgs.php83Packages.psalm}/bin/psalm","--language-server"}})
         vim.lsp.enable("psalm")
-        vim.lsp.config("intelephense",{capabilities=lsp_capabilities,cmd={"${pkgs.nodePackages.intelephense}/bin/intelephense","--stdio"}})
+        vim.lsp.config("intelephense",{capabilities=lsp_capabilities,cmd={"${pkgs.intelephense}/bin/intelephense","--stdio"}})
         vim.lsp.enable("intelephense")
         vim.lsp.config("cssls",{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}})
         vim.lsp.enable("cssls")
@@ -376,7 +376,7 @@ let
         vim.lsp.enable("solargraph")
         vim.lsp.config("omnisharp",{capabilities=lsp_capabilities,cmd={"${pkgs.omnisharp-roslyn}/bin/OmniSharp", "-z", "--hostPID", "12345", "DotNet:enablePackageRestore=false", "--encoding", "utf-8", "--languageserver"}})
         vim.lsp.enable("omnisharp")
-        vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"},init_options={typescript={tsdk="${pkgs.nodePackages.typescript}/lib/node_modules/typescript/lib"}}})
+        vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"},init_options={typescript={tsdk="${pkgs.typescript}/lib/node_modules/typescript/lib"}}})
         vim.lsp.enable("astro")
         vim.lsp.config("elp",{capabilities=lsp_capabilities,cmd={"${pkgs.erlang-language-platform}/bin/elp","server"}})
         vim.lsp.enable("elp")
@@ -676,7 +676,7 @@ let
       extraPackages = with pkgs; [
         haskell-language-server
         ripgrep
-        nodePackages.diagnostic-languageserver
+        diagnostic-languageserver
         wl-clipboard
         gcc
         tree-sitter
