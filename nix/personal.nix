@@ -396,8 +396,8 @@ let
           "$mainMod SHIFT, J, layoutmsg, swapnext"
 
           # Move workspace mainMod + arrow keys
-          "$mainMod SHIFT&CONTROL, H, movecurrentworkspacetomonitor, l"
-          "$mainMod SHIFT&CONTROL, L, movecurrentworkspacetomonitor, r"
+          "$mainMod SHIFT&CONTROL, H, movecurrentworkspacetomonitor, +1"
+          "$mainMod SHIFT&CONTROL, L, movecurrentworkspacetomonitor, -1"
 
           # Switch workspaces with mainMod + [0-9]
           "$mainMod, 1, workspace, 1"
