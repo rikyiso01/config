@@ -323,6 +323,8 @@ let
       viAlias = true;
       vimAlias = true;
       vimdiffAlias = true;
+      withRuby=true;
+      withPython3=true;
       initLua = ''
         vim.opt.termguicolors = true
         local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
