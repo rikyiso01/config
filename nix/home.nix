@@ -376,8 +376,17 @@ let
         vim.lsp.enable("clangd")
         vim.lsp.config("solargraph",{capabilities=lsp_capabilities,cmd={"${pkgs.rubyPackages.solargraph}/bin/solargraph","stdio"}})
         vim.lsp.enable("solargraph")
-        vim.lsp.config("omnisharp",{capabilities=lsp_capabilities,cmd={"${pkgs.omnisharp-roslyn}/bin/OmniSharp", "-z", "--hostPID", "12345", "DotNet:enablePackageRestore=false", "--encoding", "utf-8", "--languageserver"}})
-        vim.lsp.enable("omnisharp")
+        vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,filetypes={"cs","razor"},cmd=function(dispatchers, config)
+            env=config.cmd_env
+            if (env==nil)then env={} end
+            env.PATH="${pkgs.dotnet-sdk_10}/bin:" .. os.getenv('PATH')
+            return vim.lsp.rpc.start({ '${pkgs.csharp-ls}/bin/csharp-ls',"-f","razor-support" }, dispatchers, {
+              cwd = config.cmd_cwd or config.root_dir,
+              env = env,
+              detached = config.detached,
+            })
+        end})
+        vim.lsp.enable("csharp_ls")
         vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"},init_options={typescript={tsdk="${pkgs.typescript}/lib/node_modules/typescript/lib"}}})
         vim.lsp.enable("astro")
         vim.lsp.config("elp",{capabilities=lsp_capabilities,cmd={"${pkgs.erlang-language-platform}/bin/elp","server"}})
@@ -386,6 +395,8 @@ let
         vim.lsp.enable("postgres_lsp")
         vim.lsp.config("tinymist",{capabilities=lsp_capabilities,cmd={"${pkgs.tinymist}/bin/tinymist"}})
         vim.lsp.enable("tinymist")
+        vim.lsp.config("lua_ls",{capabilities=lsp_capabilities,settings={Lua={diagnostics={globals={"vim"}}}}})
+        vim.lsp.enable("lua_ls")
 
         require("lualine").setup()
         require('nvim-autopairs').setup{}
@@ -461,17 +472,10 @@ let
                 ['<esc>'] = cmp.mapping.abort(),
             },
         }
-        -- require'nvim-treesitter.configs'.setup {
-        --   highlight = {
-        --     enable = true,
-        --     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-        --     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-        --     -- Using this option may slow down your editor, and you may see some duplicate highlights.
-        --     -- Instead of true it can also be a list of languages
-        --     additional_vim_regex_highlighting = false,
-        --   },
-        --   matchup={enable=true},
-        -- }
+        vim.api.nvim_create_autocmd('FileType', {
+          pattern = { 'razor' },
+          callback = function() vim.treesitter.start() end,
+        })
         require('gitblame').setup {
             enabled = true,
             message_when_not_committed = ""
@@ -510,9 +514,9 @@ let
           {
             type = "coreclr",
             name = "launch - netcoredbg",
-            request = "launch",
-            program = function()
-                return vim.fn.input('Path to dll', vim.fn.getcwd() .. '/bin/Debug/', 'file')
+            request = "attach",
+            processId = function()
+                return vim.fn.input('ProcessId: ')
             end,
           },
         }
@@ -685,6 +689,7 @@ let
         ghc
         jdt-language-server
         rust-analyzer
+        lua-language-server
       ];
     };
 
