@@ -586,6 +586,8 @@ let
         vim.keymap.set('n', '<Leader>f', '<cmd>Format<cr>')
         vim.keymap.set('n', '<Leader>m', '<cmd>Trouble diagnostics toggle focus=true<cr>')
         vim.keymap.set('n', "<Leader>/", '<cmd>Telescope live_grep<cr>')
+        vim.keymap.set('v', "<Leader>/", '<cmd>Telescope grep_string<cr>')
+        vim.keymap.set('n', "<Leader>d", '<cmd>Telescope git_files<cr>')
         vim.keymap.set('n', "<Leader>l", '<cmd>Telescope find_files<cr>')
         vim.keymap.set('n', "<Leader>g", '<cmd>LazyGit<cr>')
         vim.keymap.set('n', "<Leader>bb", '<cmd>DapToggleBreakpoint<cr>')
@@ -652,7 +654,7 @@ let
         nvim-treesitter.withAllGrammars
         nvim-cmp
         cmp-nvim-lsp
-        vim-illuminate
+        # vim-illuminate
         vim-vsnip
         formatter-nvim
         yazi-nvim
