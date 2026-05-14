@@ -516,7 +516,10 @@ let
             name = "launch - netcoredbg",
             request = "attach",
             processId = function()
-                return vim.fn.input('ProcessId: ')
+                local handle=io.popen("netstat -nlp | grep 127.0.0.1:$(jq '.profiles.http.applicationUrl' Properties/launchSettings.json | sed -rn 's/\"http:\\/\\/localhost:([0-9]+)\"/\\1/p') | sed -rn 's/.* ([0-9]+)\\/Reply.Ferrar.*/\\1/p'")
+                local result=handle:read("*a")
+                handle:close()
+                return result
             end,
           },
         }
