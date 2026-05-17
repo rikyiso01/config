@@ -276,6 +276,7 @@ let
       enable = true;
       package = null;
       systemd.enable = true;
+      configType = "hyprlang";
       settings = {
         monitor = [
           "eDP-1,1920x1080@60,0x0,1"
@@ -348,13 +349,11 @@ let
           ];
         };
         dwindle = {
-          pseudotile = true; # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
           preserve_split = true; # you probably want this
         };
         misc = {
           force_default_wallpaper = 0; # Set to 0 or 1 to disable the anime mascot wallpapers
           disable_watchdog_warning = true;
-          vfr = true;
           on_focus_under_fullscreen = true;
         };
         device = [{
@@ -380,7 +379,6 @@ let
           "$mainMod, V, togglefloating,"
           "$mainMod, R, exec, $menu"
           "$mainMod, P, pseudo,"
-          "$mainMod, J, togglesplit,"
 
 
           # Move focus with mainMod + arrow keys
