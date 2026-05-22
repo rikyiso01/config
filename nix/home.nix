@@ -143,14 +143,6 @@ let
     programs.yazi = {
       enable = true;
       shellWrapperName = "y";
-      flavors = {
-        catppuccin-mocha = ./catppuccin-mocha.yazi;
-      };
-      theme = {
-        flavor = {
-          dark = "catppuccin-mocha";
-        };
-      };
       plugins = {
         smart-enter = pkgs.yaziPlugins.smart-enter;
         folder-rules = ./yazi;
@@ -209,6 +201,8 @@ let
       };
       initLua = ''require("folder-rules"):setup()'';
     };
+
+    xdg.configFile."yazi/theme.yoml".source=./yazi.toml;
 
 
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
