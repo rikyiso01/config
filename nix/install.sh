@@ -26,7 +26,7 @@ sudo flatpak remote-delete --system flathub || true
 
 if [[ ! -f /swapfile ]]
 then
-    sudo mkswap -U clear --size 16G --file /swapfile
+    sudo mkswap -U clear --size 32G --file /swapfile
 fi
 
 if ! grep '/swap' /etc/fstab
