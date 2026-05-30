@@ -195,6 +195,8 @@ let
             { mime = "application/{json,ndjson}"; use = "edit"; }
             { mime = "*/javascript"; use = "edit"; }
             { mime = "inode/empty"; use = "edit"; }
+          ];
+          append_rules = [
             { url = "*"; use = "open"; }
           ];
         };
@@ -202,7 +204,7 @@ let
       initLua = ''require("folder-rules"):setup()'';
     };
 
-    xdg.configFile."yazi/theme.yoml".source=./yazi.toml;
+    xdg.configFile."yazi/theme.yoml".source = ./yazi.toml;
 
 
     home.sessionPath = [ "$HOME/.local/bin" "$HOME/.local/share/flatpak/exports/bin" ];
@@ -317,8 +319,8 @@ let
       viAlias = true;
       vimAlias = true;
       vimdiffAlias = true;
-      withRuby=true;
-      withPython3=true;
+      withRuby = true;
+      withPython3 = true;
       initLua = ''
         vim.opt.termguicolors = true
         local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()

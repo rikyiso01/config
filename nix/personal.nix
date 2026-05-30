@@ -288,7 +288,7 @@ let
         exec-once = [
           "/usr/libexec/hyprpolkitagent"
           "[workspace 1 silent; maximize] $terminal"
-          "[workspace 1 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community"
+          "[workspace 2 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community"
           "secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@"
         ];
         "$menu" = "XDG_DATA_DIRS=${home.homeDirectory}/.local/share/flatpak/exports/share ${pkgs.fuzzel}/bin/fuzzel";
