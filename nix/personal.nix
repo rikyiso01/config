@@ -831,6 +831,64 @@ let
     programs.ncmpcpp.enable = true;
     programs.bluetuith.enable = true;
 
+    services.flatpak = {
+      enable = true;
+      packages = builtins.map (x: { appId = x; origin = "flathub"; }) [
+        "org.gnome.TextEditor"
+        "org.gnome.Characters"
+        "ca.desrt.dconf-editor"
+        "com.github.tchx84.Flatseal"
+        "com.obsproject.Studio"
+        "org.gnome.seahorse.Application"
+        "com.usebottles.bottles"
+        "org.localsend.localsend_app"
+        "org.gnome.dspy"
+        "org.keepassxc.KeePassXC"
+        "org.gnome.FileRoller"
+        "org.gnome.Evince"
+        "org.gnome.Loupe"
+        "io.github.flattool.Warehouse"
+        "io.freetubeapp.FreeTube"
+        "org.prismlauncher.PrismLauncher"
+        "org.gimp.GIMP"
+        "org.libreoffice.LibreOffice"
+        "io.gitlab.librewolf-community"
+        "eu.betterbird.Betterbird"
+        "io.mpv.Mpv"
+        "com.calibre_ebook.calibre"
+        "io.github.ungoogled_software.ungoogled_chromium"
+        "org.virt_manager.virt-manager"
+        "page.codeberg.dnkl.foot"
+        "org.kde.kdenlive"
+        "org.remmina.Remmina"
+        "org.onlyoffice.desktopeditors"
+      ]
+      ++
+      [{ appId = "org.gnome.Nautilus.Devel"; origin = "gnome-nightly"; }];
+      remotes = [{ name = "flathub"; location = "https://dl.flathub.org/repo/flathub.flatpakrepo"; }
+        { name = "gnome-nightly"; location = "https://nightly.gnome.org/gnome-nightly.flatpakrepo"; }];
+      overrides = {
+        "ca.desrt.dconf-editor" = { Context.filesystems = [ "~/.config/dconf/user:ro" ]; "Session Bus Policy"."org.freedesktop.Flatpak" = "none"; };
+        "com.github.tchx84.Flatseal" = { Context.filesystems = [ "/nix/store:ro" ]; };
+        "com.obsproject.Studio" = { Context.filesystems = [ "!xdg-config/kdeglobals" "xdg-videos" "!host" "~/backup/Flatpaks/obs-studio" ]; "Session Bus Policy"."org.freedesktop.Flatpak" = "none"; };
+        "com.userbottles.bottles" = { Context.filesystems = [ "!xdg-download" "~/backup/Flatpaks/bottles" ]; };
+        "io.gitlab.librewolf-community" = { Context = { devices = [ "all" ]; filesystems = [ "/nix/store:ro" "xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro" "~/.local/flatpak:ro" "~/.nix-profile:ro" ]; }; Environment.PATH = "${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin"; };
+        "org.gimp.GIMP" = { Context.filesystems = [ "!xdg-run/gvfs" "!xdg-run/gvfsd" "!/tmp" "!xdg-config/gtk-3.0" "!xdg-config/GIMP" "xdg-pictures" "!host" ]; };
+        "org.gnome.Loupe" = { Context.filesystems = [ "!xdg-run/gvfs" "!xdg-run/gvfsd" "!host" ]; };
+        "org.gnome.Evince" = { Context.filesystems = [ "!/run/media" "!xdg-run/gvfsd" "!/media" "!home" ]; };
+        "org.gnome.FileRolles" = { Context.filesystems = [ "!home" ]; };
+        "org.gnome.TextEditor" = { Context.filesystems = [ "!xdg-run/gvfsd" "!host" ]; };
+        "org.keepassxc.KeePassXC" = { Context = { devices = [ "!all" "dri" ]; filesystems = [ "!xdg-config/kdeglobals" "/nix/store:ro" "!host" ]; }; };
+        "org.prismlauncher.PrismLauncher" = { Context.filesystems = [ "~/backup/Games/Minecraft" ]; };
+        "com.calibre_ebook.calibre" = { Context.filesystems = [ "~/backup/Flatpaks/calibre" "~/backup/Books" "!host" ]; };
+        "eu.betterbird.Betterbird" = { Context.filesystems = [ "~/backup/Flatpaks/.thunderbird" ]; };
+        "io.github.ungoogled_software.ungoogled_chromium" = { Context.filesystems = [ "!xdg-desktop" "!xdg-run/pipewire-0" "!~/.local/share/icons" "!xdg-run/dconf" "!xdg-download" "!~/.config/dconf" "!/run/.heim_org.h5l.kcm-socket" "!~/.local/share/applications" "!/tmp" "!~/.config/kioslaverc" "~/Downloads" "/nix/store:ro" "~/.local/flatpak:ro" ]; Environment.PATH = "/home/riky/.local/flatpak:/app/bin:/usr/bin"; };
+        "org.virt_manager.virt-manager" = { Environment.LIBVIRT_DEFAULT_URI = "qemu:///system"; };
+        "page.codeberg.dnkl.foot" = { Context.filesystems = [ "xdg-config/foot:ro" "~/.local/flatpak:ro" "/nix/store:ro" ]; Environment.PATH = "/home/riky/.local/flatpak:/app/bin:/usr/bin"; };
+      };
+      uninstallUnmanaged = true;
+    };
+
     systemd.user.services = {
       startup = {
         Unit = { Description = "Startup"; };
@@ -1010,92 +1068,6 @@ let
       executable = true;
     };
 
-    xdg.dataFile = {
-      "flatpak/overrides/ca.desrt.dconf-editor".text = ''
-        [Context]
-        filesystems=~/.config/dconf/user:ro
-        [Session Bus Policy]
-        org.freedesktop.Flatpak=none
-      '';
-      "flatpak/overrides/com.github.tchx84.Flatseal".text = ''
-        [Context]
-        filesystems=/nix/store:ro
-      '';
-      "flatpak/overrides/com.obsproject.Studio".text = ''
-        [Context]
-        filesystems=!xdg-config/kdeglobals;xdg-videos;!host;~/backup/Flatpaks/obs-studio
-
-        [Session Bus Policy]
-        org.freedesktop.Flatpak=none
-      '';
-      "flatpak/overrides/com.userbottles.bottles".text = ''
-        [Context]
-        filesystems=!xdg-download;~/backup/Flatpaks/bottles
-      '';
-      "flatpak/overrides/io.gitlab.librewolf-community".text = ''
-        [Context]
-        devices=all
-        filesystems=/nix/store:ro;xdg-run/app/org.keepassxc.KeePassXC/org.keepassxc.KeePassXC.BrowserServer:ro;~/.local/flatpak:ro;~/.nix-profile:ro
-
-        [Environment]
-        PATH=${home.homeDirectory}/.local/flatpak:/app/bin:/usr/bin
-      '';
-      "flatpak/overrides/org.gimp.GIMP".text = ''
-        [Context]
-        filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!/tmp;!xdg-config/gtk-3.0;!xdg-config/GIMP;xdg-pictures;!host
-      '';
-      "flatpak/overrides/org.gnome.Loupe".text = ''
-        [Context]
-        filesystems=!xdg-run/gvfs;!xdg-run/gvfsd;!host
-      '';
-      "flatpak/overrides/org.gnome.Evince".text = ''
-        [Context]
-        filesystems=!/run/media;!xdg-run/gvfsd;!/media;!home
-      '';
-      "flatpak/overrides/org.gnome.FileRoller".text = ''
-        [Context]
-        filesystems=!home
-      '';
-      "flatpak/overrides/org.gnome.TextEditor".text = ''
-        [Context]
-        filesystems=!xdg-run/gvfsd;!host
-      '';
-      "flatpak/overrides/org.keepassxc.KeePassXC".text = ''
-        [Context]
-        devices=!all;dri
-        filesystems=!xdg-config/kdeglobals;/nix/store:ro;!host
-      '';
-      "flatpak/overrides/org.prismlauncher.PrismLauncher".text = ''
-        [Context]
-        filesystems=~/backup/Games/Minecraft
-      '';
-      "flatpak/overrides/com.calibre_ebook.calibre".text = ''
-        [Context]
-        filesystems=~/backup/Flatpaks/calibre;~/backup/Books;!host
-      '';
-      "flatpak/overrides/eu.betterbird.Betterbird".text = ''
-        [Context]
-        filesystems=~/backup/Flatpaks/.thunderbird
-      '';
-      "flatpak/overrides/io.github.ungoogled_software.ungoogled_chromium".text = ''
-        [Context]
-        filesystems=!xdg-desktop;!xdg-run/pipewire-0;!~/.local/share/icons;!xdg-run/dconf;!xdg-download;!~/.config/dconf;!/run/.heim_org.h5l.kcm-socket;!~/.local/share/applications;!/tmp;!~/.config/kioslaverc;~/Downloads;/nix/store:ro;~/.local/flatpak:ro
-
-        [Environment]
-        PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
-      '';
-      "flatpak/overrides/org.virt_manager.virt-manager".text = ''
-        [Environment]
-        LIBVIRT_DEFAULT_URI=qemu:///system
-      '';
-      "flatpak/overrides/page.codeberg.dnkl.foot".text = ''
-        [Context]
-        filesystems=xdg-config/foot:ro;~/.local/flatpak:ro;/nix/store:ro
-
-        [Environment]
-        PATH=/home/riky/.local/flatpak:/app/bin:/usr/bin
-      '';
-    };
 
 
     home.file.".var/app/org.keepassxc.KeePassXC/config/keepassxc/keepassxc.ini".text = ''
@@ -1136,45 +1108,6 @@ let
       LockDatabaseScreenLock=false
       LockDatabaseIdle=false
     '';
-
-    home.file.".local/nix-sources/flatpak" = {
-      text = ''
-        org.gnome.TextEditor
-        org.gnome.Characters
-        ca.desrt.dconf-editor
-        com.github.tchx84.Flatseal
-        com.obsproject.Studio
-        org.gnome.seahorse.Application
-        com.usebottles.bottles
-        org.localsend.localsend_app
-        org.gnome.dspy
-        org.keepassxc.KeePassXC
-        org.gnome.FileRoller
-        org.gnome.Evince
-        org.gnome.Loupe
-        io.github.flattool.Warehouse
-        io.freetubeapp.FreeTube
-        org.prismlauncher.PrismLauncher
-        org.gimp.GIMP
-        org.libreoffice.LibreOffice
-        io.gitlab.librewolf-community
-        eu.betterbird.Betterbird
-        io.mpv.Mpv
-        com.calibre_ebook.calibre
-        io.github.ungoogled_software.ungoogled_chromium
-        org.virt_manager.virt-manager
-        page.codeberg.dnkl.foot
-        org.kde.kdenlive
-        org.gnome.Nautilus.Devel
-        org.remmina.Remmina
-        org.onlyoffice.desktopeditors'';
-      onChange = ''
-        flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-        flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
-        flatpak install --user -y $(comm -23 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
-        flatpak remove --user -y $(comm -13 <(sort $HOME/.local/nix-sources/flatpak) <(flatpak list --app --user --columns=application | sort)) || true
-      '';
-    };
 
     home.file.".local/nix-sources/powertop.hs" = {
       source = ./powertop.hs;
