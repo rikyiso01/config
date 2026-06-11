@@ -173,6 +173,11 @@ let
             on = "e";
             run = "shell -- /usr/bin/flatpak run --file-forwarding org.gimp.GIMP @@ \"$@\" @@";
           }
+          {
+            on = ["g" "w"];
+            run = "cd ~/Work/FERRARI/FERRARI_GT";
+            desc = "Goto working directory";
+          }
         ];
       };
       settings = {
