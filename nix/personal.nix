@@ -161,6 +161,8 @@ let
         gh = "GH_TOKEN=$(password show -a 'gh token' Github) gh=(which gh) $gh";
         cb = "${pkgs.forgejo-cli}/bin/fj -H codeberg.org";
         # yt = ''(){file="$(mktemp)" && yt-dlp --force-overwrite -xo "$file" "$1" && mpc add "$file"* }'';
+        work = "source ${./work.fish}";
+        quit-work = "source ${./quit-work.fish}";
       };
     };
 
@@ -862,6 +864,7 @@ let
         "org.kde.kdenlive"
         "org.remmina.Remmina"
         "org.onlyoffice.desktopeditors"
+        "io.dbeaver.DBeaverCommunity"
       ]
       ++
       [{ appId = "org.gnome.Nautilus.Devel"; origin = "gnome-nightly"; }];
