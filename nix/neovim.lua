@@ -5,7 +5,7 @@ dap.configurations.cs = {
     name = "launch - netcoredbg",
     request = "attach",
     processId = function()
-        local cmd="netstat -nlp | grep 127.0.0.1:$(jq '.profiles | values[] | .applicationUrl' Properties/launchSettings.json | sed -rn 's/.*http:\\/\\/localhost:([0-9]+).*/\\1/p') | sed -rn 's/.* ([0-9]+)\\/Reply.Ferrar.*/\\1/p' | head -n 1"
+        local cmd="netstat -nlp | grep 127.0.0.1:$(jq '.profiles | values[] | .applicationUrl' Properties/launchSettings.json | sed -rn 's/.*http:\\/\\/localhost:([0-9]+).*/\\1/p' | head -n 1) | sed -rn 's/.* ([0-9]+)\\/Reply.Ferrar.*/\\1/p' | head -n 1"
         local handle=io.popen(cmd)
         local result=handle:read("*a")
         print(result)
