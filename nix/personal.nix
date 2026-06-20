@@ -980,7 +980,7 @@ let
           Description = "Dovecot server";
         };
         Service = {
-          ExecStart = "sh -c 'podman run -p 31990:31990 -p 127.0.0.1:31143:31143 -v ${home.homeDirectory}/backup/Mail/dovecot.conf:/etc/dovecot/conf.d/dovecot.conf:ro -v ${home.homeDirectory}/backup/Mail/maildir:/srv/vmail/riky/Maildir:O --rm --env USER_PASSWORD=$(${home.homeDirectory}/.local/bin/password show -a Password dovecot) --name dovecot docker.io/dovecot/dovecot:latest'";
+          ExecStart = "sh -c 'podman run -p 31995:31995 -p 127.0.0.1:31143:31143 -v ${home.homeDirectory}/backup/Mail/dovecot.conf:/etc/dovecot/conf.d/dovecot.conf:ro -v ${home.homeDirectory}/backup/Mail/maildir:/srv/vmail/riky/Maildir:O,upperdir=${home.homeDirectory}/.dovecot/upper,workdir=${home.homeDirectory}/.dovecot/work --rm --env USER_PASSWORD=$(${home.homeDirectory}/.local/bin/password show -a Password dovecot) --name dovecot docker.io/dovecot/dovecot:latest'";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -1316,6 +1316,8 @@ let
         ln -sfT "$HOME/backup/keyrings" "$HOME/.local/share/keyrings"
 
         ln -sfT "$HOME/backup/fish_history" "$HOME/.local/share/fish/fish_history"
+
+        mkdir -p '${home.homeDirectory}/.dovecot/upper' '${home.homeDirectory}/.dovecot/work'
       '';
     };
   };
