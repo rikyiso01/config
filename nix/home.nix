@@ -487,7 +487,7 @@ let
         require("nvim-surround").setup()
         -- require('leap').set_default_mappings()
         -- require('nvim_context_vt').setup()
-        -- require("hardtime").setup{restriction_mode="hint"}
+        require("hardtime").setup{}
         vim.notify = require("notify")
         require('flash').setup{}
         require('boole').setup{
