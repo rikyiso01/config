@@ -20,4 +20,4 @@ procs:
         "update",
       ]
   backup-mail:
-    cmd: ["bash", "/home/rike/backup/Mail/fetch.sh"]
+    cmd: ["just","-f", "/home/riky/backup/Mail/justfile"]
