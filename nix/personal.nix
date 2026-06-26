@@ -810,7 +810,7 @@ let
 
     services.syncthing = {
       enable = true;
-      extraOptions = [ "--config=${home.homeDirectory}/backup/syncthing" "--data=${home.homeDirectory}/.local/state/syncthing" ];
+      extraOptions = [ "--config=${home.homeDirectory}/backup/syncthing" "--data=${home.homeDirectory}/.local/state/syncthing" "--allow-newer-config" ];
     };
     services.mpd = {
       enable = true;
