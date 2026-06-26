@@ -394,8 +394,6 @@ let
         vim.lsp.enable("elp")
         vim.lsp.config("postgres_lsp",{capabilities=lsp_capabilities,cmd={"${pkgs.postgres-language-server}/bin/postgres-language-server", "lsp-proxy"}})
         vim.lsp.enable("postgres_lsp")
-        vim.lsp.config("tinymist",{capabilities=lsp_capabilities,cmd={"${pkgs.tinymist}/bin/tinymist"}})
-        vim.lsp.enable("tinymist")
         vim.lsp.config("lua_ls",{capabilities=lsp_capabilities,settings={Lua={workspace={library={"/usr/share/hypr/stubs"}},diagnostics={globals={"vim"}}}}})
         vim.lsp.enable("lua_ls")
 
