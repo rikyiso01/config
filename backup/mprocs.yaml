@@ -11,3 +11,13 @@ procs:
         "/home/riky/backup/Documents/Projects/nix/servers/justfile",
         "backup",
       ]
+  update-server:
+    cmd:
+      [
+        "just",
+        "-f",
+        "/home/riky/backup/Documents/Projects/nix/servers/justfile",
+        "update",
+      ]
+  backup-mail:
+    cmd: ["bash", "/home/rike/backup/Mail/fetch.sh"]
