@@ -381,7 +381,7 @@ let
             env=config.cmd_env
             if (env==nil)then env={} end
             env.PATH="${nixpkgs-csharpls.dotnet-sdk_10}/bin:" .. os.getenv('PATH')
-            return vim.lsp.rpc.start({ '${pkgs.csharp-ls}/bin/csharp-ls',"-f","razor-support" }, dispatchers, {
+            return vim.lsp.rpc.start({ '${nixpkgs-csharpls.csharp-ls}/bin/csharp-ls',"-f","razor-support" }, dispatchers, {
               cwd = config.cmd_cwd or config.root_dir,
               env = env,
               detached = config.detached,
