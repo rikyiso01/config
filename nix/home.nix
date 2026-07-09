@@ -70,6 +70,7 @@ let
       zip
       unzip
       # pwndbg.packages.x86_64-linux.pwndbg
+      socat
     ];
 
     programs.git = {

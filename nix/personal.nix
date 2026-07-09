@@ -280,7 +280,7 @@ let
       settings = {
         monitor = [
           "eDP-1,1920x1080@60,0x0,1"
-          ",preferred,auto,1,mirror,eDP-1"
+          ",preferred,auto,1"
           "desc:HP Inc. HP V22v G5 CNK4310DSG,1920x1080@60,800x-1080,1"
         ];
         "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
@@ -290,6 +290,7 @@ let
           "[workspace 1 silent; maximize] $terminal"
           "[workspace 2 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community"
           "secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@"
+          "${./handle-monitor.sh}"
         ];
         "$menu" = "XDG_DATA_DIRS=${home.homeDirectory}/.local/share/flatpak/exports/share ${pkgs.fuzzel}/bin/fuzzel";
         env = [ "XCURSOR_SIZE,36" "XCURSOR_THEME,Bibata-Modern-Amber" ];
@@ -392,6 +393,10 @@ let
           "$mainMod SHIFT, L, layoutmsg, swapnext"
           "$mainMod SHIFT, K, layoutmsg, swapprev"
           "$mainMod SHIFT, J, layoutmsg, swapnext"
+
+          # Move workspace mainMod + arrow keys
+          "$mainMod CONTROL, H, focusmonitor, +1"
+          "$mainMod CONTROL, L, focusmonitor, -1"
 
           # Move workspace mainMod + arrow keys
           "$mainMod SHIFT&CONTROL, H, movecurrentworkspacetomonitor, +1"
