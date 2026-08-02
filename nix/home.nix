@@ -328,56 +328,6 @@ let
       withRuby = true;
       withPython3 = true;
       initLua = ''
-        vim.opt.termguicolors = true
-        local lsp_capabilities=require("cmp_nvim_lsp").default_capabilities()
-        vim.lsp.config("basedpyright",{capabilities=lsp_capabilities,cmd={"${pkgs.basedpyright}/bin/basedpyright-langserver","--stdio"},settings={basedpyright={analysis={typeCheckingMode="strict",stubPath="${home.homeDirectory}/backup/Documents/Projects/Python/common-stubs",extraPaths={"typings"}}}}})
-        vim.lsp.enable("basedpyright")
-        -- vim.lsp.config("ruff",{capabilities=lsp_capabilities,cmd={"${pkgs.ruff}/bin/ruff","server","--preview"}})
-        -- vim.lsp.enable("ruff")
-        vim.lsp.config("nil_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.nil}/bin/nil"}})
-        vim.lsp.enable("nil_ls")
-        vim.lsp.config("bashls",{capabilities=lsp_capabilities,cmd={"${pkgs.bash-language-server}/bin/bash-language-server","start"}})
-        vim.lsp.enable("bashls")
-        vim.lsp.config("hls",{capabilities=lsp_capabilities,cmd={"haskell-language-server-wrapper","--lsp"}})
-        vim.lsp.enable("hls")
-        vim.lsp.config("dockerls",{capabilities=lsp_capabilities,cmd={"${pkgs.dockerfile-language-server}/bin/docker-langserver","--stdio"}})
-        vim.lsp.enable("dockerls")
-        vim.lsp.config("yamlls",{capabilities=lsp_capabilities,cmd={"${pkgs.yaml-language-server}/bin/yaml-language-server","--stdio"}})
-        vim.lsp.enable("yamlls")
-        vim.lsp.config("jdtls",{capabilities=lsp_capabilities,cmd={"${pkgs.jdt-language-server}/bin/jdtls", "-configuration", "${home.homeDirectory}/.cache/jdtls/config", "-data", "${home.homeDirectory}/.cache/jdtls/workspace"}})
-        vim.lsp.enable("jdtls")
-        vim.lsp.config("kotlin_language_server",{capabilities=lsp_capabilities,cmd={"${pkgs.kotlin-language-server}/bin/kotlin-language-server"}})
-        vim.lsp.enable("kotlin_language_server")
-        vim.lsp.config("ts_ls",{capabilities=lsp_capabilities,cmd={"${pkgs.typescript-language-server}/bin/typescript-language-server","--stdio"}})
-        vim.lsp.enable("ts_ls")
-        vim.lsp.config("eslint",{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-eslint-language-server","--stdio"}})
-        vim.lsp.enable("eslint")
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities.textDocument.completion.completionItem.snippetSupport = true
-        vim.lsp.config("jsonls",{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-json-languageserver}/bin/vscode-json-languageserver","--stdio"},capabilities=capabilities})
-        vim.lsp.enable("jsonls")
-        vim.lsp.config("taplo",{capabilities=lsp_capabilities,cmd={"${pkgs.taplo}/bin/taplo","lsp","stdio"}})
-        vim.lsp.enable("taplo")
-        vim.lsp.config("lemminx",{capabilities=lsp_capabilities,cmd={"${pkgs.lemminx}/bin/lemminx"}})
-        vim.lsp.enable("lemminx")
-        vim.lsp.config("psalm",{capabilities=lsp_capabilities,cmd={"${pkgs.php83Packages.psalm}/bin/psalm","--language-server"}})
-        vim.lsp.enable("psalm")
-        vim.lsp.config("intelephense",{capabilities=lsp_capabilities,cmd={"${pkgs.intelephense}/bin/intelephense","--stdio"}})
-        vim.lsp.enable("intelephense")
-        vim.lsp.config("cssls",{capabilities=lsp_capabilities,cmd={"${pkgs.vscode-langservers-extracted}/bin/vscode-css-language-server","--stdio"}})
-        vim.lsp.enable("cssls")
-        vim.lsp.config("rust_analyzer",{capabilities=lsp_capabilities,cmd={"rust-analyzer"}})
-        vim.lsp.enable("rust_analyzer")
-        vim.lsp.config("dartls",{capabilities=lsp_capabilities,cmd={"${pkgs.dart}/bin/dart","language-server","--protocol=lsp"}})
-        vim.lsp.enable("dartls")
-        vim.lsp.config("ltex_plus",{capabilities=lsp_capabilities,cmd={"${pkgs.ltex-ls-plus}/bin/ltex-ls-plus"},settings={ltex={language="auto"},additionalRules={languageModel="${home.homeDirectory}/.ngrams"}}})
-        vim.lsp.enable("ltex_plus")
-        vim.lsp.config("dhall_lsp_server",{capabilities=lsp_capabilities,cmd={"${pkgs.dhall-lsp-server}/bin/dhall-lsp-server"}})
-        vim.lsp.enable("dhall_lsp_server")
-        vim.lsp.config("clangd",{capabilities=lsp_capabilities,cmd={"${pkgs.clang-tools}/bin/clangd"}})
-        vim.lsp.enable("clangd")
-        vim.lsp.config("solargraph",{capabilities=lsp_capabilities,cmd={"${pkgs.rubyPackages.solargraph}/bin/solargraph","stdio"}})
-        vim.lsp.enable("solargraph")
         vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,filetypes={"cs","razor"},cmd=function(dispatchers, config)
             env=config.cmd_env
             if (env==nil)then env={} end
@@ -389,151 +339,12 @@ let
             })
         end})
         vim.lsp.enable("csharp_ls")
-        vim.lsp.config("astro",{capabilities=lsp_capabilities,cmd={"${pkgs.astro-language-server}/bin/astro-ls","--stdio"},init_options={typescript={tsdk="${pkgs.typescript}/lib/node_modules/typescript/lib"}}})
-        vim.lsp.enable("astro")
-        vim.lsp.config("elp",{capabilities=lsp_capabilities,cmd={"${pkgs.erlang-language-platform}/bin/elp","server"}})
-        vim.lsp.enable("elp")
-        vim.lsp.config("postgres_lsp",{capabilities=lsp_capabilities,cmd={"${pkgs.postgres-language-server}/bin/postgres-language-server", "lsp-proxy"}})
-        vim.lsp.enable("postgres_lsp")
-        vim.lsp.config("lua_ls",{capabilities=lsp_capabilities,settings={Lua={workspace={library={"/usr/share/hypr/stubs"}},diagnostics={globals={"vim"}}}}})
-        vim.lsp.enable("lua_ls")
-
-        require("lualine").setup()
-        require('nvim-autopairs').setup{}
-        require("formatter").setup{
-            filetype={
-                python={function()return {exe="${pkgs.ruff}/bin/ruff",args={"format","-"},stdin=true} end},
-                haskell={function()return {exe="${pkgs.haskellPackages.fourmolu}/bin/fourmolu",args={"--no-cabal","-"},stdin=true} end},
-                java={function()return {exe="${pkgs.google-java-format}/bin/google-java-format",args={"-"},stdin=true} end},
-                kotlin={function()return {exe="${pkgs.ktfmt}/bin/ktfmt",args={"-"},stdin=true} end},
-                javascript={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.js"},stdin=true} end},
-                typescript={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.ts"},stdin=true} end},
-                typescriptreact={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.tsx"},stdin=true} end},
-                css={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
-                json={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.json"},stdin=true} end},
-                jsonc={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.jsonc"},stdin=true} end},
-                yaml={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.yml"},stdin=true} end},
-                markdown={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.md"},stdin=true} end},
-                html={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.html"},stdin=true} end},
-                htmldjango={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.html"},stdin=true} end},
-                css={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.css"},stdin=true} end},
-                graphql={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--stdin-filepath=test.graphql"},stdin=true} end},
-                xml={function()return {exe="${pkgs.html-tidy}/bin/tidy",args={"-i","-xml"},stdin=true} end},
-                nix={function()return {exe="${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt",stdin=true} end},
-                bash={function()return {exe="${pkgs.shfmt}/bin/shfmt",stdin=true} end},
-                dockerfile={function()return {exe="${pkgs.dockerfmt}/bin/dockerfmt",stdin=true} end},
-                toml={function()return {exe="${pkgs.taplo}/bin/taplo",args={"fmt","-"},stdin=true} end},
-                arduino={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
-                c={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
-                cpp={function()return {exe="${pkgs.clang-tools}/bin/clang-format",stdin=true} end},
-                rust={function()return {exe="${pkgs.rustfmt}/bin/rustfmt",stdin=true} end},
-                dart={function()return {exe="${pkgs.dart}/bin/dart",args={"format"},stdin=false} end},
-                dhall={function()return {exe="${pkgs.dhall}/bin/dhall",args={"format"},stdin=true} end},
-                just={function()return {exe="${pkgs.just}/bin/just",args={"--dump"},stdin=true} end},
-                ruby={function()return {exe="${pkgs.rufo}/bin/rufo",args={"--simple-exit"},stdin=true} end},
-                cs={function()return {exe="${pkgs.csharpier}/bin/dotnet-csharpier",stdin=true} end},
-                astro={function()return {exe="${pkgs.prettier}/bin/prettier",args={"--plugin=${pkgs.vscode-extensions.astro-build.astro-vscode}/share/vscode/extensions/astro-build.astro-vscode/node_modules/prettier-plugin-astro/dist/index.js","--stdin-filepath=test.astro"},stdin=true} end},
-                erlang={function()return {exe="${pkgs.beamMinimal28Packages.erlfmt}/bin/erlfmt",args={"-"},stdin=true} end},
-            }
-        }
-        vim.api.nvim_create_autocmd({'BufLeave'},{command='silent! wa'})
-        require('mini.map').setup{integrations={require('mini.map').gen_integration.diagnostic()}}
-        require("trouble").setup{icons={},warn_no_results = false,open_no_results = true,preview={type="main",size={width=0.8}}}
-        vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
-        local cmp=require("cmp")
-        cmp.setup{
-        snippet = {
-              -- REQUIRED - you must specify a snippet engine
-              expand = function(args)
-                vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-                -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-                -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-                -- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
-              end,
-            },
-            sources={{name="nvim_lsp",keyword_length=1},},
-            window={
-                completion={
-                    border="rounded",
-                    winhighlight="Normal:CmpNormal",
-                },
-                documentation={
-                    border="rounded",
-                    winhighlight="Normal:CmpNormal",
-                },
-            },
-            formatting={fields={"menu","abbr","kind"},},
-            mapping={
-                ['<CR>']=cmp.mapping.confirm({select=false}),
-                ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
-                ['<Down>'] = cmp.mapping.select_next_item(select_opts),
-                ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-                ['<C-d>'] = cmp.mapping.scroll_docs(4),
-                ['<esc>'] = cmp.mapping.abort(),
-            },
-        }
-        vim.api.nvim_create_autocmd('FileType', {
-          pattern = { 'razor' },
-          callback = function() vim.treesitter.start() end,
-        })
-        require('gitblame').setup {
-            enabled = true,
-            message_when_not_committed = ""
-        }
-        require('gitsigns').setup()
-        require('yazi').setup({open_for_directories = true})
-        require('nvim-ts-autotag').setup()
-        require("nvim-surround").setup()
-        -- require('leap').set_default_mappings()
-        -- require('nvim_context_vt').setup()
-        require("hardtime").setup{}
-        vim.notify = require("notify")
-        require('flash').setup{}
-        require('boole').setup{
-          mappings = {
-              increment = '<C-a>',
-              decrement = '<C-x>'
-            },
-        }
-        require("outline").setup({})
-        require"dap-view".setup({
-            winbar={
-                sections= { "watches", "scopes", "exceptions", "breakpoints", "threads", "repl", "console" },
-                controls={enabled=true},
-                default_section="threads",
-            },
-            auto_toggle=true,
-        })
         local dap = require('dap')
         dap.adapters.coreclr = {
           type = 'executable',
           command = '${pkgs.netcoredbg}/bin/netcoredbg',
           args = {'--interpreter=vscode'}
         }
-        dap.adapters.python = function(cb, config)
-          if config.request == 'attach' then
-            ---@diagnostic disable-next-line: undefined-field
-            local port = (config.connect or config).port
-            ---@diagnostic disable-next-line: undefined-field
-            local host = (config.connect or config).host or '127.0.0.1'
-            cb({
-              type = 'server',
-              port = assert(port, '`connect.port` is required for a python `attach` configuration'),
-              host = host,
-              options = {
-                source_filetype = 'python',
-              },
-            })
-          else
-            cb({
-              type = 'executable',
-              command = '${pkgs.python3Packages.debugpy}/bin/debugpy-adapter',
-              options = {
-                source_filetype = 'python',
-              },
-            })
-          end
-        end
         dofile("${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/neovim.lua")
       '';
 
@@ -583,6 +394,43 @@ let
         jdt-language-server
         rust-analyzer
         lua-language-server
+        basedpyright
+        nil
+        bash-language-server
+        dockerfile-language-server
+        yaml-language-server
+        jdt-language-server
+        kotlin-language-server
+        typescript-language-server
+        vscode-langservers-extracted
+        vscode-json-languageserver
+        taplo
+        lemminx
+        php83Packages.psalm
+        intelephense
+        dart
+        ltex-ls-plus
+        dhall
+        dhall-lsp-server
+        clang-tools
+        rubyPackages.solargraph
+        erlang-language-platform
+        postgres-language-server
+        ruff
+        haskellPackages.fourmolu
+        google-java-format
+        ktfmt
+        prettier
+        html-tidy
+        nixpkgs-fmt
+        shfmt
+        dockerfmt
+        rustfmt
+        just
+        rufo
+        csharpier
+        beamMinimal28Packages.erlfmt
+        python3Packages.debugpy
       ];
     };
 

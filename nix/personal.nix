@@ -16,6 +16,7 @@ let
       EDITOR = "${home.homeDirectory}/.nix-profile/bin/nvim";
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
+      NIX_CONFIG_FOLDER = "${home.homeDirectory}/backup/Documents/config";
     };
 
     accounts = {
@@ -276,192 +277,8 @@ let
       enable = true;
       package = null;
       systemd.enable = true;
-      configType = "hyprlang";
-      settings = {
-        monitor = [
-          "eDP-1,1920x1080@60,0x0,1"
-          ",preferred,auto,1"
-          "desc:HP Inc. HP V22v G5 CNK4310DSG,1920x1080@60,800x-1080,1"
-        ];
-        "$terminal" = "/usr/bin/flatpak run page.codeberg.dnkl.foot";
-        "$fileManager" = "/usr/bin/flatpak run org.gnome.Nautilus.Devel";
-        exec-once = [
-          "/usr/libexec/hyprpolkitagent"
-          "[workspace 1 silent; maximize] $terminal"
-          "[workspace 2 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community"
-          "secret-tool lookup keepass password | SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ ${home.homeDirectory}/backup/phone/Drive/keepass.kdbx @@"
-          "${./handle-monitor.sh}"
-        ];
-        "$menu" = "XDG_DATA_DIRS=${home.homeDirectory}/.local/share/flatpak/exports/share ${pkgs.fuzzel}/bin/fuzzel";
-        env = [ "XCURSOR_SIZE,36" "XCURSOR_THEME,Bibata-Modern-Amber" ];
-        input = {
-          kb_layout = "us";
-          kb_variant = "";
-          kb_model = "";
-          kb_options = "ctrl:nocaps, compose:paus";
-          kb_rules = "";
-          follow_mouse = 1;
-
-          touchpad = {
-            natural_scroll = true;
-          };
-
-          sensitivity = 1.0;
-          repeat_rate = 50;
-          repeat_delay = 300;
-
-        };
-        general = {
-          gaps_in = 0;
-          gaps_out = 0;
-          border_size = 2;
-          "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
-          "col.inactive_border" = "rgba(595959aa)";
-
-          layout = "master";
-
-          allow_tearing = false;
-
-        };
-        decoration = {
-          rounding = 10;
-
-          blur = {
-            enabled = false;
-            size = 3;
-            passes = 1;
-          };
-          shadow = {
-            enabled = false;
-          };
-        };
-        animations = {
-          enabled = true;
-
-
-          bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
-
-          animation = [
-            "windows, 1, 7, myBezier"
-            "windowsOut, 1, 7, default, popin 80%"
-            "border, 1, 10, default"
-            "fade, 1, 7, default"
-            "workspaces, 1, 6, default"
-          ];
-        };
-        dwindle = {
-          preserve_split = true; # you probably want this
-        };
-        misc = {
-          force_default_wallpaper = 0; # Set to 0 or 1 to disable the anime mascot wallpapers
-          disable_watchdog_warning = true;
-          on_focus_under_fullscreen = true;
-        };
-        device = [{
-          name = "epic-mouse-v1";
-          sensitivity = -0.5;
-        }
-          {
-            name = "cx-trust-wireless-mouse-1";
-            sensitivity = -0.25;
-          }];
-        windowrule = "suppress_event maximize, match:class .*";
-        "$mainMod" = "SUPER";
-        bind = [
-          "$mainMod, RETURN, exec, $terminal"
-          "$mainMod, Q, killactive,"
-          "$mainMod SHIFT, P, exec, poweroff"
-          "$mainMod SHIFT, F, exec, if [[ $(powerprofilesctl get) = 'power-saver' ]]; then powerprofilesctl set balanced; else powerprofilesctl set power-saver; fi"
-          "$mainMod SHIFT, W, exec, pkill hyprpaper"
-          "$mainMod SHIFT, B, exec, rfkill toggle bluetooth"
-          "$mainMod SHIFT, R, exec, nmcli d wifi rescan"
-          "$mainMod SHIFT, G, exec, /usr/bin/hyprlock"
-          "$mainMod, E, exec, $fileManager"
-          "$mainMod, V, togglefloating,"
-          "$mainMod, R, exec, $menu"
-          "$mainMod, P, pseudo,"
-
-
-          # Move focus with mainMod + arrow keys
-          "$mainMod, H, layoutmsg, cycleprev"
-          "$mainMod, L, layoutmsg, cyclenext"
-          "$mainMod, K, layoutmsg, cycleprev"
-          "$mainMod, J, layoutmsg, cyclenext"
-
-          # Move window mainMod + arrow keys
-          "$mainMod SHIFT, H, layoutmsg, swapprev"
-          "$mainMod SHIFT, L, layoutmsg, swapnext"
-          "$mainMod SHIFT, K, layoutmsg, swapprev"
-          "$mainMod SHIFT, J, layoutmsg, swapnext"
-
-          # Move workspace mainMod + arrow keys
-          "$mainMod CONTROL, H, focusmonitor, +1"
-          "$mainMod CONTROL, L, focusmonitor, -1"
-
-          # Move workspace mainMod + arrow keys
-          "$mainMod SHIFT&CONTROL, H, movecurrentworkspacetomonitor, +1"
-          "$mainMod SHIFT&CONTROL, L, movecurrentworkspacetomonitor, -1"
-
-          # Switch workspaces with mainMod + [0-9]
-          "$mainMod, 1, workspace, 1"
-          "$mainMod, 2, workspace, 2"
-          "$mainMod, 3, workspace, 3"
-          "$mainMod, 4, workspace, 4"
-          "$mainMod, 5, workspace, 5"
-          "$mainMod, 6, workspace, 6"
-          "$mainMod, 7, workspace, 7"
-          "$mainMod, 8, workspace, 8"
-          "$mainMod, 9, workspace, 9"
-          "$mainMod, 0, workspace, 10"
-
-          # Move active window to a workspace with mainMod + SHIFT + [0-9]
-          "$mainMod SHIFT, 1, movetoworkspace, 1"
-          "$mainMod SHIFT, 2, movetoworkspace, 2"
-          "$mainMod SHIFT, 3, movetoworkspace, 3"
-          "$mainMod SHIFT, 4, movetoworkspace, 4"
-          "$mainMod SHIFT, 5, movetoworkspace, 5"
-          "$mainMod SHIFT, 6, movetoworkspace, 6"
-          "$mainMod SHIFT, 7, movetoworkspace, 7"
-          "$mainMod SHIFT, 8, movetoworkspace, 8"
-          "$mainMod SHIFT, 9, movetoworkspace, 9"
-          "$mainMod SHIFT, 0, movetoworkspace, 10"
-
-          # Example special workspace (scratchpad)
-          "$mainMod, S, togglespecialworkspace, magic"
-          "$mainMod SHIFT, S, movetoworkspace, special:magic"
-
-          # Scroll through existing workspaces with mainMod + scroll
-          "$mainMod, mouse_down, workspace, e+1"
-          "$mainMod, mouse_up, workspace, e-1"
-
-
-          ", XF86AudioRaiseVolume, exec, ${pkgs.pamixer}/bin/pamixer -i 5"
-          ", XF86AudioLowerVolume, exec, ${pkgs.pamixer}/bin/pamixer -d 5"
-          ", XF86AudioMicMute, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t"
-          ", XF86AudioMute, exec, ${pkgs.pamixer}/bin/pamixer -t"
-          ", XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause"
-          ", XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl -a play-pause"
-          ", XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl -a next"
-          ", XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl -a previous"
-          ", XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-"
-          ", XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+"
-          ", Print, exec, ${pkgs.grim}/bin/grim \"$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir PICTURES)/$(date +'%s_grim.png')\""
-
-          ", XF86HomePage, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-"
-          ", XF86Mail, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%+"
-
-          "$mainMod SHIFT, SPACE, exec, hyprctl switchxkblayout at-translated-set-2-keyboard next"
-
-          "$mainMod, F, fullscreen, 0"
-          "$mainMod, M, fullscreen, 1"
-          "$mainMod SHIFT, M, exec, ${pkgs.pamixer}/bin/pamixer --default-source -t"
-        ];
-        bindm = [
-          # Move/resize windows with mainMod + LMB/RMB and dragging
-          "$mainMod, mouse:272, movewindow"
-          "$mainMod, mouse:273, resizewindow"
-        ];
-      };
+      configType = "lua";
+      extraConfig="require('${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/hyprland.lua')";
     };
 
     programs.waybar = {
@@ -1172,8 +989,7 @@ let
         udisks2
         xdg-desktop-portal-gtk
         xdg-desktop-portal-hyprland
-        pacman-contrib
-        niri'';
+        pacman-contrib'';
       onChange = "
             sudo pacman -S --noconfirm --needed $(cat $HOME/.local/nix-sources/packages)
             sudo pacman -D --asdeps $(pacman -Qqe)
