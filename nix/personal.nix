@@ -7,6 +7,7 @@ let
     home.packages = with pkgs; [
       nixgl.nixGLIntel
       nixgl.nixVulkanIntel
+      grim
     ];
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
 
@@ -278,7 +279,7 @@ let
       package = null;
       systemd.enable = true;
       configType = "lua";
-      extraConfig="require('${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/hyprland.lua')";
+      extraLuaFiles."config".content=./hyprland.lua;
     };
 
     programs.waybar = {
