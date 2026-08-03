@@ -287,80 +287,6 @@ let
 
     xdg.configFile."noctalia/config.toml".source=(pkgs.formats.toml {}).generate "config" {include.files=["${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/noctalia.toml"];};
 
-    programs.hyprlock = {
-      enable = true;
-      package = null;
-      settings = {
-        source = "${./mocha.conf}";
-        "$accent" = "$mauve";
-        "$accentAlpha" = "$mauveAlpha";
-        "$font" = "JetBrainsMono Nerd Font";
-        general = {
-          hide_cursor = true;
-        };
-        animations = {
-          animation = "fadeOut, 0, 0, linear";
-        };
-        label = [
-          # LAYOUT
-          {
-            monitor = "";
-            text = "Layout: $LAYOUT";
-            color = "$text";
-            font_size = 25;
-            font_family = "$font";
-            position = "30, -30";
-            halign = "left";
-            valign = "top";
-          }
-          # TIME
-          {
-            monitor = "";
-            text = "$TIME";
-            color = "$text";
-            font_size = 90;
-            font_family = "$font";
-            position = "-30, 0";
-            halign = "right";
-            valign = "top";
-          }
-          # DATE
-          {
-            monitor = "";
-            text = "cmd[update:43200000] date +\"%A, %d %B %Y\"";
-            color = "$text";
-            font_size = 25;
-            font_family = "$font";
-            position = "-30, -150";
-            halign = "right";
-            valign = "top";
-          }
-        ];
-
-        input-field = {
-          monitor = "";
-          size = "300, 60";
-          outline_thickness = 4;
-          dots_size = 0.2;
-          dots_spacing = 0.2;
-          dots_center = true;
-          outer_color = "$accent";
-          inner_color = "$surface0";
-          font_color = "$text";
-          fade_on_empty = false;
-          placeholder_text = "<span foreground=\"##$textAlpha\"><i>󰌾 Logged in as </i><span foreground=\"##$accentAlpha\">$USER</span></span>";
-          hide_input = false;
-          check_color = "$accent";
-          fail_color = "$red";
-          fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
-          capslock_color = "$yellow";
-          position = "0, -47";
-          halign = "center";
-          valign = "center";
-        };
-      };
-    };
-
     services.syncthing = {
       enable = true;
       extraOptions = [ "--config=${home.homeDirectory}/backup/syncthing" "--data=${home.homeDirectory}/.local/state/syncthing" "--allow-newer-config" ];
@@ -681,17 +607,15 @@ let
         greetd
         greetd-tuigreet
         hyprland
-        hyprlock
-        hyprpaper
         intel-ucode
         reflector
         intel-media-driver
         util-linux
         flatpak
         polkit
+        podman
         pipewire
         wireplumber
-        podman
         pipewire-jack
         pipewire-alsa
         pipewire-pulse
@@ -829,7 +753,6 @@ let
 
         systemctl enable --user gcr-ssh-agent.socket
         systemctl enable --user podman.socket
-        systemctl enable --user hyprpaper.service
         systemctl --user mask tracker-extract-3.service tracker-miner-fs-3.service tracker-miner-rss-3.service tracker-writeback-3.service tracker-xdg-portal-3.service tracker-miner-fs-control-3.service
         mkdir -p "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution"
         ln -sfT "${./policies.json}" "${home.homeDirectory}/.local/share/flatpak/app/io.gitlab.librewolf-community/current/active/files/lib/librewolf/distribution/policies.json"
