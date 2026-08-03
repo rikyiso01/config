@@ -3,10 +3,10 @@
 set -euo pipefail
 
 if [[ $(/usr/bin/cat '/sys/class/power_supply/BAT0/status') == 'Discharging' ]]; then
-    rfkill block 'bluetooth'
-    noctalia msg britghness-set '15%'
-    (exec -c powerprofilesctl set power-saver)
+    noctalia msg brightness-set '15%'
+    noctalia msg power-set power-saver
 else
-    rfkill unblock 'bluetooth'
-    (exec -c powerprofilesctl set balanced)
+    noctalia msg power-set balanced
 fi
+
+noctalia msg bluetooth-disable
