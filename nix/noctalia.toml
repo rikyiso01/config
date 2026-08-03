@@ -44,6 +44,9 @@ stat = "ram_pct"
 type = "sysmon"
 stat = "swap_pct"
 
+[brightness]
+enable_ddcutil = true
+
 [battery]
 warning_threshold = 30
 

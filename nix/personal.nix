@@ -706,7 +706,8 @@ let
         udisks2
         xdg-desktop-portal-gtk
         xdg-desktop-portal-hyprland
-        pacman-contrib'';
+        pacman-contrib
+        ddcutil'';
       onChange = "
             sudo pacman -S --noconfirm --needed $(cat $HOME/.local/nix-sources/packages)
             sudo pacman -D --asdeps $(pacman -Qqe)
