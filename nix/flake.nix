@@ -14,17 +14,22 @@
     nixgl.url = "github:nix-community/nixGL";
     pwndbg.url = "github:pwndbg/pwndbg";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
+    pam-shim = {
+      url = "github:Cu3PO42/pam_shim/next";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, homeManager, nix-index-database, nixgl, pwndbg, nixpkgs-csharpls, nix-flatpak }: {
+  outputs = { self, nixpkgs, homeManager, nix-index-database, nixgl, pwndbg, nixpkgs-csharpls, nix-flatpak, pam-shim }: {
     homeConfigurations = {
       "riky" = homeManager.lib.homeManagerConfiguration {
-        extraSpecialArgs = { pwndbg = pwndbg; nixpkgs-csharpls=nixpkgs-csharpls.legacyPackages.x86_64-linux; };
+        extraSpecialArgs = { pwndbg = pwndbg; nixpkgs-csharpls = nixpkgs-csharpls.legacyPackages.x86_64-linux; };
         modules = [
           ./home.nix
           ./personal.nix
           nix-index-database.homeModules.nix-index
           nix-flatpak.homeManagerModules.nix-flatpak
+          pam-shim.homeModules.default
           {
             programs.nix-index-database.comma.enable = true;
             home.sessionVariables.NIX_PATH = nixpkgs.outPath;

@@ -7,9 +7,11 @@ let
     home.packages = with pkgs; [
       nixgl.nixGLIntel
       nixgl.nixVulkanIntel
-      grim
+      (config.lib.pamShim.replacePam noctalia)
     ];
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
+
+    pamShim.enable=true;
 
     home.sessionVariables = {
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
@@ -686,7 +688,7 @@ let
         intel-media-driver
         util-linux
         flatpak
-        hyprpolkitagent
+        polkit
         pipewire
         wireplumber
         podman

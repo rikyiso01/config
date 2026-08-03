@@ -67,7 +67,6 @@ let
       unzip
       # pwndbg.packages.x86_64-linux.pwndbg
       socat
-      noctalia
     ];
 
     programs.git = {

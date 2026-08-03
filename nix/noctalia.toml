@@ -1,6 +1,9 @@
 [theme]
 mode = "dark"
 
+[shell]
+polkit_agent = true
+
 [bar.default]
 position = "top"
 start = ["workspaces"]

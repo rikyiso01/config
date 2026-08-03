@@ -74,15 +74,13 @@ hl.bind(mainMod .. " + " .. "Q", hl.dsp.window.close())
 
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "P", hl.dsp.exec_cmd("poweroff"))
 
-hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "F", hl.dsp.exec_cmd("if [[ $(powerprofilesctl get) = 'power-saver' ]]; then powerprofilesctl set balanced; else powerprofilesctl set power-saver; fi"))
+hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "F", hl.dsp.exec_cmd(ipc.."power-cycle"))
 
-hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "W", hl.dsp.exec_cmd("pkill hyprpaper"))
+hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "W", hl.dsp.exec_cmd(ipc.."wallpaper-next"))
 
-hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "B", hl.dsp.exec_cmd("rfkill toggle bluetooth"))
+hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "B", hl.dsp.exec_cmd(ipc.."bluetooth-toggle"))
 
-hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "R", hl.dsp.exec_cmd("nmcli d wifi rescan"))
-
-hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "G", hl.dsp.exec_cmd("/usr/bin/hyprlock"))
+hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "G", hl.dsp.exec_cmd(ipc.."session lock"))
 
 hl.bind(mainMod .. " + " .. "E", hl.dsp.exec_cmd(fileManager))
 
@@ -135,33 +133,29 @@ hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc.."volume-up"))
 
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc.."volume-down"))
 
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("pamixer --default-source -t"))
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(ipc.."mic-mute"))
 
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc.."volume-mute"))
 
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl -a play-pause"))
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd(ipc.."media toggle"))
 
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl -a play-pause"))
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd(ipc.."media toggle"))
 
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl -a next"))
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd(ipc.."media next"))
 
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl -a previous"))
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd(ipc.."media previous"))
 
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc.."brightness-down"))
 
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc.."brightness-up"))
 
-hl.bind("Print", hl.dsp.exec_cmd("grim \"$(xdg-user-dir PICTURES)/$(date +'%s_grim.png')\""))
-
-hl.bind("XF86HomePage", hl.dsp.exec_cmd("brightnessctl set 5%-"))
-
-hl.bind("XF86Mail", hl.dsp.exec_cmd("brightnessctl set 5%+"))
+hl.bind("Print", hl.dsp.exec_cmd(ipc.."screenshot-region"))
 
 hl.bind(mainMod .. " + " .. "F", hl.dsp.window.fullscreen({mode="fullscreen"}))
 
 hl.bind(mainMod .. " + " .. "M", hl.dsp.window.fullscreen({mode="maximized"}))
 
-hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "M", hl.dsp.exec_cmd("pamixer --default-source -t"))
+hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "M", hl.dsp.exec_cmd(ipc.."mic-mute"))
 
 hl.bind(mainMod .. " + " .. "mouse:272", hl.dsp.window.drag(), { mouse = true })
 
@@ -221,11 +215,10 @@ hl.layer_rule({
 
 -- Autostart
 hl.on("hyprland.start", function()
-    hl.exec_cmd("/usr/libexec/hyprpolkitagent")
     hl.exec_cmd("[workspace 1 silent; maximize] /usr/bin/flatpak run page.codeberg.dnkl.foot")
     hl.exec_cmd("[workspace 2 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community")
     hl.exec_cmd("secret-tool lookup keepass password | SSH_AUTH_SOCK=" .. os.getenv("XDG_RUNTIME_DIR") .. "/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ "..home.."/backup/phone/Drive/keepass.kdbx @@")
-    hl.exec_cmd("nixGLIntel noctalia")
+    hl.exec_cmd("LC_TIME=en_GB nixGLIntel noctalia")
 end)
 
 hl.on("monitor.added",function(monitor)
