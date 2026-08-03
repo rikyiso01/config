@@ -147,9 +147,9 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl -a next"))
 
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl -a previous"))
 
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc.."brightness-up"))
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc.."brightness-down"))
 
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc.."brightness-down"))
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc.."brightness-up"))
 
 hl.bind("Print", hl.dsp.exec_cmd("grim \"$(xdg-user-dir PICTURES)/$(date +'%s_grim.png')\""))
 
