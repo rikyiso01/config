@@ -19,6 +19,9 @@ end = [
   "tray",
 ]
 
+[audio]
+enable_overdrive = true
+
 [widget.clock]
 format = "%a, %d %b, %H:%M"
 
