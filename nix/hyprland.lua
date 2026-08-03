@@ -5,13 +5,59 @@ local fileManager = "/usr/bin/flatpak run org.gnome.Nautilus.Devel"
 
 local mainMod = "SUPER"
 
-local menu = "XDG_DATA_DIRS="..home.."/home/riky/.local/share/flatpak/exports/share fuzzel"
-
 local terminal = "/usr/bin/flatpak run page.codeberg.dnkl.foot"
 
+local ipc="noctalia msg "
+
 hl.config({
+    general = {
+        allow_tearing = false,
+        border_size = 2,
+        gaps_in = 5,
+        gaps_out = 10,
+        layout = "master",
+        col = {
+            active_border = { colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 },
+            inactive_border = "rgba(595959aa)",
+        },
+    },
     animations = {
         enabled = true,
+    },
+    decoration = {
+        blur = {
+            enabled = true,
+            passes = 2,
+            size = 3,
+            vibrancy=0.1696,
+        },
+        shadow = {
+            enabled = true,
+            range=4,
+            render_power=3,
+            color="0xee1a1a1a",
+        },
+        rounding = 20,
+        rounding_power=2,
+    },
+    dwindle = {
+        preserve_split = true,
+    },
+    input = {
+        touchpad = {
+            natural_scroll = true,
+        },
+        follow_mouse = 1,
+        kb_layout = "us",
+        kb_options = "ctrl:nocaps, compose:paus",
+        repeat_delay = 300,
+        repeat_rate = 50,
+        sensitivity = 1.000000,
+    },
+    misc = {
+        disable_watchdog_warning = true,
+        force_default_wallpaper = 0,
+        on_focus_under_fullscreen = true,
     },
 })
 
@@ -42,7 +88,7 @@ hl.bind(mainMod .. " + " .. "E", hl.dsp.exec_cmd(fileManager))
 
 hl.bind(mainMod .. " + " .. "V", hl.dsp.window.float())
 
-hl.bind(mainMod .. " + " .. "R", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + " .. "R", hl.dsp.exec_cmd(ipc.."panel-toggle launcher"))
 
 hl.bind(mainMod .. " + " .. "P", hl.dsp.window.pseudo())
 
@@ -85,13 +131,13 @@ hl.bind(mainMod .. " + " .. "mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 
 hl.bind(mainMod .. " + " .. "mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("pamixer -i 5"))
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc.."volume-up"))
 
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("pamixer -d 5"))
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc.."volume-down"))
 
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("pamixer --default-source -t"))
 
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("pamixer -t"))
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc.."volume-mute"))
 
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl -a play-pause"))
 
@@ -101,9 +147,9 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl -a next"))
 
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl -a previous"))
 
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl set 5%-"))
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc.."brightness-up"))
 
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl set 5%+"))
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc.."brightness-down"))
 
 hl.bind("Print", hl.dsp.exec_cmd("grim \"$(xdg-user-dir PICTURES)/$(date +'%s_grim.png')\""))
 
@@ -121,20 +167,6 @@ hl.bind(mainMod .. " + " .. "mouse:272", hl.dsp.window.drag(), { mouse = true })
 
 hl.bind(mainMod .. " + " .. "mouse:273", hl.dsp.window.resize(), { mouse = true })
 
-hl.config({
-    decoration = {
-        blur = {
-            enabled = false,
-            passes = 1,
-            size = 3,
-        },
-        shadow = {
-            enabled = false,
-        },
-        rounding = 10,
-    },
-})
-
 hl.device({
     name = "epic-mouse-v1",
     sensitivity = -0.500000,
@@ -145,54 +177,9 @@ hl.device({
     sensitivity = -0.250000,
 })
 
-hl.config({
-    dwindle = {
-        preserve_split = true,
-    },
-})
-
 hl.env("XCURSOR_SIZE", 36)
 
 hl.env("XCURSOR_THEME", "Bibata-Modern-Amber")
-
-
-
-
-hl.config({
-    general = {
-        allow_tearing = false,
-        border_size = 2,
-        gaps_in = 0,
-        gaps_out = 0,
-        layout = "master",
-        col = {
-            active_border = { colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 },
-            inactive_border = "rgba(595959aa)",
-        },
-    },
-})
-
-hl.config({
-    input = {
-        touchpad = {
-            natural_scroll = true,
-        },
-        follow_mouse = 1,
-        kb_layout = "us",
-        kb_options = "ctrl:nocaps, compose:paus",
-        repeat_delay = 300,
-        repeat_rate = 50,
-        sensitivity = 1.000000,
-    },
-})
-
-hl.config({
-    misc = {
-        disable_watchdog_warning = true,
-        force_default_wallpaper = 0,
-        on_focus_under_fullscreen = true,
-    },
-})
 
 hl.monitor({
     output   = "eDP-1",
@@ -215,12 +202,30 @@ hl.monitor({
     scale    = 1,
 })
 
+hl.window_rule({
+    match = { class = "dev.noctalia.Noctalia" },
+    float = true,
+    size = { 1080, 920 },
+})
+
+hl.layer_rule({
+  name = "noctalia",
+  match = {
+    namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$",
+  },
+  no_anim = true,
+  ignore_alpha = 0.5,
+  blur = true,
+  blur_popups = true,
+})
+
 -- Autostart
 hl.on("hyprland.start", function()
     hl.exec_cmd("/usr/libexec/hyprpolkitagent")
     hl.exec_cmd("[workspace 1 silent; maximize] /usr/bin/flatpak run page.codeberg.dnkl.foot")
     hl.exec_cmd("[workspace 2 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community")
     hl.exec_cmd("secret-tool lookup keepass password | SSH_AUTH_SOCK=" .. os.getenv("XDG_RUNTIME_DIR") .. "/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ "..home.."/backup/phone/Drive/keepass.kdbx @@")
+    hl.exec_cmd("nixGLIntel noctalia")
 end)
 
 hl.on("monitor.added",function(monitor)

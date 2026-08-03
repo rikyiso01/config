@@ -5,19 +5,19 @@ set migrations ~/Work/FERRARI/migrations/supplierrisk
 
 ssh homeassistant.riccardoisola.dev docker start teams
 
-hyprctl dispatch workspace 2
-hyprctl dispatch movecurrentworkspacetomonitor HDMI-A-1
+hyprctl dispatch 'hl.dsp.focus({workspace=2})'
+hyprctl dispatch 'hl.dsp.workspace.move({monitor="HDMI-A-1"})'
 sleep 1
 
-hyprctl dispatch workspace 3
-hyprctl dispatch exec flatpak run io.github.ungoogled_software.ungoogled_chromium
+hyprctl dispatch 'hl.dsp.focus({workspace=3})'
+hyprctl dispatch 'hl.dsp.exec_cmd("flatpak run io.github.ungoogled_software.ungoogled_chromium")'
 sleep 2
 
-hyprctl dispatch workspace 5
-hyprctl dispatch exec flatpak run org.remmina.Remmina ~/.var/app/org.remmina.Remmina/data/remmina/group_rdp_work-laptop-remote_homeassistant-riccardoisola-dev.remmina
+hyprctl dispatch 'hl.dsp.focus({workspace=5})'
+hyprctl dispatch 'hl.dsp.exec_cmd("flatpak run org.remmina.Remmina ~/.var/app/org.remmina.Remmina/data/remmina/group_rdp_work-laptop-remote_homeassistant-riccardoisola-dev.remmina")'
 sleep 2
-hyprctl dispatch workspace 4
-hyprctl dispatch exec flatpak run io.dbeaver.DBeaverCommunity
+hyprctl dispatch 'hl.dsp.focus({workspace=4})'
+hyprctl dispatch 'hl.dsp.exec_cmd("flatpak run io.dbeaver.DBeaverCommunity")'
 
 tmux select-window -t 0 \; select-pane -t 0 \; send-keys 'tt1gw'
 tmux new-window -c $workspace \; send-keys 'nvim Views/Home/Index.cshtml' 'Enter' \; split-window -h -c $workspace \; select-pane -t 0 \; resize-pane -Z

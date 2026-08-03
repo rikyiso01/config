@@ -1,0 +1,63 @@
+[theme]
+mode = "dark"
+
+[bar.default]
+position = "top"
+start = ["workspaces"]
+center = ["clock"]
+end = [
+  "volume",
+  "mic",
+  "cpu",
+  "ram",
+  "swap",
+  "brightness",
+  "battery",
+  "network",
+  "power_profile",
+  "bluetooth",
+  "tray",
+]
+
+[widget.clock]
+format = "%a, %d %b, %H:%M"
+
+[widget.mic]
+type = "volume"
+device = "input"
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+
+[widget.ram]
+type = "sysmon"
+stat = "ram_pct"
+
+[widget.swap]
+type = "sysmon"
+stat = "swap_pct"
+
+[battery]
+warning_threshold = 30
+
+[location]
+auto_locate = true
+
+[calendar]
+enabled = true
+
+[calendar.account.personal]
+type = "caldav"
+name = "Personal"
+provider = "custom"
+server_url = "http://127.0.0.1:5232"
+username = "t"
+credential_source = "file"
+password_file = "~/.config/.noctalia-calendar"
+
+[nightlight]
+enabled = true
+force = true
+temperature_day = 3700
+temperature_night = 3700

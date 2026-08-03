@@ -1,17 +1,17 @@
 #!/usr/bin/env fish
 
-hyprctl dispatch workspace 2
+hyprctl dispatch 'hl.dsp.focus({workspace=2})'
 sleep 1
-hyprctl dispatch killactive
-hyprctl dispatch workspace 3
+hyprctl dispatch 'hl.dsp.window.close()'
+hyprctl dispatch 'hl.dsp.focus({workspace=3})'
 sleep 1
-hyprctl dispatch killactive
-hyprctl dispatch workspace 4
+hyprctl dispatch 'hl.dsp.window.close()'
+hyprctl dispatch 'hl.dsp.focus({workspace=4})'
 sleep 1
-hyprctl dispatch killactive
-hyprctl dispatch workspace 5
+hyprctl dispatch 'hl.dsp.window.close()'
+hyprctl dispatch 'hl.dsp.focus({workspace=5})'
 sleep 1
-hyprctl dispatch killactive
+hyprctl dispatch 'hl.dsp.window.close()'
 
 tmux select-window -t 1 \; select-pane -t 0 \; send-keys ':q' 'Enter'
 tmux select-window -t 2 \; select-pane -t 0 \; send-keys ':q' 'Enter'

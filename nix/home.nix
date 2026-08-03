@@ -48,10 +48,6 @@ let
       ascii
       w3m
       fastfetch
-      pamixer
-      pavucontrol
-      brightnessctl
-      playerctl
       trash-cli
       wl-clipboard
       nixVersions.latest
@@ -71,6 +67,7 @@ let
       unzip
       # pwndbg.packages.x86_64-linux.pwndbg
       socat
+      noctalia
     ];
 
     programs.git = {
