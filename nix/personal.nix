@@ -11,7 +11,7 @@ let
     ];
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
 
-    pamShim.enable=true;
+    pamShim.enable = true;
 
     home.sessionVariables = {
       DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/podman/podman.sock";
@@ -20,7 +20,7 @@ let
       VISUAL = "$EDITOR";
       SUDO_EDITOR = "$VISUAL";
       NIX_CONFIG_FOLDER = "${home.homeDirectory}/backup/Documents/config";
-      LC_TIME="en_GB";
+      LC_TIME = "en_GB";
     };
 
     accounts = {
@@ -282,10 +282,10 @@ let
       package = null;
       systemd.enable = true;
       configType = "lua";
-      extraLuaFiles."config".content=./hyprland.lua;
+      extraLuaFiles."config".content = ./hyprland.lua;
     };
 
-    xdg.configFile."noctalia/config.toml".source=(pkgs.formats.toml {}).generate "config" {include.files=["${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/noctalia.toml"];};
+    xdg.configFile."noctalia/config.toml".source = (pkgs.formats.toml { }).generate "config" { include.files = [ "${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/noctalia.toml" ]; };
 
     services.syncthing = {
       enable = true;
@@ -370,14 +370,6 @@ let
     };
 
     systemd.user.services = {
-      startup = {
-        Unit = { Description = "Startup"; };
-        Service = {
-          ExecStartPre = "/bin/sleep 5";
-          ExecStart = "bash ${./startup.sh}";
-        };
-        Install = { WantedBy = [ "default.target" ]; };
-      };
       rclone = {
         Unit = {
           Description = "rclone";
@@ -386,33 +378,6 @@ let
           ExecStartPre = "bash -c 'while ! getent hosts www.google.com; do sleep 5; done'";
           ExecStart = "${pkgs.rclone}/bin/rclone --config ${home.homeDirectory}/backup/rclone.conf copy --update ${home.homeDirectory}/backup/phone/Drive drive:Syncthing";
           Environment = "RCLONE_PASSWORD_COMMAND='${home.homeDirectory}/.local/bin/password show -a Password rclone'";
-        };
-        Install = { WantedBy = [ "default.target" ]; };
-      };
-      autotune = {
-        Unit = { Description = "Powertop autotune"; };
-        Service = {
-          Type = "oneshot";
-          RemainAfterExit = "yes";
-          ExecStart = "${home.homeDirectory}/.local/bin/autotune";
-        };
-        Install = { WantedBy = [ "default.target" ]; };
-      };
-      trash = {
-        Unit = { Description = "Automatically empty trash"; };
-        Service = {
-          Type = "oneshot";
-          RemainAfterExit = "yes";
-          ExecStart = "${pkgs.trash-cli}/bin/trash-empty 30";
-        };
-        Install = { WantedBy = [ "default.target" ]; };
-      };
-      clear-playlist = {
-        Unit = { Description = "Clear mpd playlist on startup"; };
-        Service = {
-          Type = "oneshot";
-          ExecStartPre = "sleep 1";
-          ExecStart = "${pkgs.mpc}/bin/mpc clear";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
@@ -487,6 +452,10 @@ let
     '';
 
 
+    home.file.".local/bin/startup.sh" = {
+      source = ./startup.sh;
+      executable = true;
+    };
     home.file.".local/bin/password" = {
       text = ''
         #!/usr/bin/env bash

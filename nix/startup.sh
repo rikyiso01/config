@@ -10,3 +10,6 @@ else
 fi
 
 noctalia msg bluetooth-disable
+mpc clear
+trash-empty -f 30
+autotune
