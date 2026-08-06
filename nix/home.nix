@@ -1,4 +1,4 @@
-{ config, pkgs, lib, pwndbg, nixpkgs-csharpls, ... }:
+{ config, pkgs, lib, pwndbg, ... }:
 
 let
   homeManager = rec {
@@ -171,7 +171,7 @@ let
             run = "shell -- /usr/bin/flatpak run --file-forwarding org.gimp.GIMP @@ \"$@\" @@";
           }
           {
-            on = ["g" "w"];
+            on = [ "g" "w" ];
             run = "cd ~/Work/FERRARI/FERRARI_GT";
             desc = "Goto working directory";
           }
@@ -323,26 +323,7 @@ let
       vimdiffAlias = true;
       withRuby = true;
       withPython3 = true;
-      initLua = ''
-        vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,filetypes={"cs","razor"},cmd=function(dispatchers, config)
-            env=config.cmd_env
-            if (env==nil)then env={} end
-            env.PATH="${nixpkgs-csharpls.dotnet-sdk_10}/bin:" .. os.getenv('PATH')
-            return vim.lsp.rpc.start({ '${nixpkgs-csharpls.csharp-ls}/bin/csharp-ls',"-f","razor-support" }, dispatchers, {
-              cwd = config.cmd_cwd or config.root_dir,
-              env = env,
-              detached = config.detached,
-            })
-        end})
-        vim.lsp.enable("csharp_ls")
-        local dap = require('dap')
-        dap.adapters.coreclr = {
-          type = 'executable',
-          command = '${pkgs.netcoredbg}/bin/netcoredbg',
-          args = {'--interpreter=vscode'}
-        }
-        dofile("${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/neovim.lua")
-      '';
+      initLua = "dofile('${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/neovim.lua')";
 
       plugins = with pkgs.vimPlugins; [
         nvim-lspconfig
@@ -427,6 +408,9 @@ let
         csharpier
         beamMinimal28Packages.erlfmt
         python3Packages.debugpy
+        netcoredbg
+        csharp-ls
+        dotnet-sdk_10
       ];
     };
 

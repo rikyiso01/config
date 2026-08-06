@@ -56,6 +56,14 @@ vim.lsp.enable("postgres_lsp")
 -- vim.lsp.enable("astro")
 vim.lsp.config("lua_ls",{capabilities=lsp_capabilities})
 vim.lsp.enable("lua_ls")
+vim.lsp.config("csharp_ls",{capabilities=lsp_capabilities,filetypes={"cs","razor"},cmd=function(dispatchers, config)
+    return vim.lsp.rpc.start({ 'csharp-ls',"-f","razor-support" }, dispatchers, {
+      cwd = config.cmd_cwd or config.root_dir,
+      env = config.cmd_env,
+      detached = config.detached,
+    })
+end})
+vim.lsp.enable("csharp_ls")
 
 require("lualine").setup()
 require('nvim-autopairs').setup{}
@@ -187,10 +195,12 @@ dap.adapters.python = function(cb, config)
     })
   end
 end
+dap.adapters.coreclr = {
+  type = 'executable',
+  command = 'netcoredbg',
+  args = {'--interpreter=vscode'}
+}
 
-
-
-local dap = require('dap')
 dap.configurations.cs = {
   {
     type = "coreclr",

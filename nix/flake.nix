@@ -4,7 +4,6 @@
   inputs = {
     # nixpkgs.url = "flake:nixpkgs/nixos-24.11";
     nixpkgs.url = "flake:nixpkgs/nixpkgs-unstable";
-    nixpkgs-csharpls.url = "github:NixOS/nixpkgs/566acc07c54dc807f91625bb286cb9b321b5f42a";
     homeManager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,10 +19,10 @@
     };
   };
 
-  outputs = { self, nixpkgs, homeManager, nix-index-database, nixgl, pwndbg, nixpkgs-csharpls, nix-flatpak, pam-shim }: {
+  outputs = { self, nixpkgs, homeManager, nix-index-database, nixgl, pwndbg, nix-flatpak, pam-shim }: {
     homeConfigurations = {
       "riky" = homeManager.lib.homeManagerConfiguration {
-        extraSpecialArgs = { pwndbg = pwndbg; nixpkgs-csharpls = nixpkgs-csharpls.legacyPackages.x86_64-linux; };
+        extraSpecialArgs = { pwndbg = pwndbg; };
         modules = [
           ./home.nix
           ./personal.nix
