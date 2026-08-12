@@ -1,6 +1,6 @@
 #!/usr/bin/env fish
 
-set workspace ~/Work/FERRARI/FERRARI_GT/supplierrisk/Reply.Ferrari.SupplierManagement
+set workspace ~/Work/FERRARI/FERRARI_GT/worktrees/DEV_SUPPLIER_RISK_2026/Reply.Ferrari.SupplierManagement
 set migrations ~/Work/FERRARI/migrations/supplierrisk
 
 ssh homeassistant.riccardoisola.dev docker start teams
