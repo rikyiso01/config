@@ -342,6 +342,9 @@ let
         "org.remmina.Remmina"
         "org.onlyoffice.desktopeditors"
         "io.dbeaver.DBeaverCommunity"
+        "com.visualstudio.code"
+        "com.getpostman.Postman"
+        "io.httpie.Httpie"
       ]
       ++
       [{ appId = "org.gnome.Nautilus.Devel"; origin = "gnome-nightly"; }];
