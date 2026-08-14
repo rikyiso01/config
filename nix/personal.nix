@@ -36,6 +36,7 @@ let
             };
             vdirsyncer = {
               enable = true;
+              localReadOnly = true;
               collections = [ value.collection ];
             };
             khal = {
