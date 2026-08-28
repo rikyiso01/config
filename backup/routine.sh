@@ -7,4 +7,4 @@ udisksctl mount -b /dev/sda1
 
 mprocs
 
-udisksctl mount -b /dev/sda1 || true
+udisksctl unmount -b /dev/sda1 || true
