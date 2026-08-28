@@ -24,6 +24,24 @@ let
     };
 
     accounts = {
+      contact = {
+          basePath = "${home.homeDirectory}/backup/Contacts";
+          accounts={
+              main={
+                  remote= {
+                      type="carddav";
+                      url="http://127.0.0.1:5232";
+                      userName="t";
+                      passwordCommand=["echo" "t"];
+                  };
+                  vdirsyncer={
+                      enable=true;
+                      localReadOnly=true;
+                      collections=[ "contacts-36a31d63-fc21-4fb8-9968-a6780938b0c8" ];
+                  };
+              };
+          };
+      };
       calendar = {
         basePath = "${home.homeDirectory}/backup/Calendar";
         accounts = (builtins.mapAttrs
@@ -382,13 +400,6 @@ let
           ExecStartPre = "bash -c 'while ! getent hosts www.google.com; do sleep 5; done'";
           ExecStart = "${pkgs.rclone}/bin/rclone --config ${home.homeDirectory}/backup/rclone.conf copy --update ${home.homeDirectory}/backup/phone/Drive drive:Syncthing";
           Environment = "RCLONE_PASSWORD_COMMAND='${home.homeDirectory}/.local/bin/password show -a Password rclone'";
-        };
-        Install = { WantedBy = [ "default.target" ]; };
-      };
-      redlib = {
-        Unit = { Description = "Custom frontend for Reddit"; };
-        Service = {
-          ExecStart = "${pkgs.redlib}/bin/redlib -p 8385";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
