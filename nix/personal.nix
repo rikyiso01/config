@@ -7,6 +7,7 @@ let
     home.packages = with pkgs; [
       nixgl.nixGLIntel
       nixgl.nixVulkanIntel
+      (config.lib.pamShim.replacePam pkgs.noctalia)
     ];
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
 
@@ -303,20 +304,14 @@ let
       extraLuaFiles."config".content = ./hyprland.lua;
     };
 
-    targets.genericLinux.nixGL = {
-      packages = pkgs.nixgl;
-      defaultWrapper = "mesa";
-    };
-
     programs.noctalia = {
       enable = true;
-      package = config.lib.nixGL.wrap (config.lib.pamShim.replacePam pkgs.noctalia);
+      package = null;
       checkConfig = true;
       settings = {
         include.files = [ "${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/noctalia.toml" ];
         wallpaper.default.path = "${./wallpapers/moon.jpg}";
       };
-      systemd.enable = true;
     };
 
     services.syncthing = {
@@ -438,16 +433,6 @@ let
         };
         Service = {
           ExecStart = "sh -c 'podman run -p 31995:31995 -p 127.0.0.1:31143:31143 -v ${home.homeDirectory}/backup/Mail/dovecot.conf:/etc/dovecot/conf.d/dovecot.conf:ro -v ${home.homeDirectory}/backup/Mail/maildir:/srv/vmail/riky/Maildir:O,upperdir=${home.homeDirectory}/.dovecot/upper,workdir=${home.homeDirectory}/.dovecot/work --rm --env USER_PASSWORD=$(${home.homeDirectory}/.local/bin/password show -a Password dovecot) --name dovecot docker.io/dovecot/dovecot:latest'";
-        };
-        Install = { WantedBy = [ "default.target" ]; };
-      };
-      keepass = {
-        Unit = {
-          Description = "KeePass unlock";
-        };
-        Service = {
-          ExecStart = "bash -c 'secret-tool lookup keepass password | /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ %h/backup/phone/Drive/keepass.kdbx @@'";
-          Environment = "SSH_AUTH_SOCK=%t/gcr/ssh";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };

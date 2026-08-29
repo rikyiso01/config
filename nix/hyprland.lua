@@ -217,6 +217,14 @@ hl.layer_rule({
 hl.on("hyprland.start", function()
 	hl.exec_cmd("[workspace 1 silent; maximize] /usr/bin/flatpak run page.codeberg.dnkl.foot")
 	hl.exec_cmd("[workspace 2 silent; no_initial_focus] sleep 5 && /usr/bin/flatpak run io.gitlab.librewolf-community")
+	hl.exec_cmd(
+		"secret-tool lookup keepass password | SSH_AUTH_SOCK="
+			.. os.getenv("XDG_RUNTIME_DIR")
+			.. "/gcr/ssh /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ "
+			.. home
+			.. "/backup/phone/Drive/keepass.kdbx @@"
+	)
+	hl.exec_cmd("LC_TIME=en_GB nixGLIntel noctalia")
 end)
 
 hl.on("monitor.added", function(monitor)
