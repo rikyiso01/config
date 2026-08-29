@@ -181,13 +181,13 @@ let
         opener = {
           edit = [
             {
-              run = "\${EDITOR:-vi} \"$@\"";
+              run = "\${EDITOR:-vi} %s";
               desc = "$EDITOR";
               block = true;
             }
           ];
           open = [
-            { run = "xdg-open \"$1\""; desc = "Open"; orphan = true; }
+            { run = "xdg-open %s"; desc = "Open"; orphan = true; }
           ];
         };
         open = {
@@ -411,6 +411,7 @@ let
         netcoredbg
         csharp-ls
         dotnet-sdk_10
+        stylua
       ];
     };
 

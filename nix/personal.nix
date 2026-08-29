@@ -7,7 +7,6 @@ let
     home.packages = with pkgs; [
       nixgl.nixGLIntel
       nixgl.nixVulkanIntel
-      (config.lib.pamShim.replacePam noctalia)
     ];
     nixpkgs.config.allowUnfreePredicate = (pkg: true);
 
@@ -25,22 +24,22 @@ let
 
     accounts = {
       contact = {
-          basePath = "${home.homeDirectory}/backup/Contacts";
-          accounts={
-              main={
-                  remote= {
-                      type="carddav";
-                      url="http://127.0.0.1:5232";
-                      userName="t";
-                      passwordCommand=["echo" "t"];
-                  };
-                  vdirsyncer={
-                      enable=true;
-                      localReadOnly=true;
-                      collections=[ "contacts-36a31d63-fc21-4fb8-9968-a6780938b0c8" ];
-                  };
-              };
+        basePath = "${home.homeDirectory}/backup/Contacts";
+        accounts = {
+          main = {
+            remote = {
+              type = "carddav";
+              url = "http://127.0.0.1:5232";
+              userName = "t";
+              passwordCommand = [ "echo" "t" ];
+            };
+            vdirsyncer = {
+              enable = true;
+              collections = [ "contacts-36a31d63-fc21-4fb8-9968-a6780938b0c8" ];
+              conflictResolution = "remote wins";
+            };
           };
+        };
       };
       calendar = {
         basePath = "${home.homeDirectory}/backup/Calendar";
@@ -54,8 +53,8 @@ let
             };
             vdirsyncer = {
               enable = true;
-              localReadOnly = true;
               collections = [ value.collection ];
+              conflictResolution = "remote wins";
             };
             khal = {
               enable = value.color != "";
@@ -304,7 +303,21 @@ let
       extraLuaFiles."config".content = ./hyprland.lua;
     };
 
-    xdg.configFile."noctalia/config.toml".source = (pkgs.formats.toml { }).generate "config" { include.files = [ "${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/noctalia.toml" ]; };
+    targets.genericLinux.nixGL = {
+      packages = pkgs.nixgl;
+      defaultWrapper = "mesa";
+    };
+
+    programs.noctalia = {
+      enable = true;
+      package = config.lib.nixGL.wrap (config.lib.pamShim.replacePam pkgs.noctalia);
+      checkConfig = true;
+      settings = {
+        include.files = [ "${home.sessionVariables.NIX_CONFIG_FOLDER}/nix/noctalia.toml" ];
+        wallpaper.default.path = "${./wallpapers/moon.jpg}";
+      };
+      systemd.enable = true;
+    };
 
     services.syncthing = {
       enable = true;
@@ -397,8 +410,7 @@ let
           Description = "rclone";
         };
         Service = {
-          ExecStartPre = "bash -c 'while ! getent hosts www.google.com; do sleep 5; done'";
-          ExecStart = "${pkgs.rclone}/bin/rclone --config ${home.homeDirectory}/backup/rclone.conf copy --update ${home.homeDirectory}/backup/phone/Drive drive:Syncthing";
+          ExecStart = "${./backup.sh}";
           Environment = "RCLONE_PASSWORD_COMMAND='${home.homeDirectory}/.local/bin/password show -a Password rclone'";
         };
         Install = { WantedBy = [ "default.target" ]; };
@@ -426,6 +438,16 @@ let
         };
         Service = {
           ExecStart = "sh -c 'podman run -p 31995:31995 -p 127.0.0.1:31143:31143 -v ${home.homeDirectory}/backup/Mail/dovecot.conf:/etc/dovecot/conf.d/dovecot.conf:ro -v ${home.homeDirectory}/backup/Mail/maildir:/srv/vmail/riky/Maildir:O,upperdir=${home.homeDirectory}/.dovecot/upper,workdir=${home.homeDirectory}/.dovecot/work --rm --env USER_PASSWORD=$(${home.homeDirectory}/.local/bin/password show -a Password dovecot) --name dovecot docker.io/dovecot/dovecot:latest'";
+        };
+        Install = { WantedBy = [ "default.target" ]; };
+      };
+      keepass = {
+        Unit = {
+          Description = "KeePass unlock";
+        };
+        Service = {
+          ExecStart = "bash -c 'secret-tool lookup keepass password | /usr/bin/flatpak run --file-forwarding org.keepassxc.KeePassXC --pw-stdin @@ %h/backup/phone/Drive/keepass.kdbx @@'";
+          Environment = "SSH_AUTH_SOCK=%t/gcr/ssh";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };

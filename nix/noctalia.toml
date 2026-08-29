@@ -75,3 +75,4 @@ temperature_night = 3700
 started = "~/.local/bin/startup.sh"
 battery_charging = "noctalia msg power-set balanced"
 battery_discharging = "noctalia msg power-set power-saver; noctalia msg brightness-set 15%"
+
