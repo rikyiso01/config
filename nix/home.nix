@@ -298,7 +298,7 @@ let
           end
         '';
         monitor = ''
-          hyprctl keyword monitor "HDMI-A-1,preferred,auto-$argv[1],1"
+          hyprctl eval "hl.monitor({output='HDMI-A-1',mode='preferred',position='auto-$argv[1]',scale=1.0})"
         '';
       };
     };
