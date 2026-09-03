@@ -11,5 +11,5 @@ done
 
 cat ~/backup/Contacts/**/*.vcf > ~/backup/phone/Drive/contacts.vcf
 
-rclone --config ~/backup/rclone.conf copy --update ~/backup/phone/Drive drive:Syncthing
+RCLONE_PASSWORD_COMMAND="$HOME/.local/bin/password show -a Password rclone" "$HOME/.nix-profile/bin/rclone" --config ~/backup/rclone.conf copy --update ~/backup/phone/Drive drive:Syncthing
 

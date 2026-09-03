@@ -406,7 +406,6 @@ let
         };
         Service = {
           ExecStart = "${./backup.sh}";
-          Environment = "RCLONE_PASSWORD_COMMAND='${home.homeDirectory}/.local/bin/password show -a Password rclone'";
         };
         Install = { WantedBy = [ "default.target" ]; };
       };
