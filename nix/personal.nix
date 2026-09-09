@@ -370,8 +370,7 @@ let
         "org.onlyoffice.desktopeditors"
         "io.dbeaver.DBeaverCommunity"
         "com.visualstudio.code"
-        "com.getpostman.Postman"
-        "io.httpie.Httpie"
+        "com.usebruno.Bruno"
       ]
       ++
       [{ appId = "org.gnome.Nautilus.Devel"; origin = "gnome-nightly"; }];
