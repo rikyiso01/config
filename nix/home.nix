@@ -168,7 +168,7 @@ let
           }
           {
             on = "e";
-            run = "shell -- /usr/bin/flatpak run --file-forwarding org.gimp.GIMP @@ \"$@\" @@";
+            run = "shell -- /usr/bin/flatpak run --file-forwarding org.gimp.GIMP @@ %s @@";
           }
           {
             on = [ "g" "w" ];
