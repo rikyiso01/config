@@ -11,7 +11,7 @@ sleep 1
 
 hyprctl dispatch 'hl.dsp.focus({workspace=3})'
 hyprctl dispatch 'hl.dsp.exec_cmd("flatpak run io.github.ungoogled_software.ungoogled_chromium")'
-sleep 2
+sleep 3
 
 hyprctl dispatch 'hl.dsp.focus({workspace=5})'
 hyprctl dispatch 'hl.dsp.exec_cmd("flatpak run org.remmina.Remmina ~/.var/app/org.remmina.Remmina/data/remmina/group_rdp_work-laptop-remote_homeassistant-riccardoisola-dev.remmina")'
